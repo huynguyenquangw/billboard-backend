@@ -1,4 +1,3 @@
-
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
@@ -9,11 +8,13 @@ async function bootstrap() {
   const app: NestExpressApplication = await NestFactory.create(AppModule);
   const config: ConfigService = app.get(ConfigService);
   const port: number = config.get<number>('PORT');
+  app.setGlobalPrefix('api');
+  const appUrl: string = config.get<string>('BASE_URL') + port + '/api';
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
   await app.listen(port, () => {
-    console.log('[WEB]', config.get<string>('BASE_URL'));
+    console.log(`[*API] ${appUrl}`);
   });
 }
 
