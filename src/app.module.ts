@@ -11,7 +11,6 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
 @Module({
   imports: [
     ConfigModule.forRoot({ envFilePath, isGlobal: true }),
-    // TypeOrmModule.forRootAsync({ useClass: TypeOrmConfigService }),
     TypeOrmModule.forRootAsync({
       imports: [SharedModule],
       useFactory: (configService: ApiConfigService) =>

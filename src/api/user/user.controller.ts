@@ -7,11 +7,11 @@ import {
   ParseIntPipe,
   Post,
 } from '@nestjs/common';
-import { CreateUserDto } from './user.dto';
+import { CreateUserDto } from './dtos/user.dto';
 import { User } from './user.entity';
 import { UserService } from './user.service';
 
-@Controller('user')
+@Controller('users')
 export class UserController {
   @Inject(UserService)
   private readonly service: UserService;

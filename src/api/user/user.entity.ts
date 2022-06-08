@@ -1,3 +1,4 @@
+import { RoleType } from 'src/constants/role-type';
 import {
   Column,
   CreateDateColumn,
@@ -9,24 +10,27 @@ import {
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
-  public id!: number;
+  id!: number;
 
   @Column({ type: 'varchar', length: 120 })
-  public name: string;
+  name: string;
+
+  @Column({ type: 'enum', enum: RoleType, default: RoleType.USER })
+  role: RoleType;
 
   @Column({ type: 'varchar', length: 120 })
-  public email: string;
+  email: string;
 
   @Column({ type: 'boolean', default: false })
-  public isDeleted: boolean;
+  isDeleted: boolean;
 
   /*
    * Create and Update Date Columns
    */
 
   @CreateDateColumn({ type: 'timestamp' })
-  public createdAt!: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn({ type: 'timestamp' })
-  public updatedAt!: Date;
+  updatedAt!: Date;
 }
