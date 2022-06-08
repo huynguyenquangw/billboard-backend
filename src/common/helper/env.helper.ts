@@ -1,4 +1,3 @@
-
 import { existsSync } from 'fs';
 import { resolve } from 'path';
 

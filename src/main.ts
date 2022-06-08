@@ -10,14 +10,17 @@ async function bootstrap() {
   const config: ConfigService = app.get(ConfigService);
   const port: number = config.get<number>('PORT');
   app.setGlobalPrefix('api');
-  const appUrl: string = config.get<string>('BASE_URL') + port + '/api';
+  const apiUrl: string = config.get<string>('BASE_URL') + port + '/api';
+  const docUrl: string =
+    config.get<string>('BASE_URL') + port + '/documentation';
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
   setupSwagger(app);
 
   await app.listen(port, () => {
-    console.log(`[*API] ${appUrl}`);
+    // console.log(`[*API] ${apiUrl}`);
+    console.log(`[APIs-Doc] ${docUrl}`);
   });
 }
 
