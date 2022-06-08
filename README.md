@@ -52,5 +52,5 @@ Billboard is an ... project. It can ...
 ## Stay in touch
 
 - Author - [SoftDev](https://www.google.com/search?q=softdev)
-- APIs - [Documentation](https://localhost:9000/documentation)
+- APIs - [Documentation](http://localhost:9000/documentation/)
 - Website - [App](https://localhost:3000)
