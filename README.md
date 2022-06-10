@@ -1,5 +1,4 @@
 <p align="center">
-  <!-- <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a> -->
   <a href="http://localhost:9000/documentation" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
 </p>
 
@@ -52,5 +51,5 @@ Billboard is an ... project. It can ...
 ## Stay in touch
 
 - Author - [SoftDev](https://www.google.com/search?q=softdev)
-- APIs - [Documentation](http://localhost:9000/documentation/)
+- APIs - [Documentation](http://localhost:9000/documentation)
 - Website - [App](https://localhost:3000)
