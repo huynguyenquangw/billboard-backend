@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { BillboardEnity } from '../billboards/billboards.entity';
+import { BillboardEnity } from '../billboards/billboard.entity';
 
 @Entity('users')
 export class UserEntity {
@@ -36,6 +36,6 @@ export class UserEntity {
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt!: Date;
 
-  @OneToMany(()=> BillboardEnity, (billboard)=> billboard.user)
+  @OneToMany(() => BillboardEnity, (billboard) => billboard.user)
   billboard: BillboardEnity[];
 }

@@ -9,14 +9,14 @@ import {
 } from '@nestjs/common';
 import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UserEntity } from './users.entity';
-import { UsersService } from './users.service';
+import { UserEntity } from './user.entity';
+import { UserService } from './user.service';
 
-@Controller('users')
+@Controller('api/users')
 @ApiTags('users')
-export class UsersController {
-  @Inject(UsersService)
-  private readonly usersService: UsersService;
+export class UserController {
+  @Inject(UserService)
+  private readonly usersService: UserService;
 
   @Get(':id')
   @ApiParam({

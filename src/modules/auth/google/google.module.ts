@@ -3,9 +3,8 @@ import { GoogleController } from './google.controller';
 import { GoogleService } from './google.service';
 
 @Module({
-    imports: [],
-    controllers: [GoogleController],
-    providers: [GoogleService],
+  imports: [],
+  controllers: [GoogleController],
+  providers: [GoogleService],
 })
-
-export class GoogleModule{}
+export class GoogleModule {}
