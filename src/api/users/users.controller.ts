@@ -14,7 +14,7 @@ import { UsersService } from './users.service';
 
 @Controller('users')
 @ApiTags('users')
-export class UserController {
+export class UsersController {
   @Inject(UsersService)
   private readonly usersService: UsersService;
 

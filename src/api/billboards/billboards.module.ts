@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { BillboardController } from './billboards.controller';
-import { BillboardService } from './billboards.service';
+import { BillboardsController } from './billboards.controller';
+import { BillboardsService } from './billboards.service';
 
 @Module({
-  controllers: [BillboardController],
-  providers: [BillboardService],
+  controllers: [BillboardsController],
+  providers: [BillboardsService],
 })
-export class BillboardModule {}
+export class BillboardsModule {}
