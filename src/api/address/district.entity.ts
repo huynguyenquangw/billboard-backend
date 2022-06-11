@@ -2,12 +2,14 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { BillboardEnity } from '../billboards/billboards.entity';
 
-@Entity()
-export class District {
+@Entity('district')
+export class DistrictEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -29,4 +31,7 @@ export class District {
 
   @UpdateDateColumn({ type: 'timestamp' })
   public updatedAt!: Date;
+
+  @OneToMany(()=> BillboardEnity, (billboard)=> billboard.district)
+  billboard: BillboardEnity[];
 }
