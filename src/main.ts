@@ -6,9 +6,10 @@ import { AppModule } from './app.module';
 import { setupSwagger } from './setup-swagger';
 
 async function bootstrap() {
-  const app: NestExpressApplication = await NestFactory.create(AppModule);
+  const app: NestExpressApplication = await NestFactory.create(AppModule, {cors: true});
   const config: ConfigService = app.get(ConfigService);
   const port: number = config.get<number>('PORT');
+  app.enableCors();
   app.setGlobalPrefix('api');
   // const apiUrl: string = config.get<string>('BASE_URL') + port + '/api';
   const docUrl: string =

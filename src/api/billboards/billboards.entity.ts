@@ -1,70 +1,69 @@
-import { StatusType } from 'src/constants';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { DistrictEntity } from 'src/api/address/district.entity';
+import { UserEntity } from 'src/api/users/users.entity';
+import {Column, Entity, PrimaryGeneratedColumn, ManyToOne} from 'typeorm';
 
-@Entity()
-export class Billboard {
-  @PrimaryGeneratedColumn()
-  id: number;
+export enum Status{
+    DRAFT = 'draft',
+    PENDING = 'pending',
+    APPROVAL = 'approval',
+    INVALID = 'invalid',
+}
 
-  @Column()
-  address: string;
+@Entity('billboard')
+export class BillboardEnity {
+    @PrimaryGeneratedColumn()
+    id: number;
 
-  @Column()
-  address2: string;
+    @ManyToOne(()=> UserEntity, (user) =>user.billboard)
+    user: UserEntity;
+    
+    @ManyToOne(()=> DistrictEntity, (district) =>district.billboard )
+    district: DistrictEntity;
 
-  @Column()
-  name: string;
+    @Column()
+    address: string;
 
-  @Column()
-  picture: string;
+    @Column()
+    area? :string;
 
-  @Column()
-  video: string;
+    @Column()
+    name: string;
 
-  @Column()
-  size_x: string;
+    @Column('simple-array')     //Array contains an id and url link
+    picture : string[];
 
-  @Column()
-  size_y: string;
+    @Column('simple-array')     //Array contains an id and url link
+    video? : string[];
 
-  @Column()
-  circulation: number;
+    @Column()
+    size_x: number;
 
-  @Column()
-  previous_client: string;
+    @Column()
+    size_y: number;
 
-  @Column()
-  rental_price: string;
+    @Column()
+    circulation: number;
 
-  @Column()
-  rental_duration: string;
+    @Column()
+    previousClient?: string;
 
-  @Column({
-    type: 'enum',
-    enum: StatusType,
-    default: StatusType.DRAFT,
-  })
-  status: string;
+    @Column()
+    rentalPrice: number;
 
-  @Column({ default: false })
-  is_rented: boolean;
+    @Column()
+    rentalDuration: number;
 
-  @Column({ default: false })
-  is_deleted: boolean;
+    @Column({
+        type: 'enum',
+        enum: Status,
+        default: Status.DRAFT,
+    })
+    status: Status
 
-  /*
-   * Create and Update Date Columns
-   */
+    @Column('bool')
+    isRented: boolean
 
-  @CreateDateColumn({ type: 'timestamp' })
-  public createdAt!: Date;
+    @Column('bool')
+    isActive: boolean
 
-  @UpdateDateColumn({ type: 'timestamp' })
-  public updatedAt!: Date;
 }
