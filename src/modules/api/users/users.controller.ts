@@ -10,13 +10,13 @@ import {
 import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserEntity } from './user.entity';
-import { UserService } from './user.service';
+import { UsersService } from './users.service';
 
 @Controller('api/users')
 @ApiTags('users')
-export class UserController {
-  @Inject(UserService)
-  private readonly usersService: UserService;
+export class UsersController {
+  @Inject(UsersService)
+  private readonly usersService: UsersService;
 
   @Get(':id')
   @ApiParam({

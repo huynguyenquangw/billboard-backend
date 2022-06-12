@@ -1,6 +1,6 @@
 import { StatusType } from 'src/constants';
-import { DistrictEntity } from 'src/modules/api/address/district.entity';
 import { UserEntity } from 'src/modules/api/users/user.entity';
+import { DistrictEntity } from 'src/modules/entities/address/district.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('billboard')

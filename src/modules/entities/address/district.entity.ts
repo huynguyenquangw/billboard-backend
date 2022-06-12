@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { BillboardEnity } from '../billboards/billboard.entity';
+import { BillboardEnity } from '../../api/billboards/billboard.entity';
 
 @Entity('district')
 export class DistrictEntity {

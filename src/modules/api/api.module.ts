@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { BillboardModule } from './billboards/billboard.module';
-import { PlanModule } from './plans/plan.module';
-import { UserModule } from './users/user.module';
+import { BillboardsModule } from './billboards/billboards.module';
+import { PlansModule } from './plans/plans.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
-  imports: [UserModule, BillboardModule, PlanModule],
+  imports: [UsersModule, BillboardsModule, PlansModule],
 })
 export class ApiModule {}
