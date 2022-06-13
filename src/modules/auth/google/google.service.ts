@@ -1,17 +1,16 @@
 import { Injectable } from '@nestjs/common';
-//import { UsersService } from '../users/users.service';
 import { ConfigService } from '@nestjs/config';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Auth, google } from 'googleapis';
-//import { AuthenticationService } from '../authentication/authentication.service';
-//import User from '../users/user.entity';
+import { UserEntity } from 'src/modules/api/users/user.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class GoogleService {
   oauthClient: Auth.OAuth2Client;
-  private user = [];
   constructor(
-    //private readonly usersService: UsersService,
-    private readonly configService: ConfigService, //private readonly authenticationService: AuthenticationService
+    @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
+    private readonly configService: ConfigService, 
   ) {
     const clientID = this.configService.get('GOOGLE_CLIENT_ID2');
     const clientSecret = this.configService.get('GOOGLE_CLIENT_SECRET2');
@@ -19,10 +18,12 @@ export class GoogleService {
     this.oauthClient = new google.auth.OAuth2(clientID, clientSecret);
   }
 
-  private upsert(array, item) {
-    const i = array.findIndex((_item) => _item.email === item.email);
-    if (i > -1) array[i] = item;
-    else array.push(item);
+  async upsert(item) {
+    const i = await this.userRepo.findOne({where: {email: item.email}});
+    if (i===null){
+      const newUser = this.userRepo.create({name: item.given_name, email: item.email });
+      this.userRepo.save(newUser);
+    }
   }
 
   async authenticate(token: string) {
@@ -32,7 +33,7 @@ export class GoogleService {
     });
 
     const payload = tokenInfo.getPayload();
-    this.upsert(this.user, payload);
+    this.upsert(payload);
 
     return payload;
   }
