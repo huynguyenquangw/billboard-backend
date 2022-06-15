@@ -1,7 +1,9 @@
+import { BillboardEnity } from 'src/modules/api/billboards/billboard.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -24,12 +26,14 @@ export class DistrictEntity {
    * Create and Update Date Columns
    */
 
-  @CreateDateColumn({ type: 'timestamp' })
+  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   public createdAt!: Date;
 
-  @UpdateDateColumn({ type: 'timestamp' })
+  @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   public updatedAt!: Date;
 
-  // @OneToMany(() => BillboardEnity, (billboard) => billboard.district)
-  // billboard: BillboardEnity[];
+  @OneToMany(() => BillboardEnity, (billboard) => billboard.district, {
+    onDelete: 'SET NULL',
+  })
+  billboard: BillboardEnity[];
 }

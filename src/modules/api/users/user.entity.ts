@@ -3,9 +3,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { BillboardEnity } from '../billboards/billboard.entity';
 
 @Entity()
 export class UserEntity {
@@ -28,12 +30,12 @@ export class UserEntity {
    * Create and Update Date Columns
    */
 
-  @CreateDateColumn({ type: 'timestamp' })
+  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt!: Date;
 
-  @UpdateDateColumn({ type: 'timestamp' })
+  @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   updatedAt!: Date;
 
-  // @OneToMany(() => BillboardEnity, (billboard) => billboard.user)
-  // billboard: BillboardEnity[];
+  @OneToMany(() => BillboardEnity, (billboard) => billboard.user)
+  billboard: BillboardEnity[];
 }

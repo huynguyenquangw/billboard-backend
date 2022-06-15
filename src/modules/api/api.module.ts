@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
+import { AddressModule } from '../entities/address/address.module';
 import { BillboardsModule } from './billboards/billboards.module';
 import { PlansModule } from './plans/plans.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
-  imports: [UsersModule, BillboardsModule, PlansModule],
+  imports: [UsersModule, BillboardsModule, PlansModule, AddressModule],
 })
 export class ApiModule {}
