@@ -974,6 +974,14 @@
     "@types/express" "*"
     "@types/passport" "*"
 
+"@types/passport-facebook@^2.1.11":
+  version "2.1.11"
+  resolved "https://registry.yarnpkg.com/@types/passport-facebook/-/passport-facebook-2.1.11.tgz#9fd1d6ad8fddc23395c36a88a46f36b9b67a4d9b"
+  integrity sha512-YsZUZryJvHt2E/WdR22FlnCi9ckMwkGR+FwCcXq830rOvruhXJHJtKSXSD+Kn4phBsrEpqoP4xX6fFuEodk20A==
+  dependencies:
+    "@types/express" "*"
+    "@types/passport" "*"
+
 "@types/passport@*":
   version "1.0.8"
   resolved "https://registry.yarnpkg.com/@types/passport/-/passport-1.0.8.tgz#cc3ee653777365ac02f630c3c08fb755567b7387"
@@ -1514,6 +1522,7 @@ base64url@3.x.x:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/base64url/-/base64url-3.0.1.tgz#6399d572e2bc3f90a9a8b22d5dbb0a32d33f788d"
   integrity sha512-ir1UPr3dkwexU7FdV8qBBbNDRUhMmIekYMFZfi+C/sLNnRESKPl23nB9b2pltqfOQNnGzsDdId90AEtG5tCx4A==
+
 bignumber.js@^9.0.0:
   version "9.0.2"
   resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-9.0.2.tgz#71c6c6bed38de64e24a65ebe16cfcf23ae693673"
@@ -2052,7 +2061,7 @@ dotenv-expand@8.0.3:
   resolved "https://registry.yarnpkg.com/dotenv-expand/-/dotenv-expand-8.0.3.tgz#29016757455bcc748469c83a19b36aaf2b83dd6e"
   integrity sha512-SErOMvge0ZUyWd5B0NXMQlDkN+8r+HhVUsxgOO7IoPDOdDRD2JjExpN6y3KnFR66jsJMwSn1pqIivhU5rcJiNg==
 
-dotenv@16.0.1, dotenv@^16.0.0:
+dotenv@16.0.1, dotenv@^16.0.0, dotenv@^16.0.1:
   version "16.0.1"
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.0.1.tgz#8f8f9d94876c35dac989876a5d3a82a267fdce1d"
   integrity sha512-1K6hR6wtk2FviQ4kEiSjFiH5rpzEVi8WW0x96aztHVMhEspNpc4DVOUTEHtEva5VThQ8IaBX1Pe4gSzpVVUsKQ==

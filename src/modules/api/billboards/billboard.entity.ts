@@ -1,18 +1,16 @@
 import { StatusType } from 'src/constants';
-import { UserEntity } from 'src/modules/api/users/user.entity';
-import { DistrictEntity } from 'src/modules/entities/address/district.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('billboard')
 export class BillboardEnity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => UserEntity, (user) => user.billboard)
-  user: UserEntity;
+  // @ManyToOne(() => UserEntity, (user) => user.billboard)
+  // user: UserEntity;
 
-  @ManyToOne(() => DistrictEntity, (district) => district.billboard)
-  district: DistrictEntity;
+  // @ManyToOne(() => DistrictEntity, (district) => district.billboard)
+  // district: DistrictEntity;
 
   @Column()
   address: string;
