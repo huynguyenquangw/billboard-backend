@@ -36,6 +36,6 @@ export class UserEntity {
   @UpdateDateColumn({ type: 'timestamp', default: ()=> 'CURRENT_TIMESTAMP' })
   updatedAt!: Date;
 
-  // @OneToMany(() => BillboardEnity, (billboard) => billboard.user)
-  // billboard: BillboardEnity[];
+  @OneToMany(() => BillboardEnity, (billboard) => billboard.user)
+  billboard: BillboardEnity[];
 }

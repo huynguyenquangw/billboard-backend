@@ -8,44 +8,47 @@ export class BillboardEnity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => UserEntity, (user) => user.billboard)
+  @ManyToOne(() => UserEntity, (user) => user.billboard, {onDelete: 'SET NULL'})
   user: UserEntity;
 
-  @ManyToOne(() => DistrictEntity, (district) => district.billboard)
+  @ManyToOne(() => DistrictEntity, (district) => district.billboard, {onDelete: 'SET NULL'})
   district: DistrictEntity;
 
-  @Column()
+  @Column({default: ''})
   address: string;
 
-  @Column()
-  area?: string;
+  @Column({default: ''})
+  area: string;
 
-  @Column()
+  @Column({default: ''})
   name: string;
 
-  @Column('simple-array') //Array contains an id and url link
+  @Column('simple-array', {default: ['']}) 
   picture: string[];
 
-  @Column('simple-array') //Array contains an id and url link
-  video?: string[];
+  @Column({default: ''}) 
+  video: string;
 
-  @Column()
+  @Column({default: 0})
   size_x: number;
 
-  @Column()
+  @Column({default: 0})
   size_y: number;
 
-  @Column()
+  @Column({default: 0})
   circulation: number;
 
-  @Column()
-  previousClient?: string;
+  @Column({default: ''})
+  previousClient: string;
 
-  @Column()
+  @Column({default: 0})
   rentalPrice: number;
 
-  @Column()
-  rentalDuration: number;
+  @Column({default: ''})
+  rentalDuration: string;
+
+  @Column({default:''})
+  description: string;
 
   @Column({
     type: 'enum',
@@ -54,9 +57,9 @@ export class BillboardEnity {
   })
   status: StatusType;
 
-  @Column('bool')
+  @Column('bool', {default:0})
   isRented: boolean;
 
-  @Column('bool')
-  isActive: boolean;
+  @Column('bool', {default: 0}) 
+  isDeleted: boolean;
 }
