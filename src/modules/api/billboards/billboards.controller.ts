@@ -31,6 +31,16 @@ export class BillboardsController {
     return this.billboardsService.getOnebyId(getOneId);
   }
 
+  @Get('/getFour/:id1/:id2/:id3/:id4')
+  billboardGetFour(
+      @Param('id1') id1: number,
+      @Param('id2') id2: number,
+      @Param('id3') id3: number,
+      @Param('id4') id4: number,
+      ): Promise<any>{
+          return this.billboardsService.getFourbyId(id1, id2, id3, id4)
+  }
+
   @Patch('/update/:id')
   billBoardUpdate(
     @Param('id') updateId: number,

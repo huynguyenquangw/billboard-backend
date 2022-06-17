@@ -51,6 +51,15 @@ export class BillboardsService {
     return await this.billboardRepo.findOne({ where: { id: findId } });
   }
 
+  async getFourbyId(findId1: number, findId2: number, findId3: number, findId4: number): Promise<BillboardEnity[]>{
+    const findBillboard1= await this.billboardRepo.findOne({where: {id: findId1}})
+    const findBillboard2= await this.billboardRepo.findOne({where: {id: findId2}})
+    const findBillboard3= await this.billboardRepo.findOne({where: {id: findId3}})
+    const findBillboard4= await this.billboardRepo.findOne({where: {id: findId4}})
+    
+    return [findBillboard1, findBillboard2, findBillboard3, findBillboard4]
+  }
+
   async updateBillboard(getId: number, name: string): Promise<BillboardEnity> {
     const selectedBillboard = await this.getOnebyId(getId);
 
