@@ -1,43 +1,45 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto } from './dto/oauth-create-user.dto';
 import { UserEntity } from './user.entity';
 
 @Injectable()
 export class UsersService {
   @InjectRepository(UserEntity)
-  private readonly repository: Repository<UserEntity>;
+  private readonly userRepository: Repository<UserEntity>;
 
-  public getUserById(id: number): Promise<UserEntity> {
-    return this.repository.findOneBy({ id: id });
+  async findExistUser(profileId, providerType) {
+    return this.userRepository.findOne({
+      where: [{ authType: providerType }, { authProviderId: profileId }],
+    });
   }
 
-  public createUser(body: CreateUserDto): Promise<UserEntity> {
+  async createUser(body: CreateUserDto): Promise<UserEntity> {
     const user: UserEntity = new UserEntity();
 
-    user.name = body.name;
+    user.authType = body.authType;
+    user.authProviderId = body.authProviderId;
     user.email = body.email;
+    user.name = body.name;
 
-    return this.repository.save(user);
+    return this.userRepository.save(user);
   }
 
-  // async findOrCreate(profile): Promise<User> {
-  //   const user = await this.userModel
-  //     .findOne({ 'facebook.id': profile.id })
-  //     .exec();
-  //   if (user) {
-  //     return user;
-  //   }
-  //   const createdUser = new this.userModel({
-  //     email: profile.emails[0].value,
-  //     firstName: profile.name.givenName,
-  //     lastName: profile.name.familyName,
-  //     Facebook: {
-  //       id: profile.id,
-  //       avatar: profile.photos[0].value,
-  //     },
-  //   });
-  //   return createdUser.save();
+  // public getUserById(id: number): Promise<UserEntity> {
+  //   return this.repository.findOneBy({ id: id });
+  // }
+
+  // async findOrCreate(userId: string, authProvider: AuthType): Promise<User> {
+  //   // TODO Perform database lookup to extract more information about the user
+  //   // or to create the user if the UserId is unknown to us.
+  //   // For now, we'll skip this and always return the same dummy user, regardless of the `userId`.
+  //   return {
+  //     id: '42195',
+  //     provider,
+  //     providerId: '123',
+  //     displayName: 'John Doe',
+  //     photos: [{ value: 'https://avatars.githubusercontent.com/u/28536201' }],
+  //   };
   // }
 }
