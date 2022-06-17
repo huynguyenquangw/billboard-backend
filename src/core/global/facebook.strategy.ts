@@ -2,10 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy } from 'passport-facebook';
+import { AuthType } from 'src/constants/auth-type';
+import { UsersService } from 'src/modules/api/users/users.service';
 
 @Injectable()
 export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
-  constructor(private configService: ConfigService) {
+  constructor(
+    private configService: ConfigService, // private readonly userRepository: Repository<UserEntity>,
+    private usersService: UsersService, // private readonly userRepository: Repository<UserEntity>,
+  ) {
     super({
       clientID: configService.get<string>('FACEBOOK_CLIENT_ID'),
       clientSecret: configService.get<string>('FACEBOOK_CLIENT_SECRET'),
@@ -21,21 +26,52 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
     profile: Profile,
     done: (err: any, user: any, info?: any) => void,
   ): Promise<any> {
-    console.log('access token: ', accessToken);
-    console.log('refresh token: ', refreshToken);
-    console.log('profile: ', profile);
+    try {
+      // console.log('access token: ', accessToken);
+      // console.log('refresh token: ', refreshToken);
+      // console.log('profile: ', profile);
+      let payload = {};
 
-    const { emails, name } = profile;
-    const userData = {
-      email: emails[0].value,
-      firstName: name.givenName,
-      lastName: name.familyName,
-    };
-    const payload = {
-      userData,
-      accessToken,
-    };
-    console.log('------->', payload);
-    done(null, payload);
+      // Check whether this user exists in the database
+      const user = await this.usersService.findExistUser(
+        profile.id,
+        AuthType.FACEBOOK,
+      );
+
+      payload = {
+        message: 'This user already exists',
+        user,
+        accessToken,
+      };
+
+      if (user) {
+        console.log(payload);
+        return done(null, payload);
+      }
+
+      const fullname = `${profile.name.familyName}${
+        profile.name.middleName ? ` ${profile.name.middleName}` : ''
+      } ${profile.name.givenName}`;
+      console.log('fullname ', fullname);
+
+      const userData = {
+        authType: AuthType.FACEBOOK,
+        authProviderId: profile.id,
+        email: profile.emails[0].value,
+        name: fullname,
+      };
+
+      const newUser = await this.usersService.createUser(userData);
+
+      payload = {
+        message: 'A new user created',
+        newUser,
+        accessToken,
+      };
+      console.log(payload);
+      done(null, payload);
+    } catch (error) {
+      done(error, false);
+    }
   }
 }

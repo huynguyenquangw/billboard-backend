@@ -6,7 +6,9 @@ export class BillboardEnity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  // @ManyToOne(() => UserEntity, (user) => user.billboard)
+  // @ManyToOne(() => UserEntity, (user) => user.billboard, {
+  //   onDelete: 'SET NULL',
+  // })
   // user: UserEntity;
 
   // @ManyToOne(() => DistrictEntity, (district) => district.billboard)

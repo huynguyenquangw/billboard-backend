@@ -13,7 +13,6 @@ async function bootstrap() {
   const port: number = config.get<number>('PORT');
   app.enableCors();
   // app.setGlobalPrefix('api');
-  // const apiUrl: string = config.get<string>('BASE_URL') + port + '/api';
   const docUrl: string =
     config.get<string>('BASE_URL') + port + '/documentation';
 
