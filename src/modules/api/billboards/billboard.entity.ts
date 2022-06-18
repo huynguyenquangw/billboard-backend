@@ -1,22 +1,21 @@
 import { StatusType } from 'src/constants';
-import { DistrictEntity } from 'src/modules/entities/address/district.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { UserEntity } from '../users/user.entity';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+// import { UserEntity } from '../users/user.entity';
 
 @Entity('billboard')
 export class BillboardEnity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => UserEntity, (user) => user.billboard, {
-    onDelete: 'SET NULL',
-  })
-  user: UserEntity;
+  // @ManyToOne(() => UserEntity, (user) => user.billboard, {
+  //   onDelete: 'SET NULL',
+  // })
+  // user: UserEntity;
 
-  @ManyToOne(() => DistrictEntity, (district) => district.billboard, {
-    onDelete: 'SET NULL',
-  })
-  district: DistrictEntity;
+  // @ManyToOne(() => DistrictEntity, (district) => district.billboard, {
+  //   onDelete: 'SET NULL',
+  // })
+  // district: DistrictEntity;
 
   @Column({ default: '' })
   address: string;
