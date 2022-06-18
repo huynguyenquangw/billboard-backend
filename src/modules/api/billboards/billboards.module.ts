@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AddressModule } from '../../entities/address/address.module';
-import { DistrictEntity } from '../../entities/address/district.entity';
+import { AddressModule } from '../address/address.module';
+import { DistrictEntity } from '../address/district.entity';
 import { UserEntity } from '../users/user.entity';
 import { UsersModule } from '../users/users.module';
 import { BillboardEnity } from './billboard.entity';

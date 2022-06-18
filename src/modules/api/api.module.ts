@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { AddressModule } from '../entities/address/address.module';
+import { AddressModule } from './address/address.module';
 import { BillboardsModule } from './billboards/billboards.module';
 import { PlansModule } from './plans/plans.module';
 import { UsersModule } from './users/users.module';

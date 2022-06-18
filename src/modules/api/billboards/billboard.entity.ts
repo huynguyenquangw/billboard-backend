@@ -1,12 +1,10 @@
+import { AbstractEntity } from 'src/common/abstract.entity';
 import { StatusType } from 'src/constants';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity } from 'typeorm';
 // import { UserEntity } from '../users/user.entity';
 
 @Entity('billboard')
-export class BillboardEnity {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class BillboardEnity extends AbstractEntity {
   // @ManyToOne(() => UserEntity, (user) => user.billboard, {
   //   onDelete: 'SET NULL',
   // })
