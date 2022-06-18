@@ -48,9 +48,9 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
         return done(null, payload);
       }
 
-      const fullname = `${profile.name.familyName}${
+      const fullname = `${profile.name.givenName} ${profile.name.familyName}${
         profile.name.middleName ? ` ${profile.name.middleName}` : ''
-      } ${profile.name.givenName}`;
+      }`;
       console.log('fullname ', fullname);
 
       const userData = {

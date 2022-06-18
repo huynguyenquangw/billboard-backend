@@ -10,7 +10,7 @@ export class GoogleService {
   oauthClient: Auth.OAuth2Client;
   constructor(
     @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
-    private readonly configService: ConfigService, 
+    private readonly configService: ConfigService,
   ) {
     const clientID = this.configService.get('GOOGLE_CLIENT_ID2');
     const clientSecret = this.configService.get('GOOGLE_CLIENT_SECRET2');
@@ -19,9 +19,12 @@ export class GoogleService {
   }
 
   async upsert(item) {
-    const i = await this.userRepo.findOne({where: {email: item.email}});
-    if (i===null){
-      const newUser = this.userRepo.create({name: item.given_name, email: item.email });
+    const i = await this.userRepo.findOne({ where: { email: item.email } });
+    if (i === null) {
+      const newUser = this.userRepo.create({
+        name: item.given_name,
+        email: item.email,
+      });
       this.userRepo.save(newUser);
     }
   }
