@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateUserDto } from './dto/oauth-create-user.dto';
+import { OauthCreateUserDto } from './dto/oauth-create-user.dto';
 import { UserEntity } from './user.entity';
 
 @Injectable()
@@ -15,7 +15,7 @@ export class UsersService {
     });
   }
 
-  async createUser(body: CreateUserDto): Promise<UserEntity> {
+  async createUser(body: OauthCreateUserDto): Promise<UserEntity> {
     const user: UserEntity = new UserEntity();
 
     user.authType = body.authType;

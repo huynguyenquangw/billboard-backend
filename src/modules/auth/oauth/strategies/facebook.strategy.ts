@@ -33,10 +33,9 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
       let payload = {};
 
       // Check whether this user exists in the database
-      const user = await this.usersService.findExistUser(
-        profile.id,
-        AuthType.FACEBOOK,
-      );
+      const user = await this.usersService
+        .findExistUser(profile.id, AuthType.FACEBOOK)
+        .then((user) => user.toDto());
 
       payload = {
         message: 'This user already exists',
@@ -62,10 +61,10 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
       };
 
       const newUser = await this.usersService.createUser(userData);
-
+      const newUserDto = await newUser.toDto();
       payload = {
         message: 'A new user created',
-        newUser,
+        newUserDto,
         accessToken,
       };
       console.log(payload);

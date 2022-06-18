@@ -28,7 +28,7 @@ export class UserEntity extends AbstractEntity {
   avatar: string;
 
   @Column({ type: 'enum', enum: AuthType, default: AuthType.LOCAL })
-  authType: string;
+  authType: AuthType;
 
   @Column({ nullable: true, default: null })
   authProviderId: string;
