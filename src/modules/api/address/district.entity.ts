@@ -1,7 +1,7 @@
 import { AbstractEntity } from 'src/common/abstract.entity';
 import { Column, Entity } from 'typeorm';
 
-@Entity('district')
+@Entity('districts')
 export class DistrictEntity extends AbstractEntity {
   @Column()
   name: string;

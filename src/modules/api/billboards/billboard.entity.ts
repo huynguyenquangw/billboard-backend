@@ -3,7 +3,7 @@ import { StatusType } from 'src/constants';
 import { Column, Entity } from 'typeorm';
 // import { UserEntity } from '../users/user.entity';
 
-@Entity('billboard')
+@Entity('billboards')
 export class BillboardEnity extends AbstractEntity {
   // @ManyToOne(() => UserEntity, (user) => user.billboard, {
   //   onDelete: 'SET NULL',

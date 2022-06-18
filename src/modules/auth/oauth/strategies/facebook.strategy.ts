@@ -8,8 +8,8 @@ import { UsersService } from 'src/modules/api/users/users.service';
 @Injectable()
 export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
   constructor(
-    private configService: ConfigService, // private readonly userRepository: Repository<UserEntity>,
-    private usersService: UsersService, // private readonly userRepository: Repository<UserEntity>,
+    private configService: ConfigService,
+    private usersService: UsersService,
   ) {
     super({
       clientID: configService.get<string>('FACEBOOK_CLIENT_ID'),
@@ -27,48 +27,50 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
     done: (err: any, user: any, info?: any) => void,
   ): Promise<any> {
     try {
+      console.log(`User login with Facebook. Token: ${accessToken}`);
+
       // console.log('access token: ', accessToken);
       // console.log('refresh token: ', refreshToken);
       // console.log('profile: ', profile);
       let payload = {};
 
       // Check whether this user exists in the database
-      const user = await this.usersService
-        .findExistUser(profile.id, AuthType.FACEBOOK)
-        .then((user) => user.toDto());
+      const user = await this.usersService.findExistUser(
+        profile.id,
+        AuthType.FACEBOOK,
+      );
 
-      payload = {
-        message: 'This user already exists',
-        user,
-        accessToken,
-      };
+      if (!user) {
+        const fullname = `${profile.name.givenName} ${profile.name.familyName}${
+          profile.name.middleName ? ` ${profile.name.middleName}` : ''
+        }`;
 
-      if (user) {
+        const userData = {
+          authType: AuthType.FACEBOOK,
+          authProviderId: profile.id,
+          email: profile.emails[0].value,
+          name: fullname,
+        };
+
+        const newUser = await this.usersService.createUser(userData);
+        const newUserDto = await newUser.toDto();
+        payload = {
+          message: `New user login with Facebook`,
+          user: newUserDto,
+          accessToken,
+        };
         console.log(payload);
-        return done(null, payload);
+        done(null, accessToken);
       }
 
-      const fullname = `${profile.name.givenName} ${profile.name.familyName}${
-        profile.name.middleName ? ` ${profile.name.middleName}` : ''
-      }`;
-      console.log('fullname ', fullname);
-
-      const userData = {
-        authType: AuthType.FACEBOOK,
-        authProviderId: profile.id,
-        email: profile.emails[0].value,
-        name: fullname,
-      };
-
-      const newUser = await this.usersService.createUser(userData);
-      const newUserDto = await newUser.toDto();
+      const userDto = await user.toDto();
       payload = {
-        message: 'A new user created',
-        newUserDto,
+        message: `Login with Facebook success. Name: ${userDto.name}`,
+        user: userDto,
         accessToken,
       };
       console.log(payload);
-      done(null, payload);
+      return done(null, accessToken);
     } catch (error) {
       done(error, false);
     }

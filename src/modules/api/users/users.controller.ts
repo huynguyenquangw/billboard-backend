@@ -1,38 +1,68 @@
-import { Controller, Inject } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Inject,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
+import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Repository } from 'typeorm';
+import { UserDto } from './dto/UserDto';
+import { UserEntity } from './user.entity';
 import { UsersService } from './users.service';
 
 @Controller('api/users')
-@ApiTags('users')
+@ApiTags('Users')
 export class UsersController {
   @Inject(UsersService)
   private readonly usersService: UsersService;
+  private readonly usersRepository: Repository<UserEntity>;
 
-  // @Get(':id')
-  // @ApiParam({
-  //   name: 'id',
-  //   required: true,
-  //   description: 'Should be an id of a user that exists in the database',
-  //   type: Number,
-  // })
-  // // @ApiResponse({
-  // //   status: 200,
-  // //   description: 'A user has been successfully fetched',
-  // //   type: UserEntity,
-  // // })
-  // @ApiResponse({
-  //   status: 404,
-  //   description: 'A user with given id does not exist.',
-  // })
-  // // getUserById(@Param() { id }: FindOneParams) {
-  // //   return this.usersService.getUserById(Number(id));
-  // // }
-  // public getUser(@Param('id', ParseIntPipe) id: number): Promise<UserEntity> {
-  //   return this.usersService.getUserById(id);
+  @Get('id')
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'Should be an id of a user that exists in the database',
+    type: String,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'A user has been successfully fetched',
+    type: UserDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'A user with given id does not exist.',
+  })
+  // getUserById(@Param() { id }: FindOneParams) {
+  //   return this.usersService.getUserById(Number(id));
   // }
+  public getOne(@Param('id') id: string): Promise<UserDto> {
+    return this.usersService.getUserById(id);
+  }
 
-  // @Post()
-  // public createUser(@Body() body: CreateUserDto): Promise<UserEntity> {
-  //   return this.usersService.createUser(body);
+  @Get('all')
+  billBoardGet(): Promise<any> {
+    return this.usersRepository.find();
+  }
+
+  @Post('create')
+  @HttpCode(201)
+  public createUser(@Body() body: UserDto): Promise<UserEntity> {
+    return this.usersService.createUser(body);
+  }
+
+  @Patch('/delete/:id')
+  @HttpCode(200)
+  billBoardDelete(@Param('id') deleteId: string): Promise<any> {
+    return this.usersService.deleteUser(deleteId);
+  }
+
+  // @Get('/getAll')
+  // billBoardGet(): Promise<any> {
+  //   return this.billboardsService.getAll();
   // }
 }

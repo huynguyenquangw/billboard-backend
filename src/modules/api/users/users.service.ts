@@ -1,17 +1,33 @@
-import { Injectable } from '@nestjs/common';
+import { HttpService, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { OauthCreateUserDto } from './dto/oauth-create-user.dto';
+import { UserDto } from './dto/UserDto';
 import { UserEntity } from './user.entity';
 
 @Injectable()
 export class UsersService {
   @InjectRepository(UserEntity)
   private readonly userRepository: Repository<UserEntity>;
+  constructor(
+    private readonly httpService: HttpService,
+    private jwtService: JwtService,
+  ) {}
 
-  async findExistUser(profileId, providerType) {
+  // public async getUserInfo(token: string): Promise<UserDto> {
+  // const headers = {
+  //   Authorization: `Bearer ${token}`,
+  // };
+  // const response = await this.httpService
+  //   .get('http://localhost:9000/api/users/profile', { headers })
+  //   .toPromise();
+  //   return new UserDto(response.data);
+  // }
+
+  public getUserById(id: string): Promise<UserDto> {
     return this.userRepository.findOne({
-      where: [{ authType: providerType }, { authProviderId: profileId }],
+      where: { id: id },
     });
   }
 
@@ -26,9 +42,31 @@ export class UsersService {
     return this.userRepository.save(user);
   }
 
-  // public getUserById(id: number): Promise<UserEntity> {
-  //   return this.repository.findOneBy({ id: id });
-  // }
+  async findExistUser(profileId, providerType) {
+    return this.userRepository.findOne({
+      where: [{ authType: providerType }, { authProviderId: profileId }],
+    });
+  }
+
+  async deleteUser(id: string) {
+    const isDeleted = true;
+
+    const result = this.userRepository
+      .createQueryBuilder()
+      .update({
+        isDeleted: isDeleted,
+      })
+      .where({
+        id: id,
+      })
+      .returning('*')
+      .execute()
+      .then((response) => {
+        return response.raw[0];
+      });
+
+    return { result };
+  }
 
   // async findOrCreate(userId: string, authProvider: AuthType): Promise<User> {
   //   // TODO Perform database lookup to extract more information about the user
