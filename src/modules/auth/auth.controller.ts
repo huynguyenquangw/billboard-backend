@@ -14,6 +14,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { UsersService } from '../api/users/users.service';
+import { LoginPayLoadDto } from './oauth/dto/loginPayload.dto';
 import { GoogleService } from './oauth/services/google.service';
 
 @Controller('auth')
@@ -97,8 +98,8 @@ export class AuthController {
    * Login handler
    */
   @Post('google/login')
-  authenticate(@Body('token') token: string) {
-    const ticket = this.googleService.authenticate(token);
+  authenticate(@Body() loginPayLoadDto: LoginPayLoadDto) {
+    const ticket = this.googleService.authenticate(loginPayLoadDto);
     return ticket;
   }
 }

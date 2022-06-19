@@ -4,7 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Auth, google } from 'googleapis';
 import { UserEntity } from 'src/modules/api/users/user.entity';
 import { Repository } from 'typeorm';
-
+import { sign } from 'jsonwebtoken';
+import { LoginPayLoadDto } from '../dto/loginPayload.dto';
 @Injectable()
 export class GoogleService {
   oauthClient: Auth.OAuth2Client;
@@ -18,21 +19,34 @@ export class GoogleService {
     this.oauthClient = new google.auth.OAuth2(clientID, clientSecret);
   }
 
-  async authenticate(token: string) {
-    const tokenInfo = await this.oauthClient.verifyIdToken({
-      idToken: token,
-      audience: process.env.GOOGLE_CLIENT_ID2,
-    });
+  async authenticate(loginPayload: LoginPayLoadDto): Promise<{status: number, message: string , accessToken: string}> {
+    const tokenInfo = await this.oauthClient.getTokenInfo(loginPayload.token);
 
-    const payload = tokenInfo.getPayload();
-    const i = await this.userRepo.findOne({where: {email: payload.email}});
-    if (i===null){
-      const newUser = this.userRepo.create({name: payload.given_name, email: payload.email });
-      return this.userRepo.save(newUser);
+    const findUser = await this.userRepo.findOne({where:{email: tokenInfo.email}})
+
+    if(findUser) {
+      return {
+        status: 200,
+        message: 'SUCESS',
+        accessToken: sign(
+        {
+          userId: findUser.id,
+        },
+        process.env.GOOGLE_CLIENT_SECRET2,
+      )};
     } else{
-      
-      return i;
-    }
+      const newUser = this.userRepo.create({name: loginPayload.name, email: loginPayload.email, authType: loginPayload.authType});
+      this.userRepo.save(newUser);
 
+      return {
+        status: 200,
+        message: 'SUCCESS',
+        accessToken: sign(
+        {
+          userId: newUser.id,
+        },
+        process.env.GOOGLE_CLIENT_SECRET2,
+      )};
+    }
   }
 }
