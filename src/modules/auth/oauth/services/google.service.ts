@@ -27,7 +27,7 @@ export class GoogleService {
     if(findUser) {
       return {
         status: 200,
-        message: 'SUCESS',
+        message: 'SUCCESS',
         accessToken: sign(
         {
           userId: findUser.id,
