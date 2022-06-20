@@ -36,7 +36,7 @@ export class GoogleService {
       )};
     } else{
       const newUser = this.userRepo.create({name: loginPayload.name, email: loginPayload.email, authType: loginPayload.authType});
-      this.userRepo.save(newUser);
+      await this.userRepo.save(newUser);
 
       return {
         status: 200,
