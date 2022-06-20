@@ -64,7 +64,7 @@ export class UsersController {
     return this.usersService.deleteUser(deleteId);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard) //Check if the request, which is an accessToken, is actually a real accessToken follow the JWT rules. 
   @Get('/token')
   GetOneBytoken(@Req() req){
     const userId = req.user.userId;

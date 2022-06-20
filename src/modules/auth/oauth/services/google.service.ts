@@ -8,27 +8,28 @@ import { sign } from 'jsonwebtoken';
 import { LoginPayLoadDto } from '../dto/loginPayload.dto';
 @Injectable()
 export class GoogleService {
-  oauthClient: Auth.OAuth2Client;
+  oauthClient: Auth.OAuth2Client;     //Create an oauth2 client
   constructor(
-    @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
-    private readonly configService: ConfigService,
+    @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,     // Inject Repository 'users' in to this service file
+    private readonly configService: ConfigService,      //Create a configService to call all the .env file
   ) {
     const clientID = this.configService.get('GOOGLE_CLIENT_ID2');
-    const clientSecret = this.configService.get('GOOGLE_CLIENT_SECRET2');
+    const clientSecret = this.configService.get('GOOGLE_CLIENT_SECRET2'); 
 
-    this.oauthClient = new google.auth.OAuth2(clientID, clientSecret);
+    this.oauthClient = new google.auth.OAuth2(clientID, clientSecret);      //Connect that client into our Google API server
   }
 
+  //Main function to decryt the accessToken from Web SPA and generate a new accessToken for our server
   async authenticate(loginPayload: LoginPayLoadDto): Promise<{status: number, message: string , accessToken: string}> {
-    const tokenInfo = await this.oauthClient.getTokenInfo(loginPayload.token);
+    const tokenInfo = await this.oauthClient.getTokenInfo(loginPayload.token);      // Decryt the accessToken
 
-    const findUser = await this.userRepo.findOne({where:{email: tokenInfo.email}})
+    const findUser = await this.userRepo.findOne({where:{email: tokenInfo.email}})      //Find the user in our database that has the same email as the decryted accessToken email 
 
-    if(findUser) {
+    if(findUser) {      //If we manage to find that user 
       return {
         status: 200,
         message: 'SUCCESS',
-        accessToken: sign(
+        accessToken: sign(      //function sign() generate a new accessToken which requires an userId and a secretKey
         {
           userId: findUser.id,
         },
@@ -36,7 +37,7 @@ export class GoogleService {
       )};
     } else{
       const newUser = this.userRepo.create({name: loginPayload.name, email: loginPayload.email, authType: loginPayload.authType});
-      await this.userRepo.save(newUser);
+      await this.userRepo.save(newUser);      // Save the new user to the database before grant it a new accessToken
 
       return {
         status: 200,
