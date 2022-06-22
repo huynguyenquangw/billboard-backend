@@ -7,8 +7,11 @@ import {
   Param,
   Patch,
   Post,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/modules/auth/oauth/guards/jwtAuth.guard';
 import { Repository } from 'typeorm';
 import { UserDto } from './dto/UserDto';
 import { UserEntity } from './user.entity';
@@ -59,6 +62,13 @@ export class UsersController {
   @HttpCode(200)
   billBoardDelete(@Param('id') deleteId: string): Promise<any> {
     return this.usersService.deleteUser(deleteId);
+  }
+
+  @UseGuards(JwtAuthGuard) //Check if the request, which is an accessToken, is actually a real accessToken follow the JWT rules. 
+  @Get('/token')
+  GetOneBytoken(@Req() req){
+    const userId = req.user.userId;
+    return this.usersService.findOneByToken(userId);
   }
 
   // @Get('/getAll')

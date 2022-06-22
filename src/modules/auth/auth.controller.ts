@@ -4,7 +4,9 @@ import { ApiTags } from '@nestjs/swagger';
 import { AuthType } from 'src/constants';
 import { UsersService } from '../api/users/users.service';
 import { LoginPayloadDto } from './dto/LoginPayload.dto';
+import { LoginPayLoadDto } from './oauth/dto/loginPayload.dto';
 import { FacebookService } from './oauth/services/facebook.service';
+
 import { GoogleService } from './oauth/services/google.service';
 // @ApiHeader({
 //   name: 'X-MyHeader',
@@ -36,8 +38,8 @@ export class AuthController {
    * Login handler
    */
   @Post('google/login')
-  authenticate(@Body('token') token: string) {
-    const ticket = this.googleService.authenticate(token);
+  authenticate(@Body() loginPayLoadDto: LoginPayLoadDto) {
+    const ticket = this.googleService.authenticate(loginPayLoadDto);
     return ticket;
   }
 }

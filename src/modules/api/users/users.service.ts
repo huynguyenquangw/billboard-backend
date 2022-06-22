@@ -71,6 +71,10 @@ export class UsersService {
     return { result };
   }
 
+  async findOneByToken(id: string): Promise<UserEntity>{
+    return this.userRepository.findOne({where:{id: id}})
+  }
+
   // async findOrCreate(userId: string, authProvider: AuthType): Promise<User> {
   //   // TODO Perform database lookup to extract more information about the user
   //   // or to create the user if the UserId is unknown to us.
