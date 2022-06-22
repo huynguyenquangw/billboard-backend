@@ -13,13 +13,13 @@ export class LoginPayLoadDto {
   @ApiProperty()
   readonly token: string;
 
-  @IsEmail()
+  @IsString()
   @IsNotEmpty()
+  @IsEmail()
   @ApiProperty()
   readonly email: string;
 
   @IsString()
-  @IsNotEmpty()
   @ApiProperty()
-  readonly name: string;
+  readonly name?: string;
 }

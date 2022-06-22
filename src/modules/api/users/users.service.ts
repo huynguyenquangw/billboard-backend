@@ -45,9 +45,10 @@ export class UsersService {
     return this.userRepository.save(user);
   }
 
+  // Find user by email (must with authType)
   async findExistUser(email, authType) {
     return this.userRepository.findOne({
-      where: [{ authType: authType }, { email: email }],
+      where: [{ email: email }, { authType: authType }],
     });
   }
 
@@ -71,8 +72,8 @@ export class UsersService {
     return { result };
   }
 
-  async findOneByToken(id: string): Promise<UserEntity>{
-    return this.userRepository.findOne({where:{id: id}})
+  async findOneByToken(id: string): Promise<UserEntity> {
+    return this.userRepository.findOne({ where: { id: id } });
   }
 
   // async findOrCreate(userId: string, authProvider: AuthType): Promise<User> {

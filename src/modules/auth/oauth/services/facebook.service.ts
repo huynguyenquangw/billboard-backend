@@ -1,5 +1,6 @@
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { sign } from 'jsonwebtoken';
 import { AuthType } from 'src/constants';
 import { UserEntity } from 'src/modules/api/users/user.entity';
 import { UsersService } from 'src/modules/api/users/users.service';
@@ -19,11 +20,18 @@ export class FacebookService {
     const info_url = `https://graph.facebook.com/me?fields=${info_fields}&access_token=${social_access_token}`;
     try {
       const res = await this.http.get(info_url).toPromise();
-      this.findOrCreateUser(res);
+      const userId = await this.findOrCreateUser(res);
 
       const apiResponse = {
         status: { code: 200, message: 'Success' },
-        data: { access_token: 'webspatoken324fdsgrwt45ht526t32rg' },
+        data: {
+          access_token: sign(
+            {
+              userId: userId,
+            },
+            process.env.FACEBOOK_CLIENT_SECRET,
+          ),
+        },
       };
       return apiResponse;
     } catch (error) {
@@ -31,7 +39,8 @@ export class FacebookService {
     }
   }
 
-  findOrCreateUser(response) {
+  async findOrCreateUser(response) {
+    let userId = '';
     const user = this.usersService.findExistUser(
       response.data.email,
       AuthType.FACEBOOK,
@@ -46,7 +55,12 @@ export class FacebookService {
         name: response.data.name,
         avatar: response.data.picture.data.url,
       };
-      this.usersService.createUser(userData);
+      const newUser = this.usersService.createUser(userData);
+      userId = (await newUser).id;
     }
+
+    userId = (await user).id;
+    console.log('id: ', userId);
+    return userId;
   }
 }
