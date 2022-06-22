@@ -31,20 +31,23 @@ export class UsersService {
     });
   }
 
-  async createUser(body: OauthCreateUserDto): Promise<UserEntity> {
+  async createUser(
+    oauthCreateUserDto: OauthCreateUserDto,
+  ): Promise<UserEntity> {
     const user: UserEntity = new UserEntity();
 
-    user.authType = body.authType;
-    user.authProviderId = body.authProviderId;
-    user.email = body.email;
-    user.name = body.name;
+    user.authType = oauthCreateUserDto.authType;
+    user.authProviderId = oauthCreateUserDto.authProviderId;
+    user.email = oauthCreateUserDto.email;
+    user.name = oauthCreateUserDto.name;
+    user.avatar = oauthCreateUserDto.avatar;
 
     return this.userRepository.save(user);
   }
 
-  async findExistUser(profileId, providerType) {
+  async findExistUser(email, authType) {
     return this.userRepository.findOne({
-      where: [{ authType: providerType }, { authProviderId: profileId }],
+      where: [{ authType: authType }, { email: email }],
     });
   }
 

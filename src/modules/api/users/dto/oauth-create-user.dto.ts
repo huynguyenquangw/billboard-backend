@@ -23,4 +23,8 @@ export class OauthCreateUserDto {
   @IsNotEmpty()
   @ApiProperty()
   readonly name: string;
+
+  @IsString()
+  @ApiProperty()
+  readonly avatar: string;
 }

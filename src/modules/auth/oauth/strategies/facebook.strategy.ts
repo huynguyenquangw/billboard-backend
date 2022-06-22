@@ -52,15 +52,15 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
           name: fullname,
         };
 
-        const newUser = await this.usersService.createUser(userData);
-        const newUserDto = await newUser.toDto();
-        payload = {
-          message: `New user login with Facebook`,
-          user: newUserDto,
-          accessToken,
-        };
-        console.log(payload);
-        done(null, accessToken);
+        // const newUser = await this.usersService.createUser(userData);
+        // const newUserDto = await newUser.toDto();
+        // payload = {
+        //   message: `New user login with Facebook`,
+        //   user: newUserDto,
+        //   accessToken,
+        // };
+        // console.log(payload);
+        // done(null, accessToken);
       }
 
       const userDto = await user.toDto();
