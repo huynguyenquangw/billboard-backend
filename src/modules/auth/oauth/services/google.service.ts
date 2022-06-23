@@ -24,7 +24,7 @@ export class GoogleService {
     const tokenInfo = await this.oauthClient.getTokenInfo(loginPayload.token); // Decryt the accessToken
 
     const findUser = await this.userRepo.findOne({
-      where: [{ email: tokenInfo.email }, { authType: loginPayload.authType }],
+      where: { email: tokenInfo.email, authType: loginPayload.authType },
     }); //Find the user in our database that has the same email as the decryted accessToken email
 
     if (!findUser) {
