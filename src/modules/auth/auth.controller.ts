@@ -27,23 +27,11 @@ export class AuthController {
   async socialLogin(@Body() loginPayloadDto: LoginPayLoadDto): Promise<any> {
     let ticket = {};
     if (loginPayloadDto.authType === AuthType.FACEBOOK) {
-      const social_access_token = loginPayloadDto.token;
-      ticket = this.facebookService.facebookLogin(social_access_token);
+      ticket = this.facebookService.facebookLogin(loginPayloadDto);
     } else if (loginPayloadDto.authType === AuthType.GOOGLE) {
       ticket = this.googleService.authenticate(loginPayloadDto);
     }
     console.log(ticket);
     return ticket;
   }
-
-  // /*
-  //  * Oauth2
-  //  * Google
-  //  * Login handler
-  //  */
-  // @Post('google/login')
-  // authenticate(@Body() loginPayLoadDto: LoginPayLoadDto) {
-  //   const ticket = this.googleService.authenticate(loginPayLoadDto);
-  //   return ticket;
-  // }
 }
