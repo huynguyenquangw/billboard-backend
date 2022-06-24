@@ -9,7 +9,7 @@ export class UserEntity extends AbstractEntity {
   @Column({ nullable: true })
   name: string;
 
-  @Column({ unique: true, nullable: false })
+  @Column({ unique: false, nullable: false })
   email: string;
 
   @Column({ nullable: true })

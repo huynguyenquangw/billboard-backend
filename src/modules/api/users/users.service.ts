@@ -42,13 +42,13 @@ export class UsersService {
     user.name = oauthCreateUserDto.name;
     user.avatar = oauthCreateUserDto.avatar;
 
-    return this.userRepository.save(user);
+    return await this.userRepository.save(user);
   }
 
   // Find user by email (must with authType)
-  async findExistUser(email, authType) {
-    return this.userRepository.findOne({
-      where: [{ email: email }, { authType: authType }],
+  async findExistUser(email, authType): Promise<UserEntity> {
+    return await this.userRepository.findOne({
+      where: { email: email, authType: authType },
     });
   }
 

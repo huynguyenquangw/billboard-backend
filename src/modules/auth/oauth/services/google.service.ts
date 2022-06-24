@@ -38,7 +38,7 @@ export class GoogleService {
       return {
         status: { code: 200, message: 'SUCCESS' },
         data: {
-          accessToken: sign(
+          access_token: sign(
             {
               userId: newUser.id,
             },
@@ -51,7 +51,7 @@ export class GoogleService {
     return {
       status: { code: 200, message: 'SUCCESS' },
       data: {
-        accessToken: sign(
+        access_token: sign(
           {
             userId: findUser.id,
           },

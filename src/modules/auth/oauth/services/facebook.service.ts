@@ -25,13 +25,13 @@ export class FacebookService {
       const userId = await this.findOrCreateUser(res);
 
       const apiResponse = {
-        status: { code: 200, message: 'Success' },
+        status: { code: 200, message: 'SUCCESS' },
         data: {
           access_token: sign(
             {
               userId: userId,
             },
-            process.env.FACEBOOK_CLIENT_SECRET,
+            process.env.GOOGLE_CLIENT_SECRET2,
           ),
         },
       };
@@ -43,37 +43,38 @@ export class FacebookService {
 
   async findOrCreateUser(response) {
     let userId = '';
-    const user = this.usersService.findExistUser(
+    const user = await this.usersService.findExistUser(
       response.data.email,
       AuthType.FACEBOOK,
     );
-    console.log(response.data);
+    console.log('data: ', response.data);
+    // console.log('user: ', (await user).email);
 
     if (!user) {
-      // const userData = {
-      //   authType: AuthType.FACEBOOK,
-      //   authProviderId: response.data.id,
-      //   email: response.data.email,
-      //   name: response.data.name,
-      //   avatar: response.data.picture.data.url,
-      // };
-      // const newUser = this.usersService.createUser(userData);
-
-      const newUser = this.userRepo.create({
+      const userData = {
         authType: AuthType.FACEBOOK,
         authProviderId: response.data.id,
         email: response.data.email,
         name: response.data.name,
         avatar: response.data.picture.data.url,
-      });
-      await this.userRepo.save(newUser);
+      };
+      const newUser = await this.usersService.createUser(userData);
+
+      // const newUser = this.userRepo.create({
+      //   authType: AuthType.FACEBOOK,
+      //   authProviderId: response.data.id,
+      //   email: response.data.email,
+      //   name: response.data.name,
+      //   avatar: response.data.picture.data.url,
+      // });
+      // await this.userRepo.save(newUser);
 
       userId = newUser.id;
       console.log('id: ', userId);
       return userId;
     }
 
-    userId = (await user).id;
+    userId = user.id;
     console.log('id: ', userId);
     return userId;
   }
