@@ -68,7 +68,9 @@ export class FacebookService {
       });
       await this.userRepo.save(newUser);
 
-      userId = (await newUser).id;
+      userId = newUser.id;
+      console.log('id: ', userId);
+      return userId;
     }
 
     userId = (await user).id;
