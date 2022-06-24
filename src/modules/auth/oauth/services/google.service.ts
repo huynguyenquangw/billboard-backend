@@ -42,7 +42,7 @@ export class GoogleService {
             {
               userId: newUser.id,
             },
-            process.env.GOOGLE_CLIENT_SECRET2,
+            process.env.SOFTDEV_BILLBOARD_SECRET,
           ),
         },
       };
@@ -55,7 +55,7 @@ export class GoogleService {
           {
             userId: findUser.id,
           },
-          process.env.GOOGLE_CLIENT_SECRET2,
+          process.env.SOFTDEV_BILLBOARD_SECRET,
         ),
       },
     };
