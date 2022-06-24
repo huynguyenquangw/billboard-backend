@@ -5,6 +5,7 @@ import { AuthType } from 'src/constants';
 import { UserEntity } from 'src/modules/api/users/user.entity';
 import { UsersService } from 'src/modules/api/users/users.service';
 import { Repository } from 'typeorm';
+import { LoginPayLoadDto } from '../dto/login-payload.dto';
 
 @Injectable()
 export class FacebookService {
@@ -15,7 +16,8 @@ export class FacebookService {
     private readonly usersService: UsersService,
   ) {}
 
-  async facebookLogin(social_access_token) {
+  async facebookLogin(loginPayloadDto: LoginPayLoadDto) {
+    const social_access_token = loginPayloadDto.token;
     const info_fields = 'id,name,birthday,email,gender,picture';
     const info_url = `https://graph.facebook.com/me?fields=${info_fields}&access_token=${social_access_token}`;
     try {
@@ -48,14 +50,24 @@ export class FacebookService {
     console.log(response.data);
 
     if (!user) {
-      const userData = {
+      // const userData = {
+      //   authType: AuthType.FACEBOOK,
+      //   authProviderId: response.data.id,
+      //   email: response.data.email,
+      //   name: response.data.name,
+      //   avatar: response.data.picture.data.url,
+      // };
+      // const newUser = this.usersService.createUser(userData);
+
+      const newUser = this.userRepo.create({
         authType: AuthType.FACEBOOK,
         authProviderId: response.data.id,
         email: response.data.email,
         name: response.data.name,
         avatar: response.data.picture.data.url,
-      };
-      const newUser = this.usersService.createUser(userData);
+      });
+      await this.userRepo.save(newUser);
+
       userId = (await newUser).id;
     }
 
