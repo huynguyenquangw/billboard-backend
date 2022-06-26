@@ -1,4 +1,5 @@
-import { HttpService, Injectable } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { sign } from 'jsonwebtoken';
 import { AuthType } from 'src/constants';
@@ -22,6 +23,7 @@ export class FacebookService {
     const info_url = `https://graph.facebook.com/me?fields=${info_fields}&access_token=${social_access_token}`;
     try {
       const res = await this.http.get(info_url).toPromise();
+      console.log(res.data);
       const userId = await this.findOrCreateUser(res);
 
       const apiResponse = {
@@ -47,8 +49,6 @@ export class FacebookService {
       response.data.email,
       AuthType.FACEBOOK,
     );
-    console.log('data: ', response.data);
-    // console.log('user: ', (await user).email);
 
     if (!user) {
       const userData = {
@@ -61,12 +61,10 @@ export class FacebookService {
       const newUser = await this.usersService.createUser(userData);
 
       userId = newUser.id;
-      console.log('id: ', userId);
       return userId;
     }
 
     userId = user.id;
-    console.log('id: ', userId);
     return userId;
   }
 }
