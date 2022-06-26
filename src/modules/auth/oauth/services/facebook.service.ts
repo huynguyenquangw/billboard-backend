@@ -17,7 +17,7 @@ export class FacebookService {
   ) {}
 
   async facebookLogin(loginPayloadDto: LoginPayLoadDto) {
-    const social_access_token = loginPayloadDto.token;
+    const social_access_token = loginPayloadDto.social_access_token;
     const info_fields = 'id,name,birthday,email,gender,picture';
     const info_url = `https://graph.facebook.com/me?fields=${info_fields}&access_token=${social_access_token}`;
     try {
@@ -59,15 +59,6 @@ export class FacebookService {
         avatar: response.data.picture.data.url,
       };
       const newUser = await this.usersService.createUser(userData);
-
-      // const newUser = this.userRepo.create({
-      //   authType: AuthType.FACEBOOK,
-      //   authProviderId: response.data.id,
-      //   email: response.data.email,
-      //   name: response.data.name,
-      //   avatar: response.data.picture.data.url,
-      // });
-      // await this.userRepo.save(newUser);
 
       userId = newUser.id;
       console.log('id: ', userId);

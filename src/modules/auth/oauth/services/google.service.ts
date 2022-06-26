@@ -21,17 +21,18 @@ export class GoogleService {
 
   //Main function to decryt the accessToken from Web SPA and generate a new accessToken for our server
   async authenticate(loginPayload: LoginPayLoadDto): Promise<any> {
-    const tokenInfo = await this.oauthClient.getTokenInfo(loginPayload.token); // Decryt the accessToken
+    const tokenInfo = await this.oauthClient.getTokenInfo(
+      loginPayload.social_access_token,
+    ); // Decryt the accessToken
 
     const findUser = await this.userRepo.findOne({
-      where: { email: tokenInfo.email, authType: loginPayload.authType },
+      where: { email: tokenInfo.email, authType: loginPayload.auth_type },
     }); //Find the user in our database that has the same email as the decryted accessToken email
 
     if (!findUser) {
       const newUser = this.userRepo.create({
-        name: loginPayload.name,
-        email: loginPayload.email,
-        authType: loginPayload.authType,
+        email: loginPayload.user_name,
+        authType: loginPayload.auth_type,
       });
       await this.userRepo.save(newUser); // Save the new user to the database before grant it a new accessToken
 

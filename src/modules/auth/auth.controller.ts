@@ -26,9 +26,9 @@ export class AuthController {
   @Post('login/social')
   async socialLogin(@Body() loginPayloadDto: LoginPayLoadDto): Promise<any> {
     let ticket = {};
-    if (loginPayloadDto.authType === AuthType.FACEBOOK) {
+    if (loginPayloadDto.auth_type === AuthType.FACEBOOK) {
       ticket = this.facebookService.facebookLogin(loginPayloadDto);
-    } else if (loginPayloadDto.authType === AuthType.GOOGLE) {
+    } else if (loginPayloadDto.auth_type === AuthType.GOOGLE) {
       ticket = this.googleService.authenticate(loginPayloadDto);
     }
     console.log(ticket);
