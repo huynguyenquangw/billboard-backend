@@ -15,11 +15,6 @@ export class LoginPayLoadDto {
 
   @IsString()
   @IsNotEmpty()
-  @IsEmail()
   @ApiProperty()
-  readonly email: string;
-
-  @IsString()
-  @ApiProperty()
-  readonly name?: string;
+  readonly user_name: string;
 }
