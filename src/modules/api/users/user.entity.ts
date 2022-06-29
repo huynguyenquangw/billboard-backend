@@ -3,7 +3,7 @@ import { AbstractEntity } from 'src/common/abstract.entity';
 import { AuthType } from 'src/constants/auth-type';
 import { RoleType } from 'src/constants/role-type';
 import { Column, DeleteDateColumn, Entity } from 'typeorm';
-import { UserDto } from './dto/UserDto';
+import { UserInfoDto } from './dto/user-info.dto';
 
 @Entity('users')
 export class UserEntity extends AbstractEntity {
@@ -43,7 +43,7 @@ export class UserEntity extends AbstractEntity {
 
   // @OneToMany(() => BillboardEnity, (billboard) => billboard.user)
   // billboard: BillboardEnity[];
-  toDto(): UserDto {
-    return new UserDto(this);
+  toDto(): UserInfoDto {
+    return new UserInfoDto(this);
   }
 }

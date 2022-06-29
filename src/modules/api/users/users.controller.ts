@@ -1,8 +1,24 @@
-import { Controller, Get, Inject, Param, Req, UseGuards } from '@nestjs/common';
-import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Inject,
+  Param,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/modules/auth/oauth/guards/jwtAuth.guard';
 import { Repository } from 'typeorm';
-import { UserDto } from './dto/UserDto';
+import { UserInfoDto } from './dto/user-info.dto';
 import { UserEntity } from './user.entity';
 import { UsersService } from './users.service';
 
@@ -23,19 +39,29 @@ export class UsersController {
   @ApiResponse({
     status: 200,
     description: 'A user has been successfully fetched',
-    type: UserDto,
+    type: UserInfoDto,
   })
   @ApiResponse({
     status: 404,
     description: 'A user with given id does not exist.',
   })
-  getUserById(@Param('id') id: string): Promise<UserDto> {
+  getUserById(@Param('id') id: string): Promise<UserInfoDto> {
     return this.usersService.getUserById(id);
   }
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  getMe(@Req() req): Promise<UserDto> {
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth()
+  @ApiOkResponse({
+    type: UserInfoDto,
+    description: "Get current user's info",
+  })
+  @ApiUnauthorizedResponse({
+    // type: UserInfoDto,
+    // description: "Get current user's info",
+  })
+  getMe(@Req() req): Promise<UserInfoDto> {
     return this.usersService.getUserById(req.user.userId);
   }
 
@@ -46,7 +72,7 @@ export class UsersController {
 
   // @Post('create')
   // @HttpCode(201)
-  // createUser(@Body() body: UserDto): Promise<UserEntity> {
+  // createUser(@Body() body: UserInfoDto): Promise<UserEntity> {
   //   return this.usersService.createUser(body);
   // }
 

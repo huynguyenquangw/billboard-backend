@@ -1,34 +1,50 @@
 'use strict';
 
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { AbstractDto } from 'src/common/dto/AbstractDto';
 import { AuthType } from 'src/constants';
 
 import { UserEntity } from '../user.entity';
 
-export class UserDto extends AbstractDto {
-  @ApiPropertyOptional()
+export class UserInfoDto extends AbstractDto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   name: string;
 
-  @ApiPropertyOptional()
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   email: string;
 
   @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
   phone: string;
 
   @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
   address: string;
 
   @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
   address2: string;
 
   @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
   avatar: string;
 
-  @ApiPropertyOptional({ enum: AuthType })
+  @ApiProperty({ enum: AuthType })
+  @IsNotEmpty()
   authType: AuthType;
 
-  @ApiPropertyOptional()
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   authProviderId: string;
 
   constructor(user: UserEntity) {

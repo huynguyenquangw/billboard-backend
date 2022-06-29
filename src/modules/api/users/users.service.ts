@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { OauthCreateUserDto } from './dto/oauth-create-user.dto';
-import { UserDto } from './dto/UserDto';
+import { UserInfoDto } from './dto/user-info.dto';
 import { UserEntity } from './user.entity';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class UsersService {
    * Get 1 user
    * by id
    */
-  async getUserById(id: string): Promise<UserDto> {
+  async getUserById(id: string): Promise<UserInfoDto> {
     const user = await this.userRepository.findOne({
       where: { id: id },
     });
@@ -30,7 +30,7 @@ export class UsersService {
    * Get 1 user
    * no filter out soft-deleted
    */
-  async getUserByIdWithDeleted(id: string): Promise<UserDto> {
+  async getUserByIdWithDeleted(id: string): Promise<UserInfoDto> {
     const user = await this.userRepository.findOne({
       where: { id: id },
       withDeleted: true,
@@ -44,7 +44,7 @@ export class UsersService {
   /**
    * Get all users
    */
-  async getAllUsers(): Promise<UserDto[]> {
+  async getAllUsers(): Promise<UserInfoDto[]> {
     const users = await this.userRepository.find();
     if (users) {
       return users;
@@ -56,7 +56,7 @@ export class UsersService {
    * Get all users
    * no filter out soft-deleted
    */
-  async getAllUsersWithDeleted(): Promise<UserDto[]> {
+  async getAllUsersWithDeleted(): Promise<UserInfoDto[]> {
     const users = await this.userRepository.find({
       withDeleted: true,
     });
@@ -69,15 +69,18 @@ export class UsersService {
   async createUser(
     oauthCreateUserDto: OauthCreateUserDto,
   ): Promise<UserEntity> {
-    const user: UserEntity = new UserEntity();
+    const newUser: UserEntity = await this.userRepository.create({
+      ...oauthCreateUserDto,
+    });
+    // const user: UserEntity = new UserEntity();
 
-    user.authType = oauthCreateUserDto.authType;
-    user.authProviderId = oauthCreateUserDto.authProviderId;
-    user.email = oauthCreateUserDto.email;
-    user.name = oauthCreateUserDto.name;
-    user.avatar = oauthCreateUserDto.avatar;
+    // user.authType = oauthCreateUserDto.authType;
+    // user.authProviderId = oauthCreateUserDto.authProviderId;
+    // user.email = oauthCreateUserDto.email;
+    // user.name = oauthCreateUserDto.name;
+    // user.avatar = oauthCreateUserDto.avatar;
 
-    return await this.userRepository.save(user);
+    return await this.userRepository.save(newUser);
   }
 
   /**
