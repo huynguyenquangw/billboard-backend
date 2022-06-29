@@ -5,7 +5,7 @@ import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { AbstractDto } from 'src/common/dto/AbstractDto';
 import { AuthType } from 'src/constants';
 
-import { UserEntity } from '../user.entity';
+import { User } from '../user.entity';
 
 export class UserInfoDto extends AbstractDto {
   @ApiProperty()
@@ -47,7 +47,7 @@ export class UserInfoDto extends AbstractDto {
   @IsNotEmpty()
   authProviderId: string;
 
-  constructor(user: UserEntity) {
+  constructor(user: User) {
     super(user);
     this.name = user.name;
     this.email = user.email;

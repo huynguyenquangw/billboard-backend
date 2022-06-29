@@ -19,7 +19,7 @@ import {
 import { JwtAuthGuard } from 'src/modules/auth/oauth/guards/jwtAuth.guard';
 import { Repository } from 'typeorm';
 import { UserInfoDto } from './dto/user-info.dto';
-import { UserEntity } from './user.entity';
+import { User } from './user.entity';
 import { UsersService } from './users.service';
 
 @Controller('api/users')
@@ -27,7 +27,7 @@ import { UsersService } from './users.service';
 export class UsersController {
   @Inject(UsersService)
   private readonly usersService: UsersService;
-  private readonly usersRepository: Repository<UserEntity>;
+  private readonly usersRepository: Repository<User>;
 
   @Get()
   @ApiParam({
@@ -72,7 +72,7 @@ export class UsersController {
 
   // @Post('create')
   // @HttpCode(201)
-  // createUser(@Body() body: UserInfoDto): Promise<UserEntity> {
+  // createUser(@Body() body: UserInfoDto): Promise<User> {
   //   return this.usersService.createUser(body);
   // }
 

@@ -6,7 +6,7 @@ import { Column, DeleteDateColumn, Entity } from 'typeorm';
 import { UserInfoDto } from './dto/user-info.dto';
 
 @Entity('users')
-export class UserEntity extends AbstractEntity {
+export class User extends AbstractEntity {
   @Column({ nullable: true })
   name: string;
 

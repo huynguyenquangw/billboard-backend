@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Auth, google } from 'googleapis';
 import { sign } from 'jsonwebtoken';
 import { AuthType } from 'src/constants';
-import { UserEntity } from 'src/modules/api/users/user.entity';
+import { User } from 'src/modules/api/users/user.entity';
 import { Repository } from 'typeorm';
 import { LoginPayLoadDto } from '../dto/login-payload.dto';
 
@@ -14,7 +14,7 @@ export class GoogleService {
   oauthClient: Auth.OAuth2Client; //Create an oauth2 client
   constructor(
     private readonly httpService: HttpService,
-    @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>, // Inject Repository 'users' in to this service file
+    @InjectRepository(User) private userRepo: Repository<User>, // Inject Repository 'users' in to this service file
     private readonly configService: ConfigService, //Create a configService to call all the .env file
   ) {
     const clientID = this.configService.get('GOOGLE_CLIENT_ID2');

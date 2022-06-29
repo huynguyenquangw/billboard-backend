@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { sign } from 'jsonwebtoken';
 import { AuthType } from 'src/constants';
-import { UserEntity } from 'src/modules/api/users/user.entity';
+import { User } from 'src/modules/api/users/user.entity';
 import { UsersService } from 'src/modules/api/users/users.service';
 import { Repository } from 'typeorm';
 import { LoginPayLoadDto } from '../dto/login-payload.dto';
@@ -11,8 +11,8 @@ import { LoginPayLoadDto } from '../dto/login-payload.dto';
 @Injectable()
 export class FacebookService {
   constructor(
-    @InjectRepository(UserEntity)
-    protected userRepo: Repository<UserEntity>,
+    @InjectRepository(User)
+    protected userRepo: Repository<User>,
     private readonly http: HttpService,
     private readonly usersService: UsersService,
   ) {}

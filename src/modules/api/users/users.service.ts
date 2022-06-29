@@ -4,12 +4,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { OauthCreateUserDto } from './dto/oauth-create-user.dto';
 import { UserInfoDto } from './dto/user-info.dto';
-import { UserEntity } from './user.entity';
+import { User } from './user.entity';
 
 @Injectable()
 export class UsersService {
-  @InjectRepository(UserEntity)
-  private readonly userRepository: Repository<UserEntity>;
+  @InjectRepository(User)
+  private readonly userRepository: Repository<User>;
   constructor(private jwtService: JwtService) {}
 
   /**
@@ -66,13 +66,11 @@ export class UsersService {
     throw new NotFoundException();
   }
 
-  async createUser(
-    oauthCreateUserDto: OauthCreateUserDto,
-  ): Promise<UserEntity> {
-    const newUser: UserEntity = await this.userRepository.create({
+  async createUser(oauthCreateUserDto: OauthCreateUserDto): Promise<User> {
+    const newUser: User = await this.userRepository.create({
       ...oauthCreateUserDto,
     });
-    // const user: UserEntity = new UserEntity();
+    // const user: User = new User();
 
     // user.authType = oauthCreateUserDto.authType;
     // user.authProviderId = oauthCreateUserDto.authProviderId;
@@ -88,7 +86,7 @@ export class UsersService {
    * by email
    * by authType
    */
-  async findExistUser(email, authType): Promise<UserEntity> {
+  async findExistUser(email, authType): Promise<User> {
     return await this.userRepository.findOne({
       where: { email: email, authType: authType },
     });
