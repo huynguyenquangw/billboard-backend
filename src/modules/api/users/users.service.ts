@@ -1,4 +1,4 @@
-import { HttpService, Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -10,25 +10,60 @@ import { UserEntity } from './user.entity';
 export class UsersService {
   @InjectRepository(UserEntity)
   private readonly userRepository: Repository<UserEntity>;
-  constructor(
-    private readonly httpService: HttpService,
-    private jwtService: JwtService,
-  ) {}
+  constructor(private jwtService: JwtService) {}
 
-  // public async getUserInfo(token: string): Promise<UserDto> {
-  // const headers = {
-  //   Authorization: `Bearer ${token}`,
-  // };
-  // const response = await this.httpService
-  //   .get('http://localhost:9000/api/users/profile', { headers })
-  //   .toPromise();
-  //   return new UserDto(response.data);
-  // }
-
-  public getUserById(id: string): Promise<UserDto> {
-    return this.userRepository.findOne({
+  /**
+   * Get 1 user
+   * by id
+   */
+  async getUserById(id: string): Promise<UserDto> {
+    const user = await this.userRepository.findOne({
       where: { id: id },
     });
+    if (user) {
+      return user;
+    }
+    throw new NotFoundException(id);
+  }
+
+  /**
+   * Get 1 user
+   * no filter out soft-deleted
+   */
+  async getUserByIdWithDeleted(id: string): Promise<UserDto> {
+    const user = await this.userRepository.findOne({
+      where: { id: id },
+      withDeleted: true,
+    });
+    if (user) {
+      return user;
+    }
+    throw new NotFoundException(id);
+  }
+
+  /**
+   * Get all users
+   */
+  async getAllUsers(): Promise<UserDto[]> {
+    const users = await this.userRepository.find();
+    if (users) {
+      return users;
+    }
+    throw new NotFoundException();
+  }
+
+  /**
+   * Get all users
+   * no filter out soft-deleted
+   */
+  async getAllUsersWithDeleted(): Promise<UserDto[]> {
+    const users = await this.userRepository.find({
+      withDeleted: true,
+    });
+    if (users) {
+      return users;
+    }
+    throw new NotFoundException();
   }
 
   async createUser(
@@ -45,47 +80,35 @@ export class UsersService {
     return await this.userRepository.save(user);
   }
 
-  // Find user by email (must with authType)
+  /**
+   * Get user
+   * by email
+   * by authType
+   */
   async findExistUser(email, authType): Promise<UserEntity> {
     return await this.userRepository.findOne({
       where: { email: email, authType: authType },
     });
   }
 
-  async deleteUser(id: string) {
-    const isDeleted = true;
-
-    const result = this.userRepository
-      .createQueryBuilder()
-      .update({
-        isDeleted: isDeleted,
-      })
-      .where({
-        id: id,
-      })
-      .returning('*')
-      .execute()
-      .then((response) => {
-        return response.raw[0];
-      });
-
-    return { result };
+  /**
+   * Soft delete a user
+   */
+  async deleteUser(id: string): Promise<void> {
+    const deleteResponse = await this.userRepository.softDelete(id);
+    if (!deleteResponse.affected) {
+      // throw new UserNotFoundException(id);
+      throw new NotFoundException(id);
+    }
   }
 
-  async findOneByToken(id: string): Promise<UserEntity> {
-    return this.userRepository.findOne({ where: { id: id } });
+  /**
+   * Restore a soft-deleted user
+   */
+  async restoreDeletedUser(id: string) {
+    const restoreResponse = await this.userRepository.restore(id);
+    if (!restoreResponse.affected) {
+      throw new NotFoundException(id);
+    }
   }
-
-  // async findOrCreate(userId: string, authProvider: AuthType): Promise<User> {
-  //   // TODO Perform database lookup to extract more information about the user
-  //   // or to create the user if the UserId is unknown to us.
-  //   // For now, we'll skip this and always return the same dummy user, regardless of the `userId`.
-  //   return {
-  //     id: '42195',
-  //     provider,
-  //     providerId: '123',
-  //     displayName: 'John Doe',
-  //     photos: [{ value: 'https://avatars.githubusercontent.com/u/28536201' }],
-  //   };
-  // }
 }

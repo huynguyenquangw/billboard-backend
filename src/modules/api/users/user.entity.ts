@@ -1,7 +1,8 @@
+import { Exclude } from 'class-transformer';
 import { AbstractEntity } from 'src/common/abstract.entity';
 import { AuthType } from 'src/constants/auth-type';
 import { RoleType } from 'src/constants/role-type';
-import { Column, Entity } from 'typeorm';
+import { Column, DeleteDateColumn, Entity } from 'typeorm';
 import { UserDto } from './dto/UserDto';
 
 @Entity('users')
@@ -15,6 +16,7 @@ export class UserEntity extends AbstractEntity {
   @Column({ nullable: true })
   phone: string;
 
+  @Exclude()
   @Column({ nullable: true })
   password: string;
 
@@ -36,8 +38,8 @@ export class UserEntity extends AbstractEntity {
   @Column({ type: 'enum', enum: RoleType, default: RoleType.USER })
   role: RoleType;
 
-  @Column({ type: 'boolean', default: false })
-  isDeleted: boolean;
+  @DeleteDateColumn()
+  deletedAt: Date;
 
   // @OneToMany(() => BillboardEnity, (billboard) => billboard.user)
   // billboard: BillboardEnity[];

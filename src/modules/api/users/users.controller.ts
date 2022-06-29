@@ -1,15 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  Inject,
-  Param,
-  Patch,
-  Post,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Inject, Param, Req, UseGuards } from '@nestjs/common';
 import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/modules/auth/oauth/guards/jwtAuth.guard';
 import { Repository } from 'typeorm';
@@ -24,7 +13,7 @@ export class UsersController {
   private readonly usersService: UsersService;
   private readonly usersRepository: Repository<UserEntity>;
 
-  @Get('id')
+  @Get()
   @ApiParam({
     name: 'id',
     required: true,
@@ -40,36 +29,39 @@ export class UsersController {
     status: 404,
     description: 'A user with given id does not exist.',
   })
-  // getUserById(@Param() { id }: FindOneParams) {
-  //   return this.usersService.getUserById(Number(id));
-  // }
-  public getOne(@Param('id') id: string): Promise<UserDto> {
+  getUserById(@Param('id') id: string): Promise<UserDto> {
     return this.usersService.getUserById(id);
   }
 
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  getMe(@Req() req): Promise<UserDto> {
+    return this.usersService.getUserById(req.user.userId);
+  }
+
   @Get('all')
-  billBoardGet(): Promise<any> {
-    return this.usersRepository.find();
+  getAllUsers(): Promise<any> {
+    return this.usersService.getAllUsers();
   }
 
-  @Post('create')
-  @HttpCode(201)
-  public createUser(@Body() body: UserDto): Promise<UserEntity> {
-    return this.usersService.createUser(body);
-  }
+  // @Post('create')
+  // @HttpCode(201)
+  // createUser(@Body() body: UserDto): Promise<UserEntity> {
+  //   return this.usersService.createUser(body);
+  // }
 
-  @Patch('/delete/:id')
-  @HttpCode(200)
-  billBoardDelete(@Param('id') deleteId: string): Promise<any> {
-    return this.usersService.deleteUser(deleteId);
-  }
+  // @Patch('/delete/:id')
+  // @HttpCode(200)
+  // billBoardDelete(@Param('id') deleteId: string): Promise<any> {
+  //   return this.usersService.deleteUser(deleteId);
+  // }
 
-  @UseGuards(JwtAuthGuard) //Check if the request, which is an accessToken, is actually a real accessToken follow the JWT rules.
-  @Get('/token')
-  GetOneBytoken(@Req() req) {
-    const userId = req.user.userId;
-    return this.usersService.findOneByToken(userId);
-  }
+  // @UseGuards(JwtAuthGuard) //Check if the request, which is an accessToken, is actually a real accessToken follow the JWT rules.
+  // @Get('/token')
+  // GetOneBytoken(@Req() req) {
+  //   const userId = req.user.userId;
+  //   return this.usersService.findOneByToken(userId);
+  // }
 
   // @Get('/getAll')
   // billBoardGet(): Promise<any> {
