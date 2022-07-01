@@ -5,7 +5,7 @@ import { RoleType } from 'src/constants/role-type';
 import { Column, DeleteDateColumn, Entity } from 'typeorm';
 import { UserInfoDto } from './dto/user-info.dto';
 
-@Entity('users')
+@Entity({ name: 'users' })
 export class User extends AbstractEntity {
   @Column({ nullable: true })
   name: string;

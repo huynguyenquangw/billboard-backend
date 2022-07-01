@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { DistrictEntity } from '../address/district.entity';
-import { UserEntity } from '../users/user.entity';
+import { District } from '../address/district.entity';
+import { User } from '../users/user.entity';
 import { BillboardEnity } from './billboard.entity';
 
 @Injectable()
@@ -10,9 +10,9 @@ export class BillboardsService {
   constructor(
     @InjectRepository(BillboardEnity)
     private billboardRepo: Repository<BillboardEnity>,
-    @InjectRepository(DistrictEntity)
-    private districtRepo: Repository<DistrictEntity>,
-    @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
+    @InjectRepository(District)
+    private districtRepo: Repository<District>,
+    @InjectRepository(User) private userRepo: Repository<User>,
   ) {}
   // TODO fix DTO and entity of billboard
 

@@ -1,16 +1,27 @@
 import { AbstractEntity } from 'src/common/abstract.entity';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
+import { City } from './city.entity';
+import { Ward } from './ward.entity';
 
-@Entity('districts')
-export class DistrictEntity extends AbstractEntity {
-  @Column()
+@Entity({ name: 'districts' })
+export class District extends AbstractEntity {
+  @Column({ nullable: false, unique: true, default: '' })
   name: string;
 
-  @Column()
+  @Column({ nullable: true, unique: true })
   abbreviation: string;
 
-  @Column()
-  zip: string;
+  @Column({ nullable: true, default: null })
+  zip: number;
+
+  @Column({ nullable: true, default: null })
+  photo: string;
+
+  @ManyToOne(() => City, (city: City) => city.districts)
+  city: City;
+
+  @OneToMany(() => Ward, (ward: Ward) => ward.district)
+  wards: Ward[];
 
   // @OneToMany(() => BillboardEnity, (billboard) => billboard.district, {
   //   onDelete: 'SET NULL',

@@ -70,13 +70,6 @@ export class UsersService {
     const newUser: User = await this.userRepository.create({
       ...oauthCreateUserDto,
     });
-    // const user: User = new User();
-
-    // user.authType = oauthCreateUserDto.authType;
-    // user.authProviderId = oauthCreateUserDto.authProviderId;
-    // user.email = oauthCreateUserDto.email;
-    // user.name = oauthCreateUserDto.name;
-    // user.avatar = oauthCreateUserDto.avatar;
 
     return await this.userRepository.save(newUser);
   }
