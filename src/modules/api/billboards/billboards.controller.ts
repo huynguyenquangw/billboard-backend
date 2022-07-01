@@ -1,21 +1,22 @@
-import { Controller } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { BillboardsService } from './billboards.service';
+import { BillboardDto } from './dto/create-billboard.dto';
 
 @Controller('api/billboards')
 @ApiTags()
 export class BillboardsController {
   constructor(private readonly billboardsService: BillboardsService) {}
 
-  // @Post('/create')
-  // billBoardCreate(@Body() billboardDto: BillboardDto): Promise<any> {
-  //   return this.billboardsService.createbillBoard(billboardDto);
-  // }
+  @Post('/create')
+  billBoardCreate(@Body() billboardDto: BillboardDto): Promise<any> {
+    return this.billboardsService.createbillBoard(billboardDto);
+  }
 
-  // @Get('/getAll')
-  // billBoardGet(): Promise<any> {
-  //   return this.billboardsService.getAll();
-  // }
+  @Get('/getAll/:address2')
+  billBoardGet(@Param('address2') address2: BillboardDto['address2'] ): Promise<any> {
+    return this.billboardsService.getAll(address2);
+  }
 
   // @Get('/getOne/:id')
   // billBoardGetOne(@Param('id') getOneId: number): Promise<any> {

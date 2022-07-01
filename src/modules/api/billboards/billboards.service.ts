@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { DistrictEntity } from '../address/district.entity';
 import { UserEntity } from '../users/user.entity';
 import { BillboardEnity } from './billboard.entity';
+import { BillboardDto } from './dto/create-billboard.dto';
 
 @Injectable()
 export class BillboardsService {
@@ -14,39 +15,39 @@ export class BillboardsService {
     private districtRepo: Repository<DistrictEntity>,
     @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
   ) {}
-  // TODO fix DTO and entity of billboard
+  //TODO fix DTO and entity of billboard
 
-  // async createbillBoard(billboardDto: BillboardDto): Promise<BillboardEnity> {
+  async createbillBoard(billboardDto: BillboardDto): Promise<BillboardEnity> {
 
-  //   const district1 = await this.districtRepo.findOne({
-  //     where: { id: billboardDto.districtId },
-  //   });
-  //   const user1 = await this.userRepo.findOne({
-  //     where: { id: billboardDto.userId },
-  //   });
-  //   const billboard1 = this.billboardRepo.create({
-  //     user: user1,
-  //     district: district1,
-  //     address: billboardDto.address,
-  //     area: billboardDto.area,
-  //     name: billboardDto.name,
-  //     picture: billboardDto.picture,
-  //     video: billboardDto.video,
-  //     size_x: billboardDto.size_x,
-  //     size_y: billboardDto.size_y,
-  //     circulation: billboardDto.circulation,
-  //     previousClient: billboardDto.previousClient,
-  //     rentalPrice: billboardDto.rentalPrice,
-  //     rentalDuration: billboardDto.rentalDuration,
-  //     description: billboardDto.description,
-  //     status: billboardDto.status,
-  //   });
-  //   return this.billboardRepo.save(billboard1);
-  // }
+    // const district1 = await this.districtRepo.findOne({
+    //   where: { id: billboardDto.districtId },
+    // });
+    // const user1 = await this.userRepo.findOne({
+    //   where: { id: billboardDto.userId },
+    // });
+    const billboard1 = this.billboardRepo.create({
+      // user: user1,
+      // district: district1,
+      address: billboardDto.address,
+      address2: billboardDto.address2,
+      name: billboardDto.name,
+      picture: billboardDto.picture,
+      video: billboardDto.video,
+      size_x: billboardDto.size_x,
+      size_y: billboardDto.size_y,
+      circulation: billboardDto.circulation,
+      previousClient: billboardDto.previousClient,
+      rentalPrice: billboardDto.rentalPrice,
+      rentalDuration: billboardDto.rentalDuration,
+      description: billboardDto.description,
+      status: billboardDto.status,
+    });
+    return this.billboardRepo.save(billboard1);
+  }
 
-  // getAll(): Promise<BillboardEnity[]> {
-  //   return this.billboardRepo.find();
-  // }
+  getAll(selectedAdrress2 :string ): Promise<BillboardEnity[]> {
+    return this.billboardRepo.find({where:{address2: selectedAdrress2}});
+  }
 
   // async getOnebyId(findId: number): Promise<BillboardEnity> {
   //   return await this.billboardRepo.findOne({ where: { id: findId } });
