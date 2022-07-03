@@ -45,46 +45,28 @@ export class BillboardsService {
     return this.billboardRepo.save(billboard1);
   }
 
-  getAll(selectedAdrress2 :string ): Promise<BillboardEnity[]> {
+  getAllbyAddress2(selectedAdrress2 :string ): Promise<BillboardEnity[]> {
     return this.billboardRepo.find({where:{address2: selectedAdrress2}});
   }
 
-  // async getOnebyId(findId: number): Promise<BillboardEnity> {
-  //   return await this.billboardRepo.findOne({ where: { id: findId } });
-  // }
+  async getOnebyId(findId: string): Promise<BillboardEnity> {
+    return await this.billboardRepo.findOne({ where: { id: findId } });
+  }
 
-  // async getFourbyId(
-  //   findId1: number,
-  //   findId2: number,
-  //   findId3: number,
-  //   findId4: number,
-  // ): Promise<BillboardEnity[]> {
-  //   const findBillboard1 = await this.billboardRepo.findOne({
-  //     where: { id: findId1 },
-  //   });
-  //   const findBillboard2 = await this.billboardRepo.findOne({
-  //     where: { id: findId2 },
-  //   });
-  //   const findBillboard3 = await this.billboardRepo.findOne({
-  //     where: { id: findId3 },
-  //   });
-  //   const findBillboard4 = await this.billboardRepo.findOne({
-  //     where: { id: findId4 },
-  //   });
+  getAll(): Promise<BillboardEnity[]> {
+    return this.billboardRepo.find();
+  }
 
-  //   return [findBillboard1, findBillboard2, findBillboard3, findBillboard4];
-  // }
+  async updateBillboard(getId: string, name: string): Promise<BillboardEnity> {
+    const selectedBillboard = await this.getOnebyId(getId);
 
-  // async updateBillboard(getId: number, name: string): Promise<BillboardEnity> {
-  //   const selectedBillboard = await this.getOnebyId(getId);
+    selectedBillboard.name = name;
+    return this.billboardRepo.save(selectedBillboard);
+  }
 
-  //   selectedBillboard.name = name;
-  //   return this.billboardRepo.save(selectedBillboard);
-  // }
+  async deleteBillboard(getId: string): Promise<BillboardEnity> {
+    const selectedBillboard = await this.getOnebyId(getId);
 
-  // async deleteBillboard(getId: number): Promise<BillboardEnity> {
-  //   const selectedBillboard = await this.getOnebyId(getId);
-
-  //   return await this.billboardRepo.remove(selectedBillboard);
-  // }
+    return await this.billboardRepo.remove(selectedBillboard);
+  }
 }
