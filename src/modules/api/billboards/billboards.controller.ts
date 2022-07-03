@@ -36,8 +36,15 @@ export class BillboardsController {
     return this.billboardsService.updateBillboard(updateId, billboardDto);
   }
 
+  @Patch('/softDelete/:id')
+  billBoardSoftDelete(
+    @Param('id') softDeleteId: string,
+  ): Promise<any> {
+    return this.billboardsService.softDeleteBillboard(softDeleteId);
+  }
+
   @Delete('/delete/:id')
-  billBoardDelete(@Param('id') deleteId: string): Promise<any> {
-    return this.billboardsService.deleteBillboard(deleteId);
+  billBoardHardDelete(@Param('id') hardDeleteId: string): Promise<any> {
+    return this.billboardsService.hardDeleteBillboard(hardDeleteId);
   }
 }

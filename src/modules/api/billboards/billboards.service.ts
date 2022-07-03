@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { StatusType } from 'src/constants';
 import { Repository } from 'typeorm';
 import { DistrictEntity } from '../address/district.entity';
 import { UserEntity } from '../users/user.entity';
@@ -14,7 +15,7 @@ export class BillboardsService {
     @InjectRepository(DistrictEntity)
     private districtRepo: Repository<DistrictEntity>,
     @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
-  ) {}
+  ) { }
   //TODO fix DTO and entity of billboard
 
   async createbillBoard(billboardDto: BillboardDto): Promise<BillboardEnity> {
@@ -45,8 +46,8 @@ export class BillboardsService {
     return this.billboardRepo.save(billboard1);
   }
 
-  getAllbyAddress2(selectedAdrress2 :string ): Promise<BillboardEnity[]> {
-    return this.billboardRepo.find({where:{address2: selectedAdrress2}});
+  getAllbyAddress2(selectedAdrress2: string): Promise<BillboardEnity[]> {
+    return this.billboardRepo.find({ where: { address2: selectedAdrress2 } });
   }
 
   async getOnebyId(findId: string): Promise<BillboardEnity> {
@@ -64,9 +65,21 @@ export class BillboardsService {
     return this.billboardRepo.save(selectedBillboard);
   }
 
-  async deleteBillboard(getId: string): Promise<BillboardEnity> {
+  async hardDeleteBillboard(getId: string): Promise<BillboardEnity> {
     const selectedBillboard = await this.getOnebyId(getId);
 
     return await this.billboardRepo.remove(selectedBillboard);
   }
+
+  async softDeleteBillboard(getId: string): Promise < BillboardEnity > {
+    const selectedBillboard = await this.getOnebyId(getId);
+
+    selectedBillboard.isDeleted = true;
+    selectedBillboard.isRented = false;
+    selectedBillboard.status = StatusType.INVALID;
+    return await this.billboardRepo.save(selectedBillboard);
+  }
 }
+
+
+
