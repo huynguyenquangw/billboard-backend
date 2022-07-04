@@ -29,7 +29,7 @@ export class BillboardDto {
   name: string;
 
   @IsArray()
-  picture: string[];
+  picture: object[];
 
   @IsString()
   video: string;
@@ -55,6 +55,4 @@ export class BillboardDto {
   @IsString()
   description: string;
 
-  @IsEnum(StatusType)
-  status: StatusType;
 }
