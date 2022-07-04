@@ -9,21 +9,21 @@ import {
 import { StatusType } from 'src/constants';
 
 export class BillboardDto {
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
-  userId: string;
+  // @IsString()
+  // @IsNotEmpty()
+  // @ApiProperty()
+  // userId: string;
 
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
-  districtId: number;
+  // @IsString()
+  // @IsNotEmpty()
+  // @ApiProperty()
+  // districtId: number;
 
   @IsString()
   address: string;
 
   @IsString()
-  area: string;
+  address2: string;
 
   @IsString()
   name: string;

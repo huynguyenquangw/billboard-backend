@@ -19,7 +19,7 @@ export class BillboardEnity extends AbstractEntity {
   address: string;
 
   @Column({ default: '' })
-  area: string;
+  address2: string;
 
   @Column({ default: '' })
   name: string;
