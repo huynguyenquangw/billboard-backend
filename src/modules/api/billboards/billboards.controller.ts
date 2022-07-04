@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { BillboardsService } from './billboards.service';
 import { BillboardDto } from './dto/create-billboard.dto';
@@ -14,7 +22,9 @@ export class BillboardsController {
   }
 
   @Get('/getAll/:address2')
-  billBoardGet(@Param('address2') address2: BillboardDto['address2'] ): Promise<any> {
+  billBoardGet(
+    @Param('address2') address2: BillboardDto['address2'],
+  ): Promise<any> {
     return this.billboardsService.getAllbyAddress2(address2);
   }
 
@@ -37,9 +47,7 @@ export class BillboardsController {
   }
 
   @Patch('/softDelete/:id')
-  billBoardSoftDelete(
-    @Param('id') softDeleteId: string,
-  ): Promise<any> {
+  billBoardSoftDelete(@Param('id') softDeleteId: string): Promise<any> {
     return this.billboardsService.softDeleteBillboard(softDeleteId);
   }
 
