@@ -2,7 +2,14 @@ import { Exclude } from 'class-transformer';
 import { AbstractEntity } from 'src/common/abstract.entity';
 import { AuthType } from 'src/constants/auth-type';
 import { RoleType } from 'src/constants/role-type';
-import { Column, DeleteDateColumn, Entity } from 'typeorm';
+import {
+  Column,
+  DeleteDateColumn,
+  Entity,
+  JoinColumn,
+  OneToOne,
+} from 'typeorm';
+import { Ward } from '../address/ward.entity';
 import { UserInfoDto } from './dto/user-info.dto';
 
 @Entity({ name: 'users' })
@@ -16,8 +23,8 @@ export class User extends AbstractEntity {
   @Column({ nullable: true })
   phone: string;
 
-  @Exclude()
   @Column({ nullable: true })
+  @Exclude()
   password: string;
 
   @Column({ nullable: true })
@@ -40,6 +47,10 @@ export class User extends AbstractEntity {
 
   @DeleteDateColumn()
   deletedAt: Date;
+
+  @OneToOne(() => Ward)
+  @JoinColumn()
+  ward: Ward;
 
   // @OneToMany(() => BillboardEnity, (billboard) => billboard.user)
   // billboard: BillboardEnity[];

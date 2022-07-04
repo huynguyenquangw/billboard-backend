@@ -19,9 +19,12 @@ export class UsersService {
   async getUserById(id: string): Promise<UserInfoDto> {
     const user = await this.userRepository.findOne({
       where: { id: id },
+      relations: {
+        ward: true,
+      },
     });
     if (user) {
-      return user;
+      return user.toDto();
     }
     throw new NotFoundException(id);
   }
@@ -42,10 +45,25 @@ export class UsersService {
   }
 
   /**
+   * Get 1 user
+   * by email
+   * by authType
+   */
+  async findExistUser(email, authType): Promise<User> {
+    return await this.userRepository.findOne({
+      where: { email: email, authType: authType },
+    });
+  }
+
+  /**
    * Get all users
    */
   async getAllUsers(): Promise<UserInfoDto[]> {
-    const users = await this.userRepository.find();
+    const users = await this.userRepository.find({
+      relations: {
+        ward: true,
+      },
+    });
     if (users) {
       return users;
     }
@@ -66,6 +84,9 @@ export class UsersService {
     throw new NotFoundException();
   }
 
+  /**
+   * Create a user
+   */
   async createUser(oauthCreateUserDto: OauthCreateUserDto): Promise<User> {
     const newUser: User = await this.userRepository.create({
       ...oauthCreateUserDto,
@@ -75,15 +96,13 @@ export class UsersService {
   }
 
   /**
-   * Get user
-   * by email
-   * by authType
+   * Create a user
    */
-  async findExistUser(email, authType): Promise<User> {
-    return await this.userRepository.findOne({
-      where: { email: email, authType: authType },
-    });
-  }
+  // async updateUser(id: string, updateData: UpdateUserDto): Promise<User> {
+  //   const updatedUser: User = await this.userRepository.update(id, updateData);
+
+  //   return await this.userRepository.save(updatedUser);
+  // }
 
   /**
    * Soft delete a user

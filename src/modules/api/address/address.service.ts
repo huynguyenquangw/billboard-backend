@@ -67,7 +67,7 @@ export class AddressService {
   async getAllDistrictsByCityId(cityId: string): Promise<District[]> {
     const city = await this.cityRepo.findOne({
       where: { id: cityId },
-      relations: ['districts'],
+      relations: { districts: true },
     });
     if (!city) {
       throw new NotFoundException(cityId);
@@ -78,7 +78,7 @@ export class AddressService {
   async getOneDistrict(id: string): Promise<District> {
     const district = await this.districtRepo.findOne({
       where: { id },
-      relations: ['city'],
+      relations: { city: true },
     });
     if (!district) {
       throw new NotFoundException(id);

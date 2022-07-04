@@ -29,7 +29,7 @@ export class UsersController {
   private readonly usersService: UsersService;
   private readonly usersRepository: Repository<User>;
 
-  @Get()
+  @Get('/:id')
   @ApiParam({
     name: 'id',
     required: true,
