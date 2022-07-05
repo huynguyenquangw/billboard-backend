@@ -18,6 +18,7 @@ export class District extends AbstractEntity {
   photo: string;
 
   @ManyToOne(() => City, (city: City) => city.districts)
+  // @JoinColumn()
   city: City;
 
   @OneToMany(() => Ward, (ward: Ward) => ward.district)

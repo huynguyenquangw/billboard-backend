@@ -13,46 +13,46 @@ export class UserInfoDto extends AbstractDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  name: string;
+  readonly name: string;
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  email: string;
+  readonly email: string;
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
-  phone: string;
+  readonly phone: string;
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
-  address: string;
+  readonly address: string;
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
-  address2: string;
+  readonly address2: string;
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
-  avatar: string;
+  readonly avatar: string;
 
   @ApiProperty({ enum: AuthType })
   @IsNotEmpty()
-  authType: AuthType;
+  readonly authType: AuthType;
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  authProviderId: string;
+  readonly authProviderId: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @Type(() => Ward)
-  ward: Ward;
+  readonly ward: Ward;
 
   constructor(user: User) {
     super(user);

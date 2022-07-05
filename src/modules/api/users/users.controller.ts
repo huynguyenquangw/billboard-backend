@@ -1,25 +1,28 @@
 import {
+  Body,
   Controller,
   Get,
   HttpCode,
   HttpStatus,
   Inject,
   Param,
+  Patch,
+  Put,
   Req,
   UseGuards,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOkResponse,
+  ApiOperation,
   ApiParam,
   ApiResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/modules/auth/oauth/guards/jwtAuth.guard';
-import { Repository } from 'typeorm';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { UserInfoDto } from './dto/user-info.dto';
-import { User } from './user.entity';
 import { UsersService } from './users.service';
 
 @Controller('api/users')
@@ -27,9 +30,26 @@ import { UsersService } from './users.service';
 export class UsersController {
   @Inject(UsersService)
   private readonly usersService: UsersService;
-  private readonly usersRepository: Repository<User>;
 
-  @Get('/:id')
+  @Get('me')
+  @ApiOperation({ summary: 'Get current user profile' })
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth()
+  @ApiOkResponse({
+    type: UserInfoDto,
+    description: "Get current user's info",
+  })
+  @ApiUnauthorizedResponse({
+    // type: UserInfoDto,
+    // description: "Get current user's info",
+  })
+  getMe(@Req() req): Promise<UserInfoDto> {
+    return this.usersService.getUserById(req.user.userId);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get 1 user by id' })
   @ApiParam({
     name: 'id',
     required: true,
@@ -49,48 +69,30 @@ export class UsersController {
     return this.usersService.getUserById(id);
   }
 
-  @Get('me')
-  @UseGuards(JwtAuthGuard)
-  @HttpCode(HttpStatus.OK)
-  @ApiBearerAuth()
-  @ApiOkResponse({
-    type: UserInfoDto,
-    description: "Get current user's info",
-  })
-  @ApiUnauthorizedResponse({
-    // type: UserInfoDto,
-    // description: "Get current user's info",
-  })
-  getMe(@Req() req): Promise<UserInfoDto> {
-    return this.usersService.getUserById(req.user.userId);
-  }
-
-  @Get('all')
-  getAllUsers(): Promise<any> {
+  @Get()
+  getAllUsers(): Promise<UserInfoDto[]> {
     return this.usersService.getAllUsers();
   }
 
-  // @Post('create')
-  // @HttpCode(201)
-  // createUser(@Body() body: UserInfoDto): Promise<User> {
-  //   return this.usersService.createUser(body);
-  // }
+  /**
+   * USER
+   * Update user
+   */
+  @Patch(':id/update')
+  update(
+    @Param('id') id: string,
+    @Body() body: UpdateUserDto,
+  ): Promise<UserInfoDto> {
+    return this.usersService.updateUser(id, body);
+  }
 
-  // @Patch('/delete/:id')
-  // @HttpCode(200)
-  // billBoardDelete(@Param('id') deleteId: string): Promise<any> {
-  //   return this.usersService.deleteUser(deleteId);
-  // }
-
-  // @UseGuards(JwtAuthGuard) //Check if the request, which is an accessToken, is actually a real accessToken follow the JWT rules.
-  // @Get('/token')
-  // GetOneBytoken(@Req() req) {
-  //   const userId = req.user.userId;
-  //   return this.usersService.findOneByToken(userId);
-  // }
-
-  // @Get('/getAll')
-  // billBoardGet(): Promise<any> {
-  //   return this.billboardsService.getAll();
-  // }
+  /**
+   * ADMIN
+   * Soft-delete user
+   */
+  @Patch(':id/delete')
+  @HttpCode(200)
+  billBoardDelete(@Param('id') deleteId: string): Promise<void> {
+    return this.usersService.deleteUser(deleteId);
+  }
 }

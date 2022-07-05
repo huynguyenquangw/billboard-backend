@@ -12,7 +12,7 @@ import { LoginPayLoadDto } from '../dto/login-payload.dto';
 export class FacebookService {
   constructor(
     @InjectRepository(User)
-    protected userRepo: Repository<User>,
+    protected userRepository: Repository<User>,
     private readonly http: HttpService,
     private readonly usersService: UsersService,
   ) {}

@@ -7,7 +7,7 @@ import {
   Param,
   Post,
 } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AddressService } from './address.service';
 import { City } from './city.entity';
 import { District } from './district.entity';
@@ -24,22 +24,8 @@ export class AddressController {
   /**
    * City
    */
-  @Get('cities')
-  getAllCities(): Promise<City[]> {
-    return this.addressService.getAllCities();
-  }
-
-  @Get('cities/:id')
-  getOneCity(@Param('id') id: string): Promise<City> {
-    return this.addressService.getOneCity(id);
-  }
-
-  @Get('cities/:id/districts')
-  getAllDistrictsWithinACity(@Param('id') id: string): Promise<District[]> {
-    return this.addressService.getAllDistrictsByCityId(id);
-  }
-
   @Post('cities')
+  @ApiOperation({ summary: 'Create a new city' })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
     type: CreateCityDto,
@@ -50,12 +36,32 @@ export class AddressController {
     return this.addressService.createCity(city);
   }
 
+  @Get('cities/:id')
+  getOneCity(@Param('id') id: string): Promise<City> {
+    return this.addressService.getOneCity(id);
+  }
+
+  @Get('cities')
+  getAllCities(): Promise<City[]> {
+    return this.addressService.getAllCities();
+  }
+
+  @Get('cities/:id/districts')
+  getAllDistrictsWithinACity(@Param('id') id: string): Promise<District[]> {
+    return this.addressService.getAllDistrictsByCityId(id);
+  }
+
   /**
    * District
    */
-  @Get('districts')
-  getAllDistricts(): Promise<District[]> {
-    return this.addressService.getAllDistricts();
+  @Post('districts')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    type: CreateDistrictDto,
+    description: 'Successfully create a new district',
+  })
+  async createDistrict(@Body() district: CreateDistrictDto): Promise<District> {
+    return this.addressService.createDistrict(district);
   }
 
   @Get('districts/:id')
@@ -68,29 +74,14 @@ export class AddressController {
     return this.addressService.getAllWardsByDistrictId(id);
   }
 
-  @Post('districts')
-  @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({
-    type: CreateDistrictDto,
-    description: 'Successfully create a new district',
-  })
-  async createDistrict(@Body() district: CreateDistrictDto): Promise<District> {
-    return this.addressService.createDistrict(district);
-  }
+  // @Get('districts/all')
+  // getAllDistricts(): Promise<District[]> {
+  //   return this.addressService.getAllDistricts();
+  // }
 
   /**
-   * District
+   * Ward
    */
-  @Get('wards')
-  getAllWards(): Promise<Ward[]> {
-    return this.addressService.getAllWards();
-  }
-
-  @Get('wards/:id')
-  getOneWard(@Param('id') id: string): Promise<Ward> {
-    return this.addressService.getOneWard(id);
-  }
-
   @Post('wards')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
@@ -100,4 +91,14 @@ export class AddressController {
   async createWard(@Body() ward: CreateWardDto): Promise<Ward> {
     return this.addressService.createWard(ward);
   }
+
+  @Get('wards/:id')
+  getOneWard(@Param('id') id: string): Promise<Ward> {
+    return this.addressService.getOneWard(id);
+  }
+
+  // @Get('wards/all')
+  // getAllWards(): Promise<Ward[]> {
+  //   return this.addressService.getAllWards();
+  // }
 }
