@@ -14,34 +14,6 @@ export class BillboardsService {
     private billboardRepository: Repository<Billboard>,
     private readonly addressService: AddressService,
   ) {}
-  // TODO fix DTO and entity of billboard
-
-  // Create a new billboard
-  // async createbillBoard(billboardDto: CreateBillboardDto): Promise<Billboard> {
-  //   // const district1 = await this.districtRepo.findOne({
-  //   //   where: { id: billboardDto.districtId },
-  //   // });
-  //   // const user1 = await this.userRepo.findOne({
-  //   //   where: { id: billboardDto.userId },
-  //   // });
-  //   const billboard1 = this.billboardRepository.create({
-  //     // user: user1,
-  //     // district: district1,
-  //     address: billboardDto.address,
-  //     address2: billboardDto.address2,
-  //     name: billboardDto.name,
-  //     picture: billboardDto.picture,
-  //     video: billboardDto.video,
-  //     size_x: billboardDto.size_x,
-  //     size_y: billboardDto.size_y,
-  //     circulation: billboardDto.circulation,
-  //     previousClient: billboardDto.previousClient,
-  //     rentalPrice: billboardDto.rentalPrice,
-  //     rentalDuration: billboardDto.rentalDuration,
-  //     description: billboardDto.description,
-  //   });
-  //   return this.billboardRepository.save(billboard1);
-  // }
 
   /**
    * Create a billboard
@@ -49,8 +21,11 @@ export class BillboardsService {
   async create(
     createBillboardDto: CreateBillboardDto,
   ): Promise<BillboardInfoDto> {
+    const findWard = await this.addressService.getOneWard(createBillboardDto.wardId);
+
     const newBillboard: Billboard = await this.billboardRepository.create({
       ...createBillboardDto,
+      ward: findWard
     });
 
     await this.billboardRepository.save(newBillboard);
@@ -131,14 +106,6 @@ export class BillboardsService {
     return updatedBillboard.toDto();
   }
 
-  //Update for one billboard (right now it's just name )
-  // async updateBillboard(getId: string, name: string): Promise<Billboard> {
-  //   const selectedBillboard = await this.getOneById(getId);
-
-  //   selectedBillboard.name = name;
-  //   return this.billboardRepository.save(selectedBillboard);
-  // }
-
   //Completely delete a billboard from database
   async hardDeleteBillboard(getId: string): Promise<Billboard> {
     const selectedBillboard = await this.getOneById(getId);
@@ -150,7 +117,6 @@ export class BillboardsService {
   async softDeleteBillboard(getId: string) {
     const deleteResponse = await this.billboardRepository.softDelete(getId);
     if (!deleteResponse.affected) {
-      // throw new UserNotFoundException(id);
       throw new NotFoundException(getId);
     } else {
       return deleteResponse;

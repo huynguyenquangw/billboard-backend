@@ -81,14 +81,6 @@ export class BillboardsController {
   ): Promise<BillboardInfoDto> {
     return this.billboardsService.update(id, body);
   }
-  //Update for one bill board (right now it just name )
-  // @Patch('/update/:id')
-  // billBoardUpdate(
-  //   @Param('id') updateId: string,
-  //   @Body('name') name: BillboardDto['name'],
-  // ): Promise<any> {
-  //   return this.billboardsService.updateBillboard(updateId, name);
-  // }
 
   //Soft Delete a billobard
   @Get('/softDelete/:id')
