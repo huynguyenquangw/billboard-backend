@@ -8,7 +8,6 @@ import {
   Post,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Billboard } from './billboard.entity';
 import { BillboardsService } from './billboards.service';
 import { BillboardInfoDto } from './dto/billboard-info.dto';
 import { CreateBillboardDto } from './dto/create-billboard.dto';
