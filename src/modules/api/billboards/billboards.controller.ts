@@ -19,6 +19,7 @@ export class BillboardsController {
 
   // Create a new billboard
   @Post('create')
+  @ApiOperation({ summary: 'Create 1 billboard' })
   billBoardCreate(
     @Body() createBillboardDto: CreateBillboardDto,
   ): Promise<BillboardInfoDto> {
@@ -36,6 +37,7 @@ export class BillboardsController {
 
   //Get one billboard by id for detail page
   @Get('/getOne/:id')
+  @ApiOperation({ summary: 'Get 1 billboard' })
   billBoardGetOne(@Param('id') getOneId: string): Promise<any> {
     return this.billboardsService.getOneById(getOneId);
   }
@@ -49,6 +51,7 @@ export class BillboardsController {
 
   //Approve a billboard
   @Get('/approve/:id')
+  @ApiOperation({ summary: 'OPERATOR: approve 1 billboard' })
   billboardApprove(@Param('id') approveId: string): Promise<any> {
     return this.billboardsService.approveBillboard(approveId);
   }
@@ -61,6 +64,7 @@ export class BillboardsController {
 
   //Get all non deleted billboard
   @Get('/getAll')
+  @ApiOperation({ summary: 'Get all billboards' })
   billboardGetAllWithoutDeleted(): Promise<any> {
     return this.billboardsService.getAll();
   }
@@ -70,6 +74,7 @@ export class BillboardsController {
    * Update billboard
    */
   @Patch(':id/update')
+  @ApiOperation({ summary: 'Update 1 billboard info' })
   update(
     @Param('id') id: string,
     @Body() body: CreateBillboardDto,

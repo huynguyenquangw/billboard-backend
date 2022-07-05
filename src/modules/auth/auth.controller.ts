@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthType } from 'src/constants';
 import { UsersService } from '../api/users/users.service';
 import { LoginPayLoadDto } from './oauth/dto/login-payload.dto';
@@ -18,6 +18,7 @@ export class AuthController {
   ) {}
 
   @Post('login/social')
+  @ApiOperation({ summary: 'Login' })
   async socialLogin(@Body() loginPayloadDto: LoginPayLoadDto): Promise<any> {
     let ticket = {};
     if (loginPayloadDto.auth_type === AuthType.FACEBOOK) {

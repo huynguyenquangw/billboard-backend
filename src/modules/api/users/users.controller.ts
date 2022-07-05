@@ -31,7 +31,7 @@ export class UsersController {
   private readonly usersService: UsersService;
 
   @Get('me')
-  @ApiOperation({ summary: 'Get current user profile' })
+  @ApiOperation({ summary: "Get current user's profile" })
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth()
@@ -69,6 +69,7 @@ export class UsersController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'Get all users' })
   getAllUsers(): Promise<UserInfoDto[]> {
     return this.usersService.getAllUsers();
   }
@@ -78,6 +79,7 @@ export class UsersController {
    * Update user
    */
   @Patch(':id/update')
+  @ApiOperation({ summary: 'Update user info' })
   update(
     @Param('id') id: string,
     @Body() body: UpdateUserDto,
@@ -90,6 +92,7 @@ export class UsersController {
    * Soft-delete user
    */
   @Patch(':id/delete')
+  @ApiOperation({ summary: 'ADMIN: soft-delete' })
   @HttpCode(200)
   billBoardDelete(@Param('id') deleteId: string): Promise<void> {
     return this.usersService.deleteUser(deleteId);

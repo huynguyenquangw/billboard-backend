@@ -24,7 +24,7 @@ export class AddressController {
   /**
    * City
    */
-  @Post('cities')
+  @Post('cities/create')
   @ApiOperation({ summary: 'Create a new city' })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
@@ -37,16 +37,19 @@ export class AddressController {
   }
 
   @Get('cities/:id')
+  @ApiOperation({ summary: 'Get 1 city' })
   getOneCity(@Param('id') id: string): Promise<City> {
     return this.addressService.getOneCity(id);
   }
 
   @Get('cities')
+  @ApiOperation({ summary: 'Get all cities' })
   getAllCities(): Promise<City[]> {
     return this.addressService.getAllCities();
   }
 
   @Get('cities/:id/districts')
+  @ApiOperation({ summary: 'Get all districts of a city' })
   getAllDistrictsWithinACity(@Param('id') id: string): Promise<District[]> {
     return this.addressService.getAllDistrictsByCityId(id);
   }
@@ -54,7 +57,8 @@ export class AddressController {
   /**
    * District
    */
-  @Post('districts')
+  @Post('districts/create')
+  @ApiOperation({ summary: 'create a new district' })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
     type: CreateDistrictDto,
@@ -65,12 +69,14 @@ export class AddressController {
   }
 
   @Get('districts/:id')
+  @ApiOperation({ summary: 'Get 1 district' })
   getOneDistrict(@Param('id') id: string): Promise<District> {
     return this.addressService.getOneDistrict(id);
   }
 
   @Get('districts/:id/wards')
-  getAllWardsWithinADistrict(@Param('id') id: string): Promise<Ward[]> {
+  @ApiOperation({ summary: 'Get all wards of a district' })
+  getAllWardsOfADistrict(@Param('id') id: string): Promise<Ward[]> {
     return this.addressService.getAllWardsByDistrictId(id);
   }
 
@@ -82,7 +88,8 @@ export class AddressController {
   /**
    * Ward
    */
-  @Post('wards')
+  @Post('wards/create')
+  @ApiOperation({ summary: 'Create a new ward' })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
     type: CreateWardDto,
@@ -93,6 +100,7 @@ export class AddressController {
   }
 
   @Get('wards/:id')
+  @ApiOperation({ summary: 'Get 1 ward' })
   getOneWard(@Param('id') id: string): Promise<Ward> {
     return this.addressService.getOneWard(id);
   }
