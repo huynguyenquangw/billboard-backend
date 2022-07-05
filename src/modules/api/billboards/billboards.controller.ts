@@ -32,7 +32,7 @@ export class BillboardsController {
   billBoardGetOne(@Param('id') getOneId: string): Promise<any> {
     return this.billboardsService.getOnebyId(getOneId);
   }
-
+  
   @Get('/getAll')
   billboardGetAll(): Promise<any> {
     return this.billboardsService.getAll();
