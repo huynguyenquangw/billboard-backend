@@ -1,6 +1,6 @@
 import { AbstractEntity } from 'src/common/abstract.entity';
 import { StatusType } from 'src/constants';
-import { Column, Entity } from 'typeorm';
+import { Column, DeleteDateColumn, Entity } from 'typeorm';
 // import { UserEntity } from '../users/user.entity';
 
 @Entity({ name: 'billboards' })
@@ -24,8 +24,8 @@ export class Billboard extends AbstractEntity {
   @Column({ default: '' })
   name: string;
 
-  @Column('simple-array', { default: [''] })
-  picture: string[];
+  @Column('jsonb', {nullable: true})
+  picture: object[];
 
   @Column({ default: '' })
   video: string;
@@ -61,6 +61,6 @@ export class Billboard extends AbstractEntity {
   @Column('bool', { default: 0 })
   isRented: boolean;
 
-  @Column('bool', { default: 0 })
-  isDeleted: boolean;
+  @DeleteDateColumn()
+  deletedAt: Date;
 }
