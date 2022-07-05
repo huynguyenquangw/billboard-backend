@@ -1,23 +1,22 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsArray,
-  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsString,
+  IsUUID,
 } from 'class-validator';
-import { StatusType } from 'src/constants';
 
-export class BillboardDto {
+export class CreateBillboardDto {
   // @IsString()
   // @IsNotEmpty()
   // @ApiProperty()
-  // userId: string;
+  // ownerId: string;
 
-  // @IsString()
-  // @IsNotEmpty()
-  // @ApiProperty()
-  // districtId: number;
+  @ApiProperty()
+  @IsUUID()
+  @IsNotEmpty()
+  readonly wardId: string;
 
   @IsString()
   address: string;
@@ -54,5 +53,4 @@ export class BillboardDto {
 
   @IsString()
   description: string;
-
 }

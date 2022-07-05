@@ -7,7 +7,6 @@ import {
   Inject,
   Param,
   Patch,
-  Put,
   Req,
   UseGuards,
 } from '@nestjs/common';

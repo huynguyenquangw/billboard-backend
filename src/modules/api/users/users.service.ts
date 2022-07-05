@@ -16,6 +16,17 @@ export class UsersService {
   ) {}
 
   /**
+   * Create a user
+   */
+  async createUser(oauthCreateUserDto: OauthCreateUserDto): Promise<User> {
+    const newUser: User = await this.userRepository.create({
+      ...oauthCreateUserDto,
+    });
+
+    return await this.userRepository.save(newUser);
+  }
+
+  /**
    * Get 1 user
    * by id
    */
@@ -85,17 +96,6 @@ export class UsersService {
       return users;
     }
     throw new NotFoundException();
-  }
-
-  /**
-   * Create a user
-   */
-  async createUser(oauthCreateUserDto: OauthCreateUserDto): Promise<User> {
-    const newUser: User = await this.userRepository.create({
-      ...oauthCreateUserDto,
-    });
-
-    return await this.userRepository.save(newUser);
   }
 
   /**

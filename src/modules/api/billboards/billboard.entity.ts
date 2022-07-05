@@ -1,19 +1,26 @@
+import { Exclude } from 'class-transformer';
 import { AbstractEntity } from 'src/common/abstract.entity';
 import { StatusType } from 'src/constants';
-import { Column, DeleteDateColumn, Entity } from 'typeorm';
+import {
+  Column,
+  DeleteDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+} from 'typeorm';
+import { Ward } from '../address/ward.entity';
+import { User } from '../users/user.entity';
+import { BillboardInfoDto } from './dto/billboard-info.dto';
 // import { UserEntity } from '../users/user.entity';
 
 @Entity({ name: 'billboards' })
 export class Billboard extends AbstractEntity {
-  // @ManyToOne(() => UserEntity, (user) => user.billboard, {
-  //   onDelete: 'SET NULL',
-  // })
-  // user: UserEntity;
+  @ManyToOne(() => User, (user) => user.billboards)
+  user: User;
 
-  // @ManyToOne(() => DistrictEntity, (district) => district.billboard, {
-  //   onDelete: 'SET NULL',
-  // })
-  // district: DistrictEntity;
+  @ManyToOne(() => Ward)
+  @JoinColumn()
+  ward: Ward;
 
   @Column({ default: '' })
   address: string;
@@ -24,7 +31,7 @@ export class Billboard extends AbstractEntity {
   @Column({ default: '' })
   name: string;
 
-  @Column('jsonb', {nullable: true})
+  @Column('jsonb', { nullable: true })
   picture: object[];
 
   @Column({ default: '' })
@@ -56,11 +63,18 @@ export class Billboard extends AbstractEntity {
     enum: StatusType,
     default: StatusType.DRAFT,
   })
+  @Exclude()
   status: StatusType;
 
   @Column('bool', { default: 0 })
+  @Exclude()
   isRented: boolean;
 
   @DeleteDateColumn()
+  @Exclude()
   deletedAt: Date;
+
+  toDto(): BillboardInfoDto {
+    return new BillboardInfoDto(this);
+  }
 }

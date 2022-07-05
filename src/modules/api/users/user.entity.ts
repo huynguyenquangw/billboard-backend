@@ -8,8 +8,10 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
 } from 'typeorm';
 import { Ward } from '../address/ward.entity';
+import { Billboard } from '../billboards/billboard.entity';
 import { UserInfoDto } from './dto/user-info.dto';
 
 @Entity({ name: 'users' })
@@ -52,8 +54,9 @@ export class User extends AbstractEntity {
   @JoinColumn()
   ward: Ward;
 
-  // @OneToMany(() => BillboardEnity, (billboard) => billboard.user)
-  // billboard: BillboardEnity[];
+  @OneToMany(() => Billboard, (billboard) => billboard.user)
+  billboards: Billboard[];
+
   toDto(): UserInfoDto {
     return new UserInfoDto(this);
   }
