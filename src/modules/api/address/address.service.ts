@@ -16,28 +16,28 @@ import { Ward } from './ward.entity';
 export class AddressService {
   constructor(
     @InjectRepository(City)
-    private cityRepo: Repository<City>,
+    private cityRepository: Repository<City>,
     @InjectRepository(District)
-    private districtRepo: Repository<District>,
+    private districtRepository: Repository<District>,
     @InjectRepository(Ward)
-    private wardRepo: Repository<Ward>,
-  ) {}
+    private wardRepository: Repository<Ward>,
+  ) {} // private wardRepository: Repository<Ward>, // @InjectRepository(Ward) // private districtRepository: Repository<District>, // @InjectRepository(District) // private cityRepository: Repository<City>, // @InjectRepository(City)
 
   /**
    * City
    */
-  async getAllCities(): Promise<City[]> {
-    const cities = await this.cityRepo.find();
-    if (!cities) {
-      throw new NotFoundException();
+  async createCity(city: CreateCityDto): Promise<City> {
+    const newCity = await this.cityRepository.create({ ...city });
+    if (!newCity) {
+      throw new BadRequestException();
     }
-    return cities;
+    return await this.cityRepository.save(newCity);
   }
 
   async getOneCity(id: string): Promise<City> {
-    const city = await this.cityRepo.findOne({
+    const city = await this.cityRepository.findOne({
       where: { id },
-      relations: { districts: true },
+      relations: ['districts'],
     });
     if (!city) {
       throw new NotFoundException(id);
@@ -45,40 +45,34 @@ export class AddressService {
     return city;
   }
 
-  async createCity(city: CreateCityDto): Promise<City> {
-    const newCity = await this.cityRepo.create({ ...city });
-    if (!newCity) {
-      throw new BadRequestException();
+  async getAllCities(): Promise<City[]> {
+    const cities = await this.cityRepository.find();
+    if (!cities) {
+      throw new NotFoundException();
     }
-    return await this.cityRepo.save(newCity);
+    return cities;
   }
 
   /**
    * District
    */
-  async getAllDistricts(): Promise<District[]> {
-    const districts = await this.districtRepo.find();
-    if (!districts) {
-      throw new NotFoundException();
-    }
-    return districts;
-  }
-
-  async getAllDistrictsByCityId(cityId: string): Promise<District[]> {
-    const city = await this.cityRepo.findOne({
+  async createDistrict(district: CreateDistrictDto): Promise<District> {
+    const { cityId, ...districtToCreate } = district;
+    const city = await this.cityRepository.findOne({
       where: { id: cityId },
-      relations: { districts: true },
     });
-    if (!city) {
-      throw new NotFoundException(cityId);
-    }
-    return city.districts;
+
+    const newDistrict = await this.districtRepository.create({
+      ...districtToCreate,
+      city: city,
+    });
+    return await this.districtRepository.save(newDistrict);
   }
 
   async getOneDistrict(id: string): Promise<District> {
-    const district = await this.districtRepo.findOne({
+    const district = await this.districtRepository.findOne({
       where: { id },
-      relations: { city: true },
+      relations: ['city', 'wards'],
     });
     if (!district) {
       throw new NotFoundException(id);
@@ -86,26 +80,37 @@ export class AddressService {
     return district;
   }
 
-  async createDistrict(district: CreateDistrictDto): Promise<District> {
-    const { cityId, ...districtToCreate } = district;
-    const city = await this.cityRepo.findOne({
+  async getAllDistrictsByCityId(cityId: string): Promise<District[]> {
+    const city = await this.cityRepository.findOne({
       where: { id: cityId },
+      relations: ['districts'],
     });
-
-    const newDistrict = await this.districtRepo.create({
-      ...districtToCreate,
-      city: city,
-    });
-    return await this.districtRepo.save(newDistrict);
+    if (!city) {
+      throw new NotFoundException(cityId);
+    }
+    return city.districts;
   }
 
   /**
    * Ward
    */
+  async createWard(ward: CreateWardDto): Promise<Ward> {
+    const { districtId, ...wardToCreate } = ward;
+    const district = await this.districtRepository.findOne({
+      where: { id: districtId },
+    });
+
+    const newWard = await this.wardRepository.create({
+      ...wardToCreate,
+      district: district,
+    });
+    return await this.wardRepository.save(newWard);
+  }
+
   async getOneWard(id: string): Promise<Ward> {
-    const ward = await this.wardRepo.findOne({
+    const ward = await this.wardRepository.findOne({
       where: { id },
-      relations: ['district'],
+      relations: ['district', 'district.city'],
     });
     if (!ward) {
       throw new NotFoundException(id);
@@ -113,12 +118,8 @@ export class AddressService {
     return ward;
   }
 
-  async getAllWards(): Promise<Ward[]> {
-    return this.wardRepo.find();
-  }
-
   async getAllWardsByDistrictId(districtId: string): Promise<Ward[]> {
-    const district = await this.districtRepo.findOne({
+    const district = await this.districtRepository.findOne({
       where: { id: districtId },
       relations: ['wards'],
     });
@@ -126,18 +127,5 @@ export class AddressService {
       throw new NotFoundException(districtId);
     }
     return district.wards;
-  }
-
-  async createWard(ward: CreateWardDto): Promise<Ward> {
-    const { districtId, ...wardToCreate } = ward;
-    const district = await this.districtRepo.findOne({
-      where: { id: districtId },
-    });
-
-    const newWard = await this.wardRepo.create({
-      ...wardToCreate,
-      district: district,
-    });
-    return await this.wardRepo.save(newWard);
   }
 }

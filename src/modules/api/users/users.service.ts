@@ -1,16 +1,19 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { AddressService } from '../address/address.service';
 import { OauthCreateUserDto } from './dto/oauth-create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { UserInfoDto } from './dto/user-info.dto';
 import { User } from './user.entity';
 
 @Injectable()
 export class UsersService {
-  @InjectRepository(User)
-  private readonly userRepository: Repository<User>;
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    private readonly addressService: AddressService,
+  ) {}
 
   /**
    * Get 1 user
@@ -19,17 +22,16 @@ export class UsersService {
   async getUserById(id: string): Promise<UserInfoDto> {
     const user = await this.userRepository.findOne({
       where: { id: id },
-      relations: {
-        ward: true,
-      },
+      relations: ['ward', 'ward.district', 'ward.district.city'],
     });
-    if (user) {
-      return user.toDto();
+    if (!user) {
+      throw new NotFoundException(id);
     }
-    throw new NotFoundException(id);
+    return user.toDto();
   }
 
   /**
+   * ADMIN
    * Get 1 user
    * no filter out soft-deleted
    */
@@ -64,13 +66,14 @@ export class UsersService {
         ward: true,
       },
     });
-    if (users) {
-      return users;
+    if (!users) {
+      throw new NotFoundException();
     }
-    throw new NotFoundException();
+    return users;
   }
 
   /**
+   * ADMIN
    * Get all users
    * no filter out soft-deleted
    */
@@ -96,26 +99,46 @@ export class UsersService {
   }
 
   /**
-   * Create a user
+   * Update a user
    */
-  // async updateUser(id: string, updateData: UpdateUserDto): Promise<User> {
-  //   const updatedUser: User = await this.userRepository.update(id, updateData);
+  async updateUser(id: string, body: UpdateUserDto): Promise<UserInfoDto> {
+    const userToUpdate = await this.userRepository.findOne({ where: { id } });
 
-  //   return await this.userRepository.save(updatedUser);
-  // }
+    if (!userToUpdate) {
+      throw new NotFoundException();
+    }
+
+    let fullUpdateData = {};
+    if (body.wardId) {
+      const { wardId, ...updateData } = body;
+      const ward = await this.addressService.getOneWard(wardId);
+      // console.log(ward);
+
+      fullUpdateData = { ...updateData, ward: { ...ward } };
+      console.log(body);
+      console.log(fullUpdateData);
+    } else {
+      fullUpdateData = body;
+    }
+
+    await this.userRepository.update(id, fullUpdateData);
+
+    return this.getUserById(id);
+  }
 
   /**
+   * ADMIN
    * Soft delete a user
    */
   async deleteUser(id: string): Promise<void> {
     const deleteResponse = await this.userRepository.softDelete(id);
     if (!deleteResponse.affected) {
-      // throw new UserNotFoundException(id);
       throw new NotFoundException(id);
     }
   }
 
   /**
+   * ADMIN
    * Restore a soft-deleted user
    */
   async restoreDeletedUser(id: string) {

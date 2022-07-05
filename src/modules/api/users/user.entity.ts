@@ -7,7 +7,7 @@ import {
   DeleteDateColumn,
   Entity,
   JoinColumn,
-  OneToOne,
+  ManyToOne,
 } from 'typeorm';
 import { Ward } from '../address/ward.entity';
 import { UserInfoDto } from './dto/user-info.dto';
@@ -48,7 +48,7 @@ export class User extends AbstractEntity {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @OneToOne(() => Ward)
+  @ManyToOne(() => Ward)
   @JoinColumn()
   ward: Ward;
 
