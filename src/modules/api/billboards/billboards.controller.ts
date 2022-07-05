@@ -13,7 +13,7 @@ import { BillboardInfoDto } from './dto/billboard-info.dto';
 import { CreateBillboardDto } from './dto/create-billboard.dto';
 
 @Controller('api/billboards')
-@ApiTags()
+@ApiTags('Billboards')
 export class BillboardsController {
   constructor(private readonly billboardsService: BillboardsService) {}
 
