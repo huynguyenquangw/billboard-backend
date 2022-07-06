@@ -21,11 +21,13 @@ export class BillboardsService {
   async create(
     createBillboardDto: CreateBillboardDto,
   ): Promise<BillboardInfoDto> {
-    const findWard = await this.addressService.getOneWard(createBillboardDto.wardId);
+    const findWard = await this.addressService.getOneWard(
+      createBillboardDto.wardId,
+    );
 
     const newBillboard: Billboard = await this.billboardRepository.create({
       ...createBillboardDto,
-      ward: findWard
+      ward: findWard,
     });
 
     await this.billboardRepository.save(newBillboard);
