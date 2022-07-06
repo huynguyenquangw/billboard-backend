@@ -40,6 +40,7 @@ export class BillboardsService {
          rentalPrice: selectedPrice,
          size_x: selectedSize_x,
          size_y: selectedSize_y,
+         status: StatusType.APPROVED,
          },
       withDeleted: true,
     });
