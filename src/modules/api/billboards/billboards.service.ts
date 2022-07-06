@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { StatusType } from 'src/constants';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { AddressService } from '../address/address.service';
 import { Billboard } from './billboard.entity';
 import { BillboardInfoDto } from './dto/billboard-info.dto';
@@ -36,7 +36,7 @@ export class BillboardsService {
   async search(selectedAdrress2: string, selectedPrice: number, selectedSize_x : number, selectedSize_y: number): Promise<Billboard[]> {
     return this.billboardRepository.find({
       where: {
-         address2: selectedAdrress2,
+         address2: Like(`%${selectedAdrress2}%`),
          rentalPrice: selectedPrice,
          size_x: selectedSize_x,
          size_y: selectedSize_y,
