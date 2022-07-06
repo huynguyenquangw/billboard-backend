@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { BillboardsService } from './billboards.service';
@@ -28,11 +29,15 @@ export class BillboardsController {
   }
 
   //Search and get all billbaord by address2
-  @Get('/getAll/:address2')
+  @Get('/search')
   billBoardGet(
-    @Param('address2') address2: CreateBillboardDto['address2'],
+    @Query('address2') address2: CreateBillboardDto['address2'],
+    @Query('rentalPrice') price: CreateBillboardDto['rentalPrice'],
+    @Query('size_x') size_x: CreateBillboardDto['size_x'],
+    @Query('size_y') size_y: CreateBillboardDto['size_y'],
+    //@Query('district') district: CreateBillboardDto['wardId']
   ): Promise<any> {
-    return this.billboardsService.getAllbyAddress2(address2);
+    return this.billboardsService.search(address2, price, size_x, size_y);
   }
 
   //Get one billboard by id for detail page
@@ -73,7 +78,7 @@ export class BillboardsController {
    * ROLE: USER
    * Update billboard
    */
-  @Patch(':id/update')
+  @Patch('update/:id')
   @ApiOperation({ summary: 'Update 1 billboard info' })
   update(
     @Param('id') id: string,
