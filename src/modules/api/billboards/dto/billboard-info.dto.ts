@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsNumber, IsString } from 'class-validator';
-import { AbstractDto } from 'src/common/dto/AbstractDto';
+import { AbstractDto } from 'src/common/dtos/abstract.dto';
 import { Ward } from '../../address/ward.entity';
 import { User } from '../../users/user.entity';
 import { Billboard } from '../billboard.entity';

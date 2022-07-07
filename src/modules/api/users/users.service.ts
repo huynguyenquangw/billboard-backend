@@ -1,5 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PageMetaDto } from 'src/common/dtos/page-meta.dto';
+import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
+import { PageDto } from 'src/common/dtos/page.dto';
 import { Repository } from 'typeorm';
 import { AddressService } from '../address/address.service';
 import { OauthCreateUserDto } from './dto/oauth-create-user.dto';
@@ -39,6 +42,28 @@ export class UsersService {
       throw new NotFoundException(id);
     }
     return user;
+  }
+
+  /**
+   * test get users with pagination
+   * by id
+   */
+  async getUsers(
+    pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<UserInfoDto>> {
+    const queryBuilder = this.userRepository.createQueryBuilder('users');
+
+    queryBuilder
+      .orderBy('users.createdAt', pageOptionsDto.order)
+      .skip(pageOptionsDto.skip)
+      .take(pageOptionsDto.take);
+
+    const itemCount = await queryBuilder.getCount();
+    const { entities } = await queryBuilder.getRawAndEntities();
+
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+
+    return new PageDto(entities, pageMetaDto);
   }
 
   /**

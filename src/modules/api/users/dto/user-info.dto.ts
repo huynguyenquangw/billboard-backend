@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { AbstractDto } from 'src/common/dto/AbstractDto';
+import { AbstractDto } from 'src/common/dtos/abstract.dto';
 import { AuthType } from 'src/constants';
 import { Ward } from '../../address/ward.entity';
 

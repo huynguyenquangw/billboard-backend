@@ -7,6 +7,7 @@ import {
   Inject,
   Param,
   Patch,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -19,6 +20,8 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
+import { PageDto } from 'src/common/dtos/page.dto';
 import { JwtAuthGuard } from 'src/modules/auth/oauth/guards/jwtAuth.guard';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserInfoDto } from './dto/user-info.dto';
@@ -30,6 +33,14 @@ import { UsersService } from './users.service';
 export class UsersController {
   @Inject(UsersService)
   private readonly usersService: UsersService;
+
+  @Get('test')
+  @HttpCode(HttpStatus.OK)
+  async getUsers(
+    @Query() pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<UserInfoDto>> {
+    return this.usersService.getUsers(pageOptionsDto);
+  }
 
   @Get('me')
   @ApiOperation({ summary: "Get current user's profile" })
@@ -46,6 +57,12 @@ export class UsersController {
   })
   getMe(@Req() req): Promise<UserInfoDto> {
     return this.usersService.getUserById(req.user.userId);
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'Get all users' })
+  async getAllUsers(): Promise<UserInfoDto[]> {
+    return await this.usersService.getAllUsers();
   }
 
   @Get(':id')
@@ -70,23 +87,17 @@ export class UsersController {
     return user.toDto();
   }
 
-  @Get()
-  @ApiOperation({ summary: 'Get all users' })
-  getAllUsers(): Promise<UserInfoDto[]> {
-    return this.usersService.getAllUsers();
-  }
-
   /**
    * USER
    * Update user
    */
   @Patch(':id/update')
   @ApiOperation({ summary: 'Update user info' })
-  update(
+  async update(
     @Param('id') id: string,
     @Body() body: UpdateUserDto,
   ): Promise<UserInfoDto> {
-    return this.usersService.updateUser(id, body);
+    return await this.usersService.updateUser(id, body);
   }
 
   /**
@@ -96,7 +107,7 @@ export class UsersController {
   @Patch(':id/delete')
   @ApiOperation({ summary: 'ADMIN: soft-delete' })
   @HttpCode(200)
-  billBoardDelete(@Param('id') deleteId: string): Promise<void> {
-    return this.usersService.deleteUser(deleteId);
+  async billBoardDelete(@Param('id') deleteId: string): Promise<void> {
+    return await this.usersService.deleteUser(deleteId);
   }
 }
