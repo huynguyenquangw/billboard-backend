@@ -4,7 +4,7 @@ import { PageMetaDto } from 'src/common/dtos/page-meta.dto';
 import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { PageDto } from 'src/common/dtos/page.dto';
 import { StatusType } from 'src/constants';
-import { ILike, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { AddressService } from '../address/address.service';
 import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
@@ -63,11 +63,11 @@ export class BillboardsService {
         size_x: selectedSize_x,
         size_y: selectedSize_y,
         status: StatusType.APPROVED,
-        ward:{
-          district:{ 
-            name: selectedDistrict
-          }
-         },
+        ward: {
+          district: {
+            name: selectedDistrict,
+          },
+        },
       },
       withDeleted: true,
     });
