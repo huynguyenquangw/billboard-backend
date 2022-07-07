@@ -1,5 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PageMetaDto } from 'src/common/dtos/page-meta.dto';
+import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
+import { PageDto } from 'src/common/dtos/page.dto';
 import { StatusType } from 'src/constants';
 import { ILike, Repository } from 'typeorm';
 import { AddressService } from '../address/address.service';
@@ -77,6 +80,30 @@ export class BillboardsService {
     return this.billboardRepository.find({
       where: { status: StatusType.APPROVED },
     });
+  }
+
+  /**
+   * Get 1 user
+   * by id
+   */
+  async getApprovedBillboards(
+    pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<BillboardInfoDto>> {
+    const queryBuilder =
+      this.billboardRepository.createQueryBuilder('billboards');
+
+    queryBuilder
+      .orderBy('billboards.createdAt', pageOptionsDto.order)
+      .skip(pageOptionsDto.skip)
+      .take(pageOptionsDto.take)
+      .where({ status: StatusType.APPROVED, isRented: false });
+
+    const itemCount = await queryBuilder.getCount();
+    const { entities } = await queryBuilder.getRawAndEntities();
+
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+
+    return new PageDto(entities, pageMetaDto);
   }
 
   //Approve a billboard

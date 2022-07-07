@@ -1,8 +1,9 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Patch,
   Post,
@@ -11,6 +12,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
+import { PageDto } from 'src/common/dtos/page.dto';
 import { JwtAuthGuard } from 'src/modules/auth/oauth/guards/jwtAuth.guard';
 import { Billboard } from './billboard.entity';
 import { BillboardsService } from './billboards.service';
@@ -63,6 +66,17 @@ export class BillboardsController {
     return this.billboardsService.getAllApproved();
   }
 
+  @Get('/all/approved')
+  @ApiOperation({
+    summary: 'Get all approved billboards for main page with pagination',
+  })
+  @HttpCode(HttpStatus.OK)
+  async getUsers(
+    @Query() pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<BillboardInfoDto>> {
+    return this.billboardsService.getApprovedBillboards(pageOptionsDto);
+  }
+
   //Approve a billboard
   @Get('/approve/:id')
   @ApiOperation({ summary: 'OPERATOR: approve 1 billboard' })
@@ -87,7 +101,7 @@ export class BillboardsController {
    * ROLE: USER
    * Update billboard
    */
-  @Patch('update/:id')
+  @Patch(':id/update')
   @ApiOperation({ summary: 'Update 1 billboard info' })
   update(
     @Param('id') id: string,
@@ -97,20 +111,20 @@ export class BillboardsController {
   }
 
   //Soft Delete a billobard
-  @Get('/softDelete/:id')
+  @Get(':id/delete')
   billBoardSoftDelete(@Param('id') softDeleteId: string): Promise<any> {
     return this.billboardsService.softDeleteBillboard(softDeleteId);
   }
 
   //Restore a soft deleted billboard
-  @Get('restore/:id')
+  @Get(':id/restore')
   billboardRestore(@Param('id') restoreId: string): Promise<any> {
     return this.billboardsService.restoreSoftDeleteBillboard(restoreId);
   }
 
   //Completely delete a billboard from database
-  @Delete('/delete/:id')
-  billBoardHardDelete(@Param('id') hardDeleteId: string): Promise<any> {
-    return this.billboardsService.hardDeleteBillboard(hardDeleteId);
-  }
+  // @Delete('/delete/:id')
+  // billBoardHardDelete(@Param('id') hardDeleteId: string): Promise<any> {
+  //   return this.billboardsService.hardDeleteBillboard(hardDeleteId);
+  // }
 }
