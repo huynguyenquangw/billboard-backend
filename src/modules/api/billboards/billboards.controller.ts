@@ -59,9 +59,9 @@ export class BillboardsController {
     @Query('rentalPrice') price: CreateBillboardDto['rentalPrice'],
     @Query('size_x') size_x: CreateBillboardDto['size_x'],
     @Query('size_y') size_y: CreateBillboardDto['size_y'],
-    //@Query('district') district: CreateBillboardDto['wardId']
+    @Query('district') district: string,
   ): Promise<any> {
-    return this.billboardsService.search(address2, price, size_x, size_y);
+    return this.billboardsService.search(address2, price, size_x, size_y, district);
   }
 
   //Get all billboard that has been approved

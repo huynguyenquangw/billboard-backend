@@ -50,14 +50,21 @@ export class BillboardsService {
     selectedPrice: number,
     selectedSize_x: number,
     selectedSize_y: number,
+    selectedDistrict: string,
   ): Promise<Billboard[]> {
     return this.billboardRepository.find({
+      relations: ['ward', 'ward.district', 'ward.district.city'],
       where: {
-        address2: ILike(`%${selectedAdrress2}%`),
+        address2: selectedAdrress2,
         rentalPrice: selectedPrice,
         size_x: selectedSize_x,
         size_y: selectedSize_y,
         status: StatusType.APPROVED,
+        ward:{
+          district:{ 
+            name: selectedDistrict
+          }
+         },
       },
       withDeleted: true,
     });
