@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+// import { Point } from 'geojson';
 import { Repository } from 'typeorm';
 import { City } from './city.entity';
 import { District } from './district.entity';
@@ -22,6 +23,25 @@ export class AddressService {
     @InjectRepository(Ward)
     private wardRepository: Repository<Ward>,
   ) {} // private wardRepository: Repository<Ward>, // @InjectRepository(Ward) // private districtRepository: Repository<District>, // @InjectRepository(District) // private cityRepository: Repository<City>, // @InjectRepository(City)
+
+  /**
+   * Address
+   */
+  // async createAddress(): Promise<any> {
+  //   const newCity = await this.cityRepository.create(hcm);
+  //   if (!newCity) {
+  //     throw new BadRequestException();
+  //   }
+  //   return await this.cityRepository.save(newCity);
+  // }
+  // async create(location: City) {
+  //   const pointObject: Point = {
+  //     type: 'Point',
+  //     coordinates: [location.long, location.lat],
+  //   };
+  //   location.location = pointObject;
+  //   return await this.cityRepository.save(location);
+  // }
 
   /**
    * City

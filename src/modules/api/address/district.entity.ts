@@ -1,5 +1,6 @@
+// import { Point } from 'geojson';
 import { AbstractEntity } from 'src/common/abstract.entity';
-import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { City } from './city.entity';
 import { Ward } from './ward.entity';
 
@@ -11,14 +12,26 @@ export class District extends AbstractEntity {
   @Column({ nullable: true, unique: true })
   abbreviation: string;
 
-  @Column({ nullable: true, default: null })
-  zip: number;
+  @Column({ name: 'photo_url', nullable: true, default: null })
+  photoUrl: string;
 
-  @Column({ nullable: true, default: null })
-  photo: string;
+  @Column({ type: 'double precision', name: 'lat', nullable: true })
+  lat: number;
+
+  @Column({ type: 'double precision', name: 'long', nullable: true })
+  long: number;
+
+  // @Index({ spatial: true })
+  // @Column({
+  //   type: 'geography',
+  //   spatialFeatureType: 'Point',
+  //   srid: 4326,
+  //   nullable: true,
+  // })
+  // location: Point;
 
   @ManyToOne(() => City, (city: City) => city.districts)
-  // @JoinColumn()
+  @JoinColumn({ name: 'city_id' })
   city: City;
 
   @OneToMany(() => Ward, (ward: Ward) => ward.district)

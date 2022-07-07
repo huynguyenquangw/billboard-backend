@@ -8,7 +8,7 @@ export class CreateWardDto {
   readonly name: string;
 
   @ApiProperty()
-  @IsNotEmpty()
   @IsUUID()
+  @IsNotEmpty()
   readonly districtId: string;
 }

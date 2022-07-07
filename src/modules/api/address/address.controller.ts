@@ -22,6 +22,24 @@ export class AddressController {
   constructor(private readonly addressService: AddressService) {}
 
   /**
+   * Address
+   */
+  // @Post('address/create')
+  // @ApiOperation({ summary: 'Create address' })
+  // @HttpCode(HttpStatus.OK)
+  // @ApiOkResponse({
+  //   type: CreateCityDto,
+  //   description: 'Successfully create address',
+  // })
+  // async createAddress(): Promise<any> {
+  //   return this.addressService.createAddress();
+  // }
+  // @Post('mycity')
+  // createLocation(@Body() location: City): void {
+  //   this.addressService.create(location);
+  // }
+
+  /**
    * City
    */
   @Post('cities/create')

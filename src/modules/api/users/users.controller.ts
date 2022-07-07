@@ -22,6 +22,7 @@ import {
 import { JwtAuthGuard } from 'src/modules/auth/oauth/guards/jwtAuth.guard';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserInfoDto } from './dto/user-info.dto';
+import { User } from './user.entity';
 import { UsersService } from './users.service';
 
 @Controller('api/users')
@@ -64,8 +65,9 @@ export class UsersController {
     status: 404,
     description: 'A user with given id does not exist.',
   })
-  getUserById(@Param('id') id: string): Promise<UserInfoDto> {
-    return this.usersService.getUserById(id);
+  async getUserById(@Param('id') id: string): Promise<UserInfoDto> {
+    const user: User = await this.usersService.getUserById(id);
+    return user.toDto();
   }
 
   @Get()

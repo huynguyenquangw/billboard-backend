@@ -17,6 +17,11 @@ export class UpdateUserDto {
   @IsOptional()
   readonly address2: string;
 
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  readonly companyName: string;
+
   @ApiProperty()
   @IsUUID()
   @IsOptional()

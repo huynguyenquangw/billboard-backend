@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { StatusType } from 'src/constants';
 import { ILike, Repository } from 'typeorm';
 import { AddressService } from '../address/address.service';
+import { User } from '../users/user.entity';
+import { UsersService } from '../users/users.service';
 import { Billboard } from './billboard.entity';
 import { BillboardInfoDto } from './dto/billboard-info.dto';
 import { CreateBillboardDto } from './dto/create-billboard.dto';
@@ -13,37 +15,50 @@ export class BillboardsService {
     @InjectRepository(Billboard)
     private billboardRepository: Repository<Billboard>,
     private readonly addressService: AddressService,
+    private readonly usersService: UsersService,
   ) {}
 
   /**
    * Create a billboard
    */
   async create(
+    ownerId: string,
     createBillboardDto: CreateBillboardDto,
-  ): Promise<BillboardInfoDto> {
-    const findWard = await this.addressService.getOneWard(
+  ): Promise<Billboard> {
+    const owner: User = await this.usersService.getUserById(ownerId);
+    if (!owner) {
+      throw new NotFoundException(ownerId);
+    }
+
+    const ward = await this.addressService.getOneWard(
       createBillboardDto.wardId,
     );
 
     const newBillboard: Billboard = await this.billboardRepository.create({
       ...createBillboardDto,
-      ward: findWard,
+      owner: owner,
+      ward: ward,
     });
 
     await this.billboardRepository.save(newBillboard);
-    return newBillboard.toDto();
+    return newBillboard;
   }
 
   //Search and get all billboard by address2, rentalPrice, size_x, size_y, district(not done)
-  async search(selectedAdrress2: string, selectedPrice: number, selectedSize_x : number, selectedSize_y: number): Promise<Billboard[]> {
+  async search(
+    selectedAdrress2: string,
+    selectedPrice: number,
+    selectedSize_x: number,
+    selectedSize_y: number,
+  ): Promise<Billboard[]> {
     return this.billboardRepository.find({
       where: {
-         address2: ILike(`%${selectedAdrress2}%`),
-         rentalPrice: selectedPrice,
-         size_x: selectedSize_x,
-         size_y: selectedSize_y,
-         status: StatusType.APPROVED,
-         },
+        address2: ILike(`%${selectedAdrress2}%`),
+        rentalPrice: selectedPrice,
+        size_x: selectedSize_x,
+        size_y: selectedSize_y,
+        status: StatusType.APPROVED,
+      },
       withDeleted: true,
     });
   }
@@ -53,7 +68,7 @@ export class BillboardsService {
     return await this.billboardRepository.findOne({
       where: { id: findId },
       withDeleted: true,
-      relations: ['ward', 'ward.district', 'ward.district.city'],
+      relations: ['ward', 'ward.district', 'ward.district.city', 'owner'],
     });
   }
 

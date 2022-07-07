@@ -7,8 +7,12 @@ import {
   Patch,
   Post,
   Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/modules/auth/oauth/guards/jwtAuth.guard';
+import { Billboard } from './billboard.entity';
 import { BillboardsService } from './billboards.service';
 import { BillboardInfoDto } from './dto/billboard-info.dto';
 import { CreateBillboardDto } from './dto/create-billboard.dto';
@@ -19,13 +23,18 @@ export class BillboardsController {
   constructor(private readonly billboardsService: BillboardsService) {}
 
   // Create a new billboard
+  @UseGuards(JwtAuthGuard)
   @Post('create')
   @ApiOperation({ summary: 'Create 1 billboard' })
-  billBoardCreate(
+  async billBoardCreate(
+    @Req() req,
     @Body() createBillboardDto: CreateBillboardDto,
   ): Promise<BillboardInfoDto> {
-    // return this.billboardsService.createbillBoard(createBillboardDto);
-    return this.billboardsService.create(createBillboardDto);
+    const newBillboard: Billboard = await this.billboardsService.create(
+      req.user.id,
+      createBillboardDto,
+    );
+    return newBillboard.toDto();
   }
 
   //Search and get all billbaord by address2

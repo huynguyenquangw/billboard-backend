@@ -13,20 +13,25 @@ export class CreateDistrictDto {
   @IsNotEmpty()
   readonly name: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsString()
-  @IsNotEmpty()
-  readonly abbreviation: string;
+  @IsOptional()
+  readonly abbreviation?: string;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  readonly photoUrl?: string;
 
   @ApiPropertyOptional()
   @IsNumber()
   @IsOptional()
-  readonly zip?: number;
+  readonly lat?: number;
 
   @ApiPropertyOptional()
-  @IsString()
+  @IsNumber()
   @IsOptional()
-  readonly photo?: string;
+  readonly long?: number;
 
   @ApiProperty()
   @IsNotEmpty()
