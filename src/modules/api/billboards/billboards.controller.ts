@@ -22,10 +22,24 @@ import { CreateBillboardDto } from './dto/create-billboard.dto';
 export class BillboardsController {
   constructor(private readonly billboardsService: BillboardsService) {}
 
+  //Get all billboard
+  @Get('/admin/all')
+  @ApiOperation({ summary: 'ADMIN: Get all billboards, include deleted' })
+  billboardGetAllWithDeleted(): Promise<any> {
+    return this.billboardsService.getAllWithDeleted();
+  }
+
+  //Approve a billboard
+  @Get('/approve/:id')
+  @ApiOperation({ summary: 'OPERATOR: approve 1 billboard' })
+  billboardApprove(@Param('id') approveId: string): Promise<any> {
+    return this.billboardsService.approveBillboard(approveId);
+  }
+
   // Create a new billboard
   @UseGuards(JwtAuthGuard)
   @Post('create')
-  @ApiOperation({ summary: 'Create 1 billboard' })
+  @ApiOperation({ summary: 'Create billboard' })
   async billBoardCreate(
     @Req() req,
     @Body() createBillboardDto: CreateBillboardDto,
@@ -38,7 +52,8 @@ export class BillboardsController {
   }
 
   //Search and get all billbaord by address2
-  @Get('/search')
+  @Get('search')
+  @ApiOperation({ summary: 'Search billboards' })
   billBoardGet(
     @Query('address2') address2: CreateBillboardDto['address2'],
     @Query('rentalPrice') price: CreateBillboardDto['rentalPrice'],
@@ -49,38 +64,25 @@ export class BillboardsController {
     return this.billboardsService.search(address2, price, size_x, size_y);
   }
 
-  //Get one billboard by id for detail page
-  @Get('/getOne/:id')
-  @ApiOperation({ summary: 'Get 1 billboard' })
-  billBoardGetOne(@Param('id') getOneId: string): Promise<any> {
-    return this.billboardsService.getOneById(getOneId);
-  }
-
   //Get all billboard that has been approved
-  @Get('/approved')
+  @Get('/all/approved')
   @ApiOperation({ summary: 'Get all approved billboards for main page' })
   billboardGetAllApproved(): Promise<any> {
     return this.billboardsService.getAllApproved();
   }
 
-  //Approve a billboard
-  @Get('/approve/:id')
-  @ApiOperation({ summary: 'OPERATOR: approve 1 billboard' })
-  billboardApprove(@Param('id') approveId: string): Promise<any> {
-    return this.billboardsService.approveBillboard(approveId);
-  }
-
-  //Get all billboard
-  @Get('/admin/getAll')
-  billboardGetAllWithDeleted(): Promise<any> {
-    return this.billboardsService.getAllWithDeleted();
-  }
-
   //Get all non deleted billboard
-  @Get('/getAll')
+  @Get('/all')
   @ApiOperation({ summary: 'Get all billboards' })
   billboardGetAllWithoutDeleted(): Promise<any> {
     return this.billboardsService.getAll();
+  }
+
+  //Get one billboard by id for detail page
+  @Get('/:id')
+  @ApiOperation({ summary: 'Get 1 billboard' })
+  billBoardGetOne(@Param('id') getOneId: string): Promise<any> {
+    return this.billboardsService.getOneById(getOneId);
   }
 
   /**

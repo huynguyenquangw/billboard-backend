@@ -76,6 +76,7 @@ export class BillboardsService {
   async getAllApproved(): Promise<Billboard[]> {
     return this.billboardRepository.find({
       where: { status: StatusType.APPROVED },
+      relations: ['ward', 'ward.district', 'ward.district.city'],
     });
   }
 
