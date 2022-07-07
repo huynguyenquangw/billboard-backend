@@ -36,6 +36,11 @@ export class UserInfoDto extends AbstractDto {
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
+  readonly companyName: string;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
   readonly avatar: string;
 
   @ApiProperty({ enum: AuthType })
@@ -59,6 +64,7 @@ export class UserInfoDto extends AbstractDto {
     this.phone = user.phone;
     this.address = user.address;
     this.address2 = user.address2;
+    this.companyName = user.companyName;
     this.avatar = user.avatar;
     this.authType = user.authType;
     this.authProviderId = user.authProviderId;

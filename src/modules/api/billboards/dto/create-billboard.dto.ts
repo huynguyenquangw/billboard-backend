@@ -8,9 +8,9 @@ import {
 } from 'class-validator';
 
 export class CreateBillboardDto {
-  // @IsString()
-  // @IsNotEmpty()
   // @ApiProperty()
+  // @IsString()
+  // // @IsNotEmpty()
   // ownerId: string;
 
   @ApiProperty()

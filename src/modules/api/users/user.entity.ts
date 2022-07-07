@@ -1,4 +1,3 @@
-import { Exclude } from 'class-transformer';
 import { AbstractEntity } from 'src/common/abstract.entity';
 import { AuthType } from 'src/constants/auth-type';
 import { RoleType } from 'src/constants/role-type';
@@ -25,8 +24,7 @@ export class User extends AbstractEntity {
   @Column({ nullable: true })
   phone: string;
 
-  @Column({ nullable: true })
-  @Exclude()
+  @Column({ select: false, nullable: true })
   password: string;
 
   @Column({ nullable: true })
@@ -34,6 +32,9 @@ export class User extends AbstractEntity {
 
   @Column({ nullable: true })
   address2: string;
+
+  @Column({ name: 'company_name', nullable: true })
+  companyName: string;
 
   @Column({ nullable: true })
   avatar: string;
@@ -44,17 +45,22 @@ export class User extends AbstractEntity {
   @Column({ nullable: true, default: null })
   authProviderId: string;
 
-  @Column({ type: 'enum', enum: RoleType, default: RoleType.USER })
+  @Column({
+    select: false,
+    type: 'enum',
+    enum: RoleType,
+    default: RoleType.USER,
+  })
   role: RoleType;
 
-  @DeleteDateColumn()
+  @DeleteDateColumn({ select: false })
   deletedAt: Date;
 
   @ManyToOne(() => Ward)
-  @JoinColumn()
+  @JoinColumn({ name: 'ward_id' })
   ward: Ward;
 
-  @OneToMany(() => Billboard, (billboard) => billboard.user)
+  @OneToMany(() => Billboard, (billboard) => billboard.owner)
   billboards: Billboard[];
 
   toDto(): UserInfoDto {

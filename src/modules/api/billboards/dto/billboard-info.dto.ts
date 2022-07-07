@@ -62,6 +62,7 @@ export class BillboardInfoDto extends AbstractDto {
     this.rentalPrice = billboard.rentalPrice;
     this.rentalDuration = billboard.rentalDuration;
     this.description = billboard.description;
+    this.owner = billboard.owner;
     this.ward = billboard.ward;
   }
 }

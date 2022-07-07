@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { StatusType } from 'src/constants';
 import { Repository } from 'typeorm';
 import { AddressService } from '../address/address.service';
+import { User } from '../users/user.entity';
+import { UsersService } from '../users/users.service';
 import { Billboard } from './billboard.entity';
 import { BillboardInfoDto } from './dto/billboard-info.dto';
 import { CreateBillboardDto } from './dto/create-billboard.dto';
@@ -13,23 +15,33 @@ export class BillboardsService {
     @InjectRepository(Billboard)
     private billboardRepository: Repository<Billboard>,
     private readonly addressService: AddressService,
+    private readonly usersService: UsersService,
   ) {}
 
   /**
    * Create a billboard
    */
   async create(
+    ownerId: string,
     createBillboardDto: CreateBillboardDto,
-  ): Promise<BillboardInfoDto> {
-    const findWard = await this.addressService.getOneWard(createBillboardDto.wardId);
+  ): Promise<Billboard> {
+    const owner: User = await this.usersService.getUserById(ownerId);
+    if (!owner) {
+      throw new NotFoundException(ownerId);
+    }
+
+    const ward = await this.addressService.getOneWard(
+      createBillboardDto.wardId,
+    );
 
     const newBillboard: Billboard = await this.billboardRepository.create({
       ...createBillboardDto,
-      ward: findWard
+      owner: owner,
+      ward: ward,
     });
 
     await this.billboardRepository.save(newBillboard);
-    return newBillboard.toDto();
+    return newBillboard;
   }
 
   //Search and get all billboard by address2
@@ -45,7 +57,7 @@ export class BillboardsService {
     return await this.billboardRepository.findOne({
       where: { id: findId },
       withDeleted: true,
-      relations: ['ward', 'ward.district', 'ward.district.city'],
+      relations: ['ward', 'ward.district', 'ward.district.city', 'owner'],
     });
   }
 

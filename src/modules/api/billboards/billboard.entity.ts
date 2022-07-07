@@ -16,7 +16,7 @@ import { BillboardInfoDto } from './dto/billboard-info.dto';
 @Entity({ name: 'billboards' })
 export class Billboard extends AbstractEntity {
   @ManyToOne(() => User, (user) => user.billboards)
-  user: User;
+  owner: User;
 
   @ManyToOne(() => Ward)
   @JoinColumn()
@@ -66,12 +66,10 @@ export class Billboard extends AbstractEntity {
   @Exclude()
   status: StatusType;
 
-  @Column('bool', { default: 0 })
-  @Exclude()
+  @Column({ type: 'bool', default: 0 })
   isRented: boolean;
 
-  @DeleteDateColumn()
-  @Exclude()
+  @DeleteDateColumn({ select: false })
   deletedAt: Date;
 
   toDto(): BillboardInfoDto {

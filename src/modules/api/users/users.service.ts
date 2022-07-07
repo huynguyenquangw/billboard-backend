@@ -30,15 +30,15 @@ export class UsersService {
    * Get 1 user
    * by id
    */
-  async getUserById(id: string): Promise<UserInfoDto> {
-    const user = await this.userRepository.findOne({
+  async getUserById(id: string): Promise<User> {
+    const user: User = await this.userRepository.findOne({
       where: { id: id },
       relations: ['ward', 'ward.district', 'ward.district.city'],
     });
     if (!user) {
       throw new NotFoundException(id);
     }
-    return user.toDto();
+    return user;
   }
 
   /**
