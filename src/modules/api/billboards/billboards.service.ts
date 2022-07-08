@@ -104,6 +104,9 @@ export class BillboardsService {
       .orderBy('billboards.createdAt', pageOptionsDto.order)
       .skip(pageOptionsDto.skip)
       .take(pageOptionsDto.take)
+      .leftJoinAndSelect('billboards.ward', 'wards')
+      .leftJoinAndSelect('wards.district', 'districts')
+      .leftJoinAndSelect('districts.city', 'citys')
       .where({ status: StatusType.APPROVED, isRented: false });
 
     const itemCount = await queryBuilder.getCount();
