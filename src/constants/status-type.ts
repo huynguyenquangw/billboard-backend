@@ -4,7 +4,7 @@ export enum StatusType {
   // billboard status
   DRAFT = 'DRAFT',
   APPROVED = 'APPROVED',
-  INVALID = 'INVALID',
+  REJECTED = 'REJECTED',
 
   // subscription status
   SUCCESS = 'SUCCESS',

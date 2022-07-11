@@ -90,9 +90,29 @@ export class BillboardsService {
     });
   }
 
+  //Approve a billboard
+  async approveBillboard(getId: string): Promise<Billboard> {
+    const selectedBillboard = await this.getOneById(getId);
+
+    selectedBillboard.status = StatusType.APPROVED;
+    return this.billboardRepository.save(selectedBillboard);
+  }
+
+  //Get all billboard
+  async getAllWithDeleted(): Promise<Billboard[]> {
+    return this.billboardRepository.find({
+      withDeleted: true,
+    });
+  }
+
+  //Get all non soft deleted billboard
+  async getAll(): Promise<Billboard[]> {
+    return this.billboardRepository.find();
+  }
+
   /**
-   * Get 1 user
-   * by id
+   * Get approved billboard list
+   *
    */
   async getApprovedBillboards(
     pageOptionsDto: PageOptionsDto,
@@ -117,24 +137,142 @@ export class BillboardsService {
     return new PageDto(entities, pageMetaDto);
   }
 
-  //Approve a billboard
-  async approveBillboard(getId: string): Promise<Billboard> {
-    const selectedBillboard = await this.getOneById(getId);
+  /**
+   * Get billboard list by price
+   */
+  async getAllFilteredByPrice(
+    pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<BillboardInfoDto>> {
+    const queryBuilder =
+      this.billboardRepository.createQueryBuilder('billboards');
 
-    selectedBillboard.status = StatusType.APPROVED;
-    return this.billboardRepository.save(selectedBillboard);
+    queryBuilder
+      .orderBy('billboards.rentalPrice', pageOptionsDto.order)
+      .skip(pageOptionsDto.skip)
+      .take(pageOptionsDto.take)
+      .where({ status: StatusType.APPROVED, isRented: false });
+
+    const itemCount = await queryBuilder.getCount();
+    const { entities } = await queryBuilder.getRawAndEntities();
+
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+
+    return new PageDto(entities, pageMetaDto);
   }
 
-  //Get all billboard
-  async getAllWithDeleted(): Promise<Billboard[]> {
-    return this.billboardRepository.find({
-      withDeleted: true,
-    });
+  /**
+   * Get billboard list by circulation
+   */
+  async getAllFilteredByCirculation(
+    pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<BillboardInfoDto>> {
+    const queryBuilder =
+      this.billboardRepository.createQueryBuilder('billboards');
+
+    queryBuilder
+      .orderBy('billboards.circulation', pageOptionsDto.order)
+      .skip(pageOptionsDto.skip)
+      .take(pageOptionsDto.take)
+      .where({ status: StatusType.APPROVED, isRented: false });
+
+    const itemCount = await queryBuilder.getCount();
+    const { entities } = await queryBuilder.getRawAndEntities();
+
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+
+    return new PageDto(entities, pageMetaDto);
   }
 
-  //Get all non soft deleted billboard
-  async getAll(): Promise<Billboard[]> {
-    return this.billboardRepository.find();
+  /**
+   * Get draft billboard list
+   */
+  async getDraftBillboards(
+    pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<BillboardInfoDto>> {
+    const queryBuilder =
+      this.billboardRepository.createQueryBuilder('billboards');
+
+    queryBuilder
+      .orderBy('billboards.createdAt', pageOptionsDto.order)
+      .skip(pageOptionsDto.skip)
+      .take(pageOptionsDto.take)
+      .where({ status: StatusType.DRAFT, isRented: false });
+
+    const itemCount = await queryBuilder.getCount();
+    const { entities } = await queryBuilder.getRawAndEntities();
+
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+
+    return new PageDto(entities, pageMetaDto);
+  }
+
+  /**
+   * Get pending billboard list
+   */
+  async getPendingBillboards(
+    pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<BillboardInfoDto>> {
+    const queryBuilder =
+      this.billboardRepository.createQueryBuilder('billboards');
+
+    queryBuilder
+      .orderBy('billboards.createdAt', pageOptionsDto.order)
+      .skip(pageOptionsDto.skip)
+      .take(pageOptionsDto.take)
+      .where({ status: StatusType.PENDING, isRented: false });
+
+    const itemCount = await queryBuilder.getCount();
+    const { entities } = await queryBuilder.getRawAndEntities();
+
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+
+    return new PageDto(entities, pageMetaDto);
+  }
+
+  /**
+   * Get reject billboard list
+   */
+  async getRejectBillboards(
+    pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<BillboardInfoDto>> {
+    const queryBuilder =
+      this.billboardRepository.createQueryBuilder('billboards');
+
+    queryBuilder
+      .orderBy('billboards.createdAt', pageOptionsDto.order)
+      .skip(pageOptionsDto.skip)
+      .take(pageOptionsDto.take)
+      .where({ status: StatusType.PENDING, isRented: false });
+
+    const itemCount = await queryBuilder.getCount();
+    const { entities } = await queryBuilder.getRawAndEntities();
+
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+
+    return new PageDto(entities, pageMetaDto);
+  }
+
+  /**
+   * Get rented billboard list
+   */
+  async getRentedBillboards(
+    pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<BillboardInfoDto>> {
+    const queryBuilder =
+      this.billboardRepository.createQueryBuilder('billboards');
+
+    queryBuilder
+      .orderBy('billboards.createdAt', pageOptionsDto.order)
+      .skip(pageOptionsDto.skip)
+      .take(pageOptionsDto.take)
+      .where({ status: StatusType.APPROVED, isRented: true });
+
+    const itemCount = await queryBuilder.getCount();
+    const { entities } = await queryBuilder.getRawAndEntities();
+
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+
+    return new PageDto(entities, pageMetaDto);
   }
 
   /**

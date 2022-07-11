@@ -73,7 +73,17 @@ export class BillboardsController {
     );
   }
 
-  //Get all billboard that has been approved
+  //Get all non deleted billboard
+  // @Get('/all')
+  // @ApiOperation({ summary: 'Get all billboards' })
+  // billboardGetAllWithoutDeleted(): Promise<Billboard[]> {
+  //   return this.billboardsService.getAll();
+  // }
+
+  /**
+   * Get billboard list by created time (default)
+   * @returns billboard list with pagination
+   */
   @Get('/all/approved')
   @ApiOperation({
     summary: 'Get all approved billboards for main page with pagination',
@@ -85,11 +95,84 @@ export class BillboardsController {
     return this.billboardsService.getApprovedBillboards(pageOptionsDto);
   }
 
-  //Get all non deleted billboard
-  @Get('/all')
-  @ApiOperation({ summary: 'Get all billboards' })
-  billboardGetAllWithoutDeleted(): Promise<any> {
-    return this.billboardsService.getAll();
+  /**
+   * Get billboard list price
+   * @returns billboard list with pagination
+   */
+  @Get('all/approved/price')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get all billboards filtered by price' })
+  async getAllFilteredByPrice(
+    @Query() pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<BillboardInfoDto>> {
+    return this.billboardsService.getAllFilteredByPrice(pageOptionsDto);
+  }
+
+  /**
+   * Get billboard list by circulation
+   * @returns billboard list with pagination
+   */
+  @Get('all/approved/circulation')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get all billboards filtered by circulation' })
+  async getAllFilteredByCirculation(
+    @Query() pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<BillboardInfoDto>> {
+    return this.billboardsService.getAllFilteredByCirculation(pageOptionsDto);
+  }
+
+  /**
+   * TODO: update check current user
+   * TODO: move it to useCase folder (billboardManagement) later on
+   * CURRENT USER - OWNER
+   * Get draft billboard list by created time (default)
+   * @returns draft billboard list with pagination
+   */
+  @Get('/all/draft')
+  @ApiOperation({
+    summary: 'Get all draft billboards of current user with pagination',
+  })
+  @HttpCode(HttpStatus.OK)
+  async getDraftBillboards(
+    @Query() pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<BillboardInfoDto>> {
+    return this.billboardsService.getDraftBillboards(pageOptionsDto);
+  }
+
+  /**
+   * TODO: update check current user
+   * TODO: move it to useCase folder (billboardManagement) later on
+   * CURRENT USER - OWNER
+   * Get rented billboard list by created time (default)
+   * @returns rented billboard list with pagination
+   */
+  @Get('/all/pending')
+  @ApiOperation({
+    summary: 'Get all pending billboards of current user with pagination',
+  })
+  @HttpCode(HttpStatus.OK)
+  async getPendingBillboards(
+    @Query() pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<BillboardInfoDto>> {
+    return this.billboardsService.getPendingBillboards(pageOptionsDto);
+  }
+
+  /**
+   * TODO: update check current user
+   * TODO: move it to useCase folder (billboardManagement) later on
+   * CURRENT USER - OWNER
+   * Get rented billboard list by created time (default)
+   * @returns rented billboard list with pagination
+   */
+  @Get('/all/rented')
+  @ApiOperation({
+    summary: 'Get all rented billboards of current user with pagination',
+  })
+  @HttpCode(HttpStatus.OK)
+  async getRentedBillboards(
+    @Query() pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<BillboardInfoDto>> {
+    return this.billboardsService.getRentedBillboards(pageOptionsDto);
   }
 
   //Get one billboard by id for detail page

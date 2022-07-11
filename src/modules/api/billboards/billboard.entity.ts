@@ -70,7 +70,10 @@ export class Billboard extends AbstractEntity {
   isRented: boolean;
 
   @Column({ default: 0 })
-  rentedCounter: number;
+  rentedCounter?: number = 0;
+
+  @Column({ default: 0 })
+  likedCounter?: number = 0;
 
   @DeleteDateColumn({ select: false })
   deletedAt: Date;
