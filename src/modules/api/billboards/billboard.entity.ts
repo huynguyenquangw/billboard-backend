@@ -46,6 +46,9 @@ export class Billboard extends AbstractEntity {
   @Column({ default: 0 })
   circulation: number;
 
+    /*
+    TODO: Need to adjust
+   */
   @Column({ default: '' })
   previousClient: string;
 
