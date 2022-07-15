@@ -49,13 +49,19 @@ export class BillboardsService {
 
   //Search and get all billboard by address2, rentalPrice, size_x, size_y, district(not done)
   async search(
+    pageOptionsDto: PageOptionsDto,
     selectedAdrress2: string,
     selectedPrice: number,
     selectedSize_x: number,
     selectedSize_y: number,
     selectedDistrict: string,
-  ): Promise<Billboard[]> {
-    return this.billboardRepository.find({
+  ): Promise<PageDto<BillboardInfoDto>> {
+    const searchBillboard= await this.billboardRepository.findAndCount({
+      order:{
+        createdAt: pageOptionsDto.order,
+      },
+      skip: pageOptionsDto.skip,
+      take: pageOptionsDto.take,
       relations: ['ward', 'ward.district', 'ward.district.city'],
       where: {
         address2: selectedAdrress2,
@@ -69,8 +75,12 @@ export class BillboardsService {
           },
         },
       },
-      withDeleted: true,
     });
+
+    const itemCount =searchBillboard[1];
+    const pageMetaDto = new PageMetaDto({itemCount, pageOptionsDto});
+
+    return new PageDto(searchBillboard[0], pageMetaDto)
   }
 
   //Get one billboard by id for detail page and other function
@@ -88,6 +98,14 @@ export class BillboardsService {
       where: { status: StatusType.APPROVED },
       relations: ['ward', 'ward.district', 'ward.district.city'],
     });
+  }
+
+  //Reject a billboard
+  async rejectBillboard(getId: string): Promise<Billboard> {
+    const selectedBillboard = await this.getOneById(getId);
+
+    selectedBillboard.status = StatusType.REJECTED;
+    return this.billboardRepository.save(selectedBillboard);
   }
 
   //Approve a billboard

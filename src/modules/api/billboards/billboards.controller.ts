@@ -39,6 +39,13 @@ export class BillboardsController {
     return this.billboardsService.approveBillboard(approveId);
   }
 
+  //Reject a billboard
+  @Get('/reject/:id')
+  @ApiOperation({ summary: 'OPERATOR: reject 1 billboard' })
+  billboardReject(@Param('id') rejectId: string): Promise<any> {
+    return this.billboardsService.rejectBillboard(rejectId);
+  }
+
   // Create a new billboard
   @UseGuards(JwtAuthGuard)
   @Post('create')
@@ -57,14 +64,17 @@ export class BillboardsController {
   //Search and get all billbaord by address2
   @Get('search')
   @ApiOperation({ summary: 'Search billboards' })
+  @HttpCode(HttpStatus.OK)
   billBoardGet(
+    @Query() pageOptionsDto: PageOptionsDto,
     @Query('address2') address2: CreateBillboardDto['address2'],
     @Query('rentalPrice') price: CreateBillboardDto['rentalPrice'],
     @Query('size_x') size_x: CreateBillboardDto['size_x'],
     @Query('size_y') size_y: CreateBillboardDto['size_y'],
     @Query('district') district: string,
-  ): Promise<any> {
+  ):  Promise<PageDto<BillboardInfoDto>> {
     return this.billboardsService.search(
+      pageOptionsDto,
       address2,
       price,
       size_x,
