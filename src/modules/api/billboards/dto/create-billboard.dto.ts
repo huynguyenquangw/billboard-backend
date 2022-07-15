@@ -51,9 +51,9 @@ export class CreateBillboardDto {
   @IsOptional()
   circulation: number;
 
-  @IsString()
+  @IsArray()
   @IsOptional()
-  previousClient: string;
+  previousClient: object[];
 
   @IsNumber()
   @IsOptional()

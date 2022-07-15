@@ -47,10 +47,10 @@ export class Billboard extends AbstractEntity {
   circulation: number;
 
     /*
-    TODO: Need to adjust
+    TODO: Need to check
    */
-  @Column({ default: '' })
-  previousClient: string;
+  @Column('jsonb', { nullable: true })
+  previousClient: object[];
 
   @Column({ default: 0 })
   rentalPrice: number;
