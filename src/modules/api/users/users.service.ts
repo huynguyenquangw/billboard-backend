@@ -85,11 +85,9 @@ export class UsersService {
   /**
    * Get all users
    */
-  async getAllUsers(): Promise<UserInfoDto[]> {
+  async getAllActiveUsers(): Promise<UserInfoDto[]> {
     const users = await this.userRepository.find({
-      relations: {
-        ward: true,
-      },
+      relations: ['ward', 'ward.district', 'ward.district.city'],
     });
     if (!users) {
       throw new NotFoundException();
@@ -102,8 +100,9 @@ export class UsersService {
    * Get all users
    * no filter out soft-deleted
    */
-  async getAllUsersWithDeleted(): Promise<UserInfoDto[]> {
+  async getAllUsers(): Promise<User[]> {
     const users = await this.userRepository.find({
+      relations: ['ward', 'ward.district', 'ward.district.city'],
       withDeleted: true,
     });
     if (users) {

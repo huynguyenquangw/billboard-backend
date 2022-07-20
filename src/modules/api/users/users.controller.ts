@@ -5,7 +5,6 @@ import {
   HttpCode,
   HttpStatus,
   Inject,
-  Param,
   Patch,
   Req,
   UseGuards,
@@ -58,7 +57,7 @@ export class UsersController {
   /**
    * Update current user's info
    */
-  @Patch('me')
+  @Patch('me/update')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update user info' })
   @ApiOkResponse({
