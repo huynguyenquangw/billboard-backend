@@ -7,7 +7,7 @@ import { UsersModule } from '../users/users.module';
 import { Billboard } from './billboard.entity';
 import { BillboardsController } from './billboards.controller';
 import { BillboardsService } from './billboards.service';
-import { previousClient } from './previousClient.entity';
+import { previousClient } from './previousClients.entity';
 
 @Module({
   imports: [
