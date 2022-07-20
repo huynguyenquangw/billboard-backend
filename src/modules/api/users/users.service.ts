@@ -46,7 +46,7 @@ export class UsersService {
    */
   async getOneWithAddress(id: string): Promise<User> {
     const user: User = await this.userRepository.findOne({
-      where: { id: id },
+      where: { id },
       relations: ['ward', 'ward.district', 'ward.district.city'],
     });
     if (user) {
@@ -114,7 +114,7 @@ export class UsersService {
   /**
    * Update a user
    */
-  async updateUser(id: string, body: UpdateUserDto): Promise<UserInfoDto> {
+  async updateUser(id: string, body: UpdateUserDto): Promise<User> {
     const userToUpdate = await this.userRepository.findOne({ where: { id } });
 
     if (!userToUpdate) {
@@ -132,6 +132,6 @@ export class UsersService {
     }
 
     await this.userRepository.update(id, updateData);
-    return this.getOneWithAddress(id);
+    return await this.getOneWithAddress(id);
   }
 }

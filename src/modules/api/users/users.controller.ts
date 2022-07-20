@@ -34,7 +34,6 @@ export class UsersController {
    * Get current user's profile
    */
   @Get('me')
-  @ApiBearerAuth()
   @ApiOperation({ summary: "Get current user's profile" })
   @ApiOkResponse({
     status: 200,
@@ -50,14 +49,17 @@ export class UsersController {
     description: 'User does not exist.',
   })
   @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth()
   async getMe(@Req() req): Promise<UserInfoDto> {
-    return this.usersService.getOneWithAddress(req.user.userId);
+    const user = await this.usersService.getOneWithAddress(req.user.id);
+    return user;
   }
 
   /**
    * Update current user's info
    */
   @Patch('me/update')
+  // @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update user info' })
   @ApiOkResponse({
@@ -81,6 +83,7 @@ export class UsersController {
     @Req() req,
     @Body() body: UpdateUserDto,
   ): Promise<UserInfoDto> {
-    return await this.usersService.updateUser(req.user.userId, body);
+    const updatedUser = await this.usersService.updateUser(req.user.id, body);
+    return updatedUser.toDto();
   }
 }
