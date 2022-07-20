@@ -7,107 +7,81 @@ import {
   Inject,
   Param,
   Patch,
-  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
-  ApiParam,
-  ApiResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
-import { PageDto } from 'src/common/dtos/page.dto';
-import { JwtAuthGuard } from 'src/modules/auth/oauth/guards/jwtAuth.guard';
+import { JwtAuthGuard } from 'src/modules/auth/oauth/guards/jwt-authentication.guard';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserInfoDto } from './dto/user-info.dto';
-import { User } from './user.entity';
 import { UsersService } from './users.service';
 
 @Controller('api/users')
 @ApiTags('Users')
+@UseGuards(JwtAuthGuard)
 export class UsersController {
   @Inject(UsersService)
   private readonly usersService: UsersService;
 
-  @Get('test')
-  @HttpCode(HttpStatus.OK)
-  async getUsers(
-    @Query() pageOptionsDto: PageOptionsDto,
-  ): Promise<PageDto<UserInfoDto>> {
-    return this.usersService.getUsers(pageOptionsDto);
-  }
-
+  /**
+   * Get current user's profile
+   */
   @Get('me')
-  @ApiOperation({ summary: "Get current user's profile" })
-  @UseGuards(JwtAuthGuard)
-  @HttpCode(HttpStatus.OK)
   @ApiBearerAuth()
+  @ApiOperation({ summary: "Get current user's profile" })
   @ApiOkResponse({
+    status: 200,
+    description: "Return current user's information",
     type: UserInfoDto,
-    description: "Get current user's info",
   })
   @ApiUnauthorizedResponse({
-    // type: UserInfoDto,
-    // description: "Get current user's info",
+    status: 401,
+    description: 'Unauthorized or Unauthenticated',
   })
-  getMe(@Req() req): Promise<UserInfoDto> {
-    return this.usersService.getUserById(req.user.userId);
+  @ApiUnauthorizedResponse({
+    status: 404,
+    description: 'User does not exist.',
+  })
+  @HttpCode(HttpStatus.OK)
+  async getMe(@Req() req): Promise<UserInfoDto> {
+    return this.usersService.getOneWithAddress(req.user.userId);
   }
 
-  @Get()
-  @ApiOperation({ summary: 'Get all users' })
-  async getAllUsers(): Promise<UserInfoDto[]> {
-    return await this.usersService.getAllUsers();
-  }
-
-  @Get(':id')
-  @ApiOperation({ summary: 'Get 1 user by id' })
-  @ApiParam({
-    name: 'id',
-    required: true,
-    description: 'Should be an id of a user that exists in the database',
-    type: String,
-  })
-  @ApiResponse({
+  /**
+   * Update current user's info
+   */
+  @Patch('me')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update user info' })
+  @ApiOkResponse({
     status: 200,
-    description: 'A user has been successfully fetched',
+    description: 'User information is successfully updated',
     type: UserInfoDto,
   })
-  @ApiResponse({
-    status: 404,
-    description: 'A user with given id does not exist.',
+  @ApiBadRequestResponse({
+    status: 400,
+    description: 'Bad Request',
   })
-  async getUserById(@Param('id') id: string): Promise<UserInfoDto> {
-    const user: User = await this.usersService.getUserById(id);
-    return user.toDto();
-  }
-
-  /**
-   * USER
-   * Update user
-   */
-  @Patch(':id/update')
-  @ApiOperation({ summary: 'Update user info' })
-  async update(
-    @Param('id') id: string,
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Unauthorized or Unauthenticated',
+  })
+  @ApiNotFoundResponse({
+    status: 404,
+    description: 'User does not exist',
+  })
+  async updateMe(
+    @Req() req,
     @Body() body: UpdateUserDto,
   ): Promise<UserInfoDto> {
-    return await this.usersService.updateUser(id, body);
-  }
-
-  /**
-   * ADMIN
-   * Soft-delete user
-   */
-  @Patch(':id/delete')
-  @ApiOperation({ summary: 'ADMIN: soft-delete' })
-  @HttpCode(200)
-  async billBoardDelete(@Param('id') deleteId: string): Promise<void> {
-    return await this.usersService.deleteUser(deleteId);
+    return await this.usersService.updateUser(req.user.userId, body);
   }
 }

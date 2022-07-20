@@ -1,8 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PageMetaDto } from 'src/common/dtos/page-meta.dto';
-import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
-import { PageDto } from 'src/common/dtos/page.dto';
 import { Repository } from 'typeorm';
 import { AddressService } from '../address/address.service';
 import { OauthCreateUserDto } from './dto/oauth-create-user.dto';
@@ -19,6 +16,20 @@ export class UsersService {
   ) {}
 
   /**
+   * Find only ONE user
+   * by id
+   */
+  async findOne(id: string): Promise<User> {
+    const user: User = await this.userRepository.findOne({
+      where: { id: id },
+    });
+    if (user) {
+      return user;
+    }
+    throw new NotFoundException(id);
+  }
+
+  /**
    * Create a user
    */
   async createUser(oauthCreateUserDto: OauthCreateUserDto): Promise<User> {
@@ -33,37 +44,15 @@ export class UsersService {
    * Get 1 user
    * by id
    */
-  async getUserById(id: string): Promise<User> {
+  async getOneWithAddress(id: string): Promise<User> {
     const user: User = await this.userRepository.findOne({
       where: { id: id },
       relations: ['ward', 'ward.district', 'ward.district.city'],
     });
-    if (!user) {
-      throw new NotFoundException(id);
+    if (user) {
+      return user;
     }
-    return user;
-  }
-
-  /**
-   * test get users with pagination
-   * by id
-   */
-  async getUsers(
-    pageOptionsDto: PageOptionsDto,
-  ): Promise<PageDto<UserInfoDto>> {
-    const queryBuilder = this.userRepository.createQueryBuilder('users');
-
-    queryBuilder
-      .orderBy('users.createdAt', pageOptionsDto.order)
-      .skip(pageOptionsDto.skip)
-      .take(pageOptionsDto.take);
-
-    const itemCount = await queryBuilder.getCount();
-    const { entities } = await queryBuilder.getRawAndEntities();
-
-    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
-
-    return new PageDto(entities, pageMetaDto);
+    throw new NotFoundException(id);
   }
 
   /**
@@ -71,7 +60,7 @@ export class UsersService {
    * Get 1 user
    * no filter out soft-deleted
    */
-  async getUserByIdWithDeleted(id: string): Promise<UserInfoDto> {
+  async getOne(id: string): Promise<UserInfoDto> {
     const user = await this.userRepository.findOne({
       where: { id: id },
       withDeleted: true,
@@ -133,43 +122,17 @@ export class UsersService {
       throw new NotFoundException();
     }
 
-    let fullUpdateData = {};
+    let updateData = {};
     if (body.wardId) {
-      const { wardId, ...updateData } = body;
+      const { wardId, ...newData } = body;
       const ward = await this.addressService.getOneWard(wardId);
-      // console.log(ward);
 
-      fullUpdateData = { ...updateData, ward: { ...ward } };
-      console.log(body);
-      console.log(fullUpdateData);
+      updateData = { ...newData, ward: { ...ward } };
     } else {
-      fullUpdateData = body;
+      updateData = body;
     }
 
-    await this.userRepository.update(id, fullUpdateData);
-
-    return this.getUserById(id);
-  }
-
-  /**
-   * ADMIN
-   * Soft delete a user
-   */
-  async deleteUser(id: string): Promise<void> {
-    const deleteResponse = await this.userRepository.softDelete(id);
-    if (!deleteResponse.affected) {
-      throw new NotFoundException(id);
-    }
-  }
-
-  /**
-   * ADMIN
-   * Restore a soft-deleted user
-   */
-  async restoreDeletedUser(id: string) {
-    const restoreResponse = await this.userRepository.restore(id);
-    if (!restoreResponse.affected) {
-      throw new NotFoundException(id);
-    }
+    await this.userRepository.update(id, updateData);
+    return this.getOneWithAddress(id);
   }
 }

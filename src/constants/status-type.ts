@@ -5,6 +5,7 @@ export enum StatusType {
   DRAFT = 'DRAFT',
   APPROVED = 'APPROVED',
   REJECTED = 'REJECTED',
+  RENTED = 'RENTED',
 
   // subscription status
   SUCCESS = 'SUCCESS',

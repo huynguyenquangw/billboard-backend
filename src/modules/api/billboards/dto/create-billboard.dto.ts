@@ -9,11 +9,6 @@ import {
 } from 'class-validator';
 
 export class CreateBillboardDto {
-  // @ApiProperty()
-  // @IsString()
-  // // @IsNotEmpty()
-  // ownerId: string;
-
   @ApiProperty()
   @IsUUID()
   @IsOptional()

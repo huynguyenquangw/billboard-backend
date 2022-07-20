@@ -16,5 +16,6 @@ import { BillboardsService } from './billboards.service';
   ],
   controllers: [BillboardsController],
   providers: [BillboardsService],
+  exports: [BillboardsService],
 })
 export class BillboardsModule {}

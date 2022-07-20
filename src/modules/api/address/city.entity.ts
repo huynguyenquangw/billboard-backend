@@ -20,19 +20,6 @@ export class City extends AbstractEntity {
   @Column({ type: 'double precision', name: 'long', nullable: true })
   long: number;
 
-  // @Index({ spatial: true })
-  // @Column({
-  //   type: 'geography',
-  //   spatialFeatureType: 'Point',
-  //   srid: 4326,
-  //   nullable: true,
-  // })
-  // location: Point;
-
   @OneToMany(() => District, (district: District) => district.city)
   districts: District[];
-
-  // toDto(): CityDto {
-  //   return new CityDto(this);
-  // }
 }

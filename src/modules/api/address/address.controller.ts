@@ -75,6 +75,12 @@ export class AddressController {
   /**
    * District
    */
+
+  @Get('districts/countBillboard')
+  getApprovedBillboardsWithinDistrict(): Promise<any> {
+    return this.addressService.getApprovedBillboardsWithinDistrict();
+  }
+
   @Post('districts/create')
   @ApiOperation({ summary: 'create a new district' })
   @HttpCode(HttpStatus.OK)
@@ -97,11 +103,6 @@ export class AddressController {
   getAllWardsOfADistrict(@Param('id') id: string): Promise<Ward[]> {
     return this.addressService.getAllWardsByDistrictId(id);
   }
-
-  // @Get('districts/all')
-  // getAllDistricts(): Promise<District[]> {
-  //   return this.addressService.getAllDistricts();
-  // }
 
   /**
    * Ward

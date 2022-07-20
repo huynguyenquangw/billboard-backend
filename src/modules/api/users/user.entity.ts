@@ -46,7 +46,7 @@ export class User extends AbstractEntity {
   authProviderId: string;
 
   @Column({
-    select: false,
+    // select: false,
     type: 'enum',
     enum: RoleType,
     default: RoleType.USER,

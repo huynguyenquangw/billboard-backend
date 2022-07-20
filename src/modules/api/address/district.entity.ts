@@ -21,15 +21,6 @@ export class District extends AbstractEntity {
   @Column({ type: 'double precision', name: 'long', nullable: true })
   long: number;
 
-  // @Index({ spatial: true })
-  // @Column({
-  //   type: 'geography',
-  //   spatialFeatureType: 'Point',
-  //   srid: 4326,
-  //   nullable: true,
-  // })
-  // location: Point;
-
   @ManyToOne(() => City, (city: City) => city.districts)
   @JoinColumn({ name: 'city_id' })
   city: City;
