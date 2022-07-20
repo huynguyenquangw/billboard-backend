@@ -81,8 +81,6 @@ export class BillboardsController {
    * Update billboard
    */
   @Patch(':id')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update 1 billboard info' })
   async getOne(@Param('id') id: string): Promise<BillboardInfoDto> {
     return this.billboardsService.findOneWithRelations(id);
