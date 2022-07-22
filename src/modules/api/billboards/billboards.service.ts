@@ -4,6 +4,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PageMetaDto } from 'src/common/dtos/page-meta.dto';
+import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
+import { PageDto } from 'src/common/dtos/page.dto';
 import { StatusType } from 'src/constants';
 import { Brackets, Repository, UpdateResult } from 'typeorm';
 import { AddressService } from '../address/address.service';
@@ -79,13 +82,19 @@ export class BillboardsService {
 
   //Search and get all billboard by address2, rentalPrice, size_x, size_y, district(not done)
   async search(
+    pageOptionsDto: PageOptionsDto,
     selectedAdrress2: string,
     selectedPrice: number,
     selectedSize_x: number,
     selectedSize_y: number,
     selectedDistrict: string,
-  ): Promise<Billboard[]> {
-    return this._billboardRepo.find({
+  ): Promise<PageDto<BillboardInfoDto>> {
+    const searchBillboard = await this._billboardRepo.findAndCount({
+      order: {
+        createdAt: pageOptionsDto.order,
+      },
+      skip: pageOptionsDto.skip,
+      take: pageOptionsDto.take,
       relations: ['ward', 'ward.district', 'ward.district.city'],
       where: {
         address2: selectedAdrress2,
@@ -99,8 +108,12 @@ export class BillboardsService {
           },
         },
       },
-      withDeleted: true,
     });
+
+    const itemCount = searchBillboard[1];
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+
+    return new PageDto(searchBillboard[0], pageMetaDto);
   }
 
   /**

@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Patch,
   Post,
@@ -17,6 +19,8 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
+import { PageDto } from 'src/common/dtos/page.dto';
 // import RolesGuard from 'src/guards/roles.guard';
 import { JwtAuthGuard } from 'src/modules/auth/oauth/guards/jwt-authentication.guard';
 import { UpdateResult } from 'typeorm';
@@ -61,14 +65,17 @@ export class BillboardsController {
   //Search and get all billbaord by address2
   @Get('search')
   @ApiOperation({ summary: 'Search billboards' })
+  @HttpCode(HttpStatus.OK)
   async search(
+    @Query() pageOptionsDto: PageOptionsDto,
     @Query('address2') address2: CreateBillboardDto['address2'],
     @Query('rentalPrice') price: CreateBillboardDto['rentalPrice'],
     @Query('size_x') size_x: CreateBillboardDto['size_x'],
     @Query('size_y') size_y: CreateBillboardDto['size_y'],
     @Query('district') district: string,
-  ): Promise<any> {
+  ): Promise<PageDto<BillboardInfoDto>> {
     return this.billboardsService.search(
+      pageOptionsDto,
       address2,
       price,
       size_x,
