@@ -9,9 +9,17 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiForbiddenResponse,
+  ApiNoContentResponse,
+  ApiNotFoundResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 // import RolesGuard from 'src/guards/roles.guard';
 import { JwtAuthGuard } from 'src/modules/auth/oauth/guards/jwt-authentication.guard';
+import { UpdateResult } from 'typeorm';
 import { Billboard } from './billboard.entity';
 import { BillboardsService } from './billboards.service';
 import { BillboardInfoDto } from './dto/billboard-info.dto';
@@ -22,19 +30,17 @@ import { CreateBillboardDto } from './dto/create-billboard.dto';
 export class BillboardsController {
   constructor(private readonly billboardsService: BillboardsService) {}
 
-  //Get all billboard
-  @Get('/admin/all')
-  @ApiOperation({ summary: 'ADMIN: Get all billboards, include deleted' })
-  billboardGetAllWithDeleted(): Promise<any> {
-    return this.billboardsService.getAllWithDeleted();
-  }
-
-  // Create a new billboard
+  /**
+   * Create a new billboard
+   * @param req
+   * @param createBillboardDto
+   * @returns BillboardInfoDto
+   */
   @Post('create')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create billboard' })
-  async billBoardCreate(
+  async create(
     @Req() req,
     @Body() createBillboardDto: CreateBillboardDto,
   ): Promise<BillboardInfoDto> {
@@ -45,10 +51,17 @@ export class BillboardsController {
     return newBillboard.toDto();
   }
 
+  @Get('count')
+  async getCountOfBillboardsWithinDistrict(@Req() req): Promise<any> {
+    return await this.billboardsService.getCountOfBillboardsWithinDistrict(
+      req.body.cityName,
+    );
+  }
+
   //Search and get all billbaord by address2
   @Get('search')
   @ApiOperation({ summary: 'Search billboards' })
-  billBoardGet(
+  async search(
     @Query('address2') address2: CreateBillboardDto['address2'],
     @Query('rentalPrice') price: CreateBillboardDto['rentalPrice'],
     @Query('size_x') size_x: CreateBillboardDto['size_x'],
@@ -65,39 +78,55 @@ export class BillboardsController {
   }
 
   /**
-   * Get billboard count by district
-   * @returns district and billboard count
-   */
-  // @Get('all/approved/byDistrict')
-  // @ApiOperation({ summary: 'Get billboard count by district' })
-  // getApprovedBillboardsWithinDistrict(): Promise<any> {
-  //   return this.billboardsService.getApprovedBillboardsWithinDistrict();
-  // }
-
-  //
-
-  /**
-   * ROLE: USER
-   * Update billboard
-   */
-  @Get(':id')
-  @ApiOperation({ summary: 'Update 1 billboard info' })
-  async getOne(@Param('id') id: string): Promise<BillboardInfoDto> {
-    return this.billboardsService.findOneWithRelations(id);
-  }
-
-  /**
-   * ROLE: USER
+   * TODO: fix (like update user)
+   * ROLE: USER (OWNER)
    * Update billboard
    */
   @Patch(':id/update')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Update 1 billboard info' })
-  update(
+  @ApiOperation({ summary: 'Update billboard info' })
+  async update(
     @Param('id') id: string,
     @Body() body: CreateBillboardDto,
   ): Promise<BillboardInfoDto> {
-    return this.billboardsService.update(id, body);
+    return await this.billboardsService.update(id, body);
+  }
+
+  /**
+   * only OWNER can
+   * Soft-delete billboard
+   */
+  @Patch(':id/delete')
+  @ApiTags('Billboards')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Owner delete billboard' })
+  @ApiNoContentResponse({
+    status: 204,
+    description: 'Billboard with given id has been successfully deleted',
+  })
+  @ApiForbiddenResponse({
+    status: 403,
+    description: 'Forbidden',
+  })
+  @ApiNotFoundResponse({
+    status: 404,
+    description: 'Billboard with given id is not exist',
+  })
+  async delete(
+    @Req() req,
+    @Param('id') id: string,
+  ): Promise<UpdateResult | void> {
+    return await this.billboardsService.delete(req.user.id, id);
+  }
+
+  /**
+   * ROLE: any
+   * Get ONE billboard
+   */
+  @Get(':id')
+  @ApiOperation({ summary: 'Update 1 billboard info' })
+  async getOne(@Param('id') id: string): Promise<BillboardInfoDto> {
+    return this.billboardsService.findOneWithRelations(id);
   }
 }

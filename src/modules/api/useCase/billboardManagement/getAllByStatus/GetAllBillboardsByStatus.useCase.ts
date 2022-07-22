@@ -10,7 +10,6 @@ import { BillboardInfoDto } from 'src/modules/api/billboards/dto/billboard-info.
 import { Repository } from 'typeorm';
 
 @Injectable()
-// implements IUseCase<Request, Promise<Response>>
 export class GetAllBillboardsByStatusUseCase {
   constructor(
     @InjectRepository(Billboard)

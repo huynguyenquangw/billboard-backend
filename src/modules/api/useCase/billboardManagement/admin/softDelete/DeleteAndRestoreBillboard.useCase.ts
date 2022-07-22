@@ -15,29 +15,6 @@ export class DeleteAndRestoreBillboardUseCase {
   ) {}
 
   /**
-   * Soft delete a billboard
-   */
-  async delete(
-    ownerId: string,
-    billboardId: string,
-  ): Promise<UpdateResult | void> {
-    const billboardToDelete = await this._billboardRepo.findOne({
-      where: { id: billboardId },
-    });
-
-    // Check owner
-    if (billboardToDelete.owner.id !== ownerId) {
-      throw new ForbiddenException('Cannot delete this billboard');
-    }
-
-    const deleteResponse = await this._billboardRepo.softDelete(billboardId);
-    if (!deleteResponse.affected) {
-      throw new NotFoundException('Billboard with given id is not exist');
-    }
-    return deleteResponse;
-  }
-
-  /**
    * Restore a soft-deleted user
    */
   async restore(ownerId: string, billboardId: string): Promise<UpdateResult> {

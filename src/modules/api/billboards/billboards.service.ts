@@ -1,8 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { StatusType } from 'src/constants';
-import { Repository } from 'typeorm';
+import { Brackets, Repository, UpdateResult } from 'typeorm';
 import { AddressService } from '../address/address.service';
+import { District } from '../address/district.entity';
 import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
 import { Billboard } from './billboard.entity';
@@ -13,7 +18,9 @@ import { CreateBillboardDto } from './dto/create-billboard.dto';
 export class BillboardsService {
   constructor(
     @InjectRepository(Billboard)
-    private readonly billboardRepository: Repository<Billboard>,
+    private readonly _billboardRepo: Repository<Billboard>,
+    @InjectRepository(District)
+    private readonly _districtRepo: Repository<District>,
     private readonly addressService: AddressService,
     private readonly usersService: UsersService,
   ) {}
@@ -23,7 +30,7 @@ export class BillboardsService {
    * by id
    */
   async findOne(id: string): Promise<Billboard> {
-    const billboard: Billboard = await this.billboardRepository.findOne({
+    const billboard: Billboard = await this._billboardRepo.findOne({
       where: { id: id },
     });
     if (billboard) {
@@ -34,26 +41,13 @@ export class BillboardsService {
 
   /**
    * Find only ONE billboard
+   * with relations
    * by id
    */
   async findOneWithRelations(id: string): Promise<Billboard> {
-    return await this.billboardRepository.findOne({
+    return await this._billboardRepo.findOne({
       where: { id: id },
       relations: ['ward', 'ward.district', 'ward.district.city', 'owner'],
-    });
-  }
-
-  /**
-   *
-   * TODO: move to use case
-   * Find only ONE billboard
-   * by id
-   * include deleted
-   */
-  async findOneIncludeDeleted(id: string): Promise<Billboard> {
-    return await this.billboardRepository.findOne({
-      where: { id: id },
-      withDeleted: true,
     });
   }
 
@@ -73,13 +67,13 @@ export class BillboardsService {
       createBillboardDto.wardId,
     );
 
-    const newBillboard: Billboard = await this.billboardRepository.create({
+    const newBillboard: Billboard = await this._billboardRepo.create({
       ...createBillboardDto,
       owner: owner,
       ward: ward,
     });
 
-    await this.billboardRepository.save(newBillboard);
+    await this._billboardRepo.save(newBillboard);
     return newBillboard;
   }
 
@@ -91,7 +85,7 @@ export class BillboardsService {
     selectedSize_y: number,
     selectedDistrict: string,
   ): Promise<Billboard[]> {
-    return this.billboardRepository.find({
+    return this._billboardRepo.find({
       relations: ['ward', 'ward.district', 'ward.district.city'],
       where: {
         address2: selectedAdrress2,
@@ -109,177 +103,6 @@ export class BillboardsService {
     });
   }
 
-  //Get all approved billboard
-  async getAllApproved(): Promise<Billboard[]> {
-    return this.billboardRepository.find({
-      where: { status: StatusType.APPROVED },
-      relations: ['ward', 'ward.district', 'ward.district.city'],
-    });
-  }
-
-  /**
-   * TODO: move to use case
-   *
-   */
-  //Get all billboard
-  async getAllWithDeleted(): Promise<Billboard[]> {
-    return this.billboardRepository.find({
-      withDeleted: true,
-    });
-  }
-
-  //Get all non soft deleted billboard
-  async getAll(): Promise<Billboard[]> {
-    return this.billboardRepository.find();
-  }
-
-  /**
-   * Get approved billboard list within district
-   *
-   */
-  // async getApprovedBillboardsWithinDistrict(): Promise<any> {
-  //   const cityName = 'Ho Chi Minh City';
-  //   // const districts = await this.districtRepository;
-
-  //   const queryBuilder =
-  //     this.billboardRepository.createQueryBuilder('billboards');
-
-  //   queryBuilder
-  //     .leftJoin('billboards.ward', 'wards')
-  //     .leftJoin('wards.district', 'districts')
-  //     .leftJoin('districts.city', 'cities')
-  //     .where('cities.name = :name', { name: cityName })
-  //     .andWhere({ status: StatusType.APPROVED, isRented: false })
-  //     .select('districts.id', 'id')
-  //     .addSelect('districts.name', 'name')
-  //     .addSelect('districts.abbreviation', 'abbreviation')
-  //     .addSelect('COUNT(DISTINCT(billboards.id)) as billboard_count')
-  //     .groupBy('districts.id');
-
-  //   const result = await queryBuilder.getRawMany();
-
-  //   return result;
-  // }
-
-  // /**
-  //  * Get approved billboard list
-  //  *
-  //  */
-  // async getApprovedBillboards(
-  //   pageOptionsDto: PageOptionsDto,
-  // ): Promise<PageDto<BillboardInfoDto>> {
-  //   const queryBuilder =
-  //     this.billboardRepository.createQueryBuilder('billboards');
-
-  //   queryBuilder
-  //     .orderBy('billboards.createdAt', pageOptionsDto.order)
-  //     .skip(pageOptionsDto.skip)
-  //     .take(pageOptionsDto.take)
-  //     .leftJoinAndSelect('billboards.ward', 'wards')
-  //     .leftJoinAndSelect('wards.district', 'districts')
-  //     .leftJoinAndSelect('districts.city', 'cities')
-  //     .where({ status: StatusType.APPROVED, isRented: false });
-
-  //   const itemCount = await queryBuilder.getCount();
-  //   const { entities } = await queryBuilder.getRawAndEntities();
-
-  //   const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
-
-  //   return new PageDto(entities, pageMetaDto);
-  // }
-
-  // /**
-  //  * Get draft billboard list
-  //  */
-  // async getDraftBillboards(
-  //   pageOptionsDto: PageOptionsDto,
-  // ): Promise<PageDto<BillboardInfoDto>> {
-  //   const queryBuilder =
-  //     this.billboardRepository.createQueryBuilder('billboards');
-
-  //   queryBuilder
-  //     .orderBy('billboards.createdAt', pageOptionsDto.order)
-  //     .skip(pageOptionsDto.skip)
-  //     .take(pageOptionsDto.take)
-  //     .where({ status: StatusType.DRAFT, isRented: false });
-
-  //   const itemCount = await queryBuilder.getCount();
-  //   const { entities } = await queryBuilder.getRawAndEntities();
-
-  //   const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
-
-  //   return new PageDto(entities, pageMetaDto);
-  // }
-
-  // /**
-  //  * Get pending billboard list
-  //  */
-  // async getPendingBillboards(
-  //   pageOptionsDto: PageOptionsDto,
-  // ): Promise<PageDto<BillboardInfoDto>> {
-  //   const queryBuilder =
-  //     this.billboardRepository.createQueryBuilder('billboards');
-
-  //   queryBuilder
-  //     .orderBy('billboards.createdAt', pageOptionsDto.order)
-  //     .skip(pageOptionsDto.skip)
-  //     .take(pageOptionsDto.take)
-  //     .where({ status: StatusType.PENDING, isRented: false });
-
-  //   const itemCount = await queryBuilder.getCount();
-  //   const { entities } = await queryBuilder.getRawAndEntities();
-
-  //   const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
-
-  //   return new PageDto(entities, pageMetaDto);
-  // }
-
-  // /**
-  //  * Get reject billboard list
-  //  */
-  // async getRejectBillboards(
-  //   pageOptionsDto: PageOptionsDto,
-  // ): Promise<PageDto<BillboardInfoDto>> {
-  //   const queryBuilder =
-  //     this.billboardRepository.createQueryBuilder('billboards');
-
-  //   queryBuilder
-  //     .orderBy('billboards.createdAt', pageOptionsDto.order)
-  //     .skip(pageOptionsDto.skip)
-  //     .take(pageOptionsDto.take)
-  //     .where({ status: StatusType.PENDING, isRented: false });
-
-  //   const itemCount = await queryBuilder.getCount();
-  //   const { entities } = await queryBuilder.getRawAndEntities();
-
-  //   const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
-
-  //   return new PageDto(entities, pageMetaDto);
-  // }
-
-  // /**
-  //  * Get rented billboard list
-  //  */
-  // async getRentedBillboards(
-  //   pageOptionsDto: PageOptionsDto,
-  // ): Promise<PageDto<BillboardInfoDto>> {
-  //   const queryBuilder =
-  //     this.billboardRepository.createQueryBuilder('billboards');
-
-  //   queryBuilder
-  //     .orderBy('billboards.createdAt', pageOptionsDto.order)
-  //     .skip(pageOptionsDto.skip)
-  //     .take(pageOptionsDto.take)
-  //     .where({ status: StatusType.APPROVED, isRented: true });
-
-  //   const itemCount = await queryBuilder.getCount();
-  //   const { entities } = await queryBuilder.getRawAndEntities();
-
-  //   const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
-
-  //   return new PageDto(entities, pageMetaDto);
-  // }
-
   /**
    * Update a billboard
    */
@@ -287,7 +110,7 @@ export class BillboardsService {
     id: string,
     body: CreateBillboardDto,
   ): Promise<BillboardInfoDto> {
-    const billboardToUpdate = await this.billboardRepository.findOne({
+    const billboardToUpdate = await this._billboardRepo.findOne({
       where: { id: id, status: StatusType.DRAFT },
     });
 
@@ -305,8 +128,76 @@ export class BillboardsService {
       fullUpdateData = body;
     }
 
-    await this.billboardRepository.update(id, fullUpdateData);
+    await this._billboardRepo.update(id, fullUpdateData);
     const updatedBillboard = await this.findOneWithRelations(id);
     return updatedBillboard.toDto();
+  }
+
+  /**
+   * delete a billboard
+   */
+  async delete(
+    ownerId: string,
+    billboardId: string,
+  ): Promise<UpdateResult | void> {
+    const billboardToDelete = await this._billboardRepo.findOne({
+      where: { id: billboardId, status: StatusType.DRAFT },
+      relations: ['owner'],
+    });
+
+    // Check owner
+    if (billboardToDelete.owner.id !== ownerId) {
+      throw new ForbiddenException('Cannot delete this billboard');
+    }
+
+    const deleteResponse = await this._billboardRepo.softDelete(billboardId);
+    if (!deleteResponse.affected) {
+      throw new NotFoundException('Draft billboard with given id is not exist');
+    }
+    return deleteResponse;
+  }
+
+  /**
+   * Get approved billboard list within district
+   */
+  async getCountOfBillboardsWithinDistrict(cityName: string): Promise<any> {
+    const defaultCity = 'Ho Chi Minh City';
+    const city = cityName || defaultCity;
+    console.log(city);
+
+    const queryBuilder = this._districtRepo.createQueryBuilder('districts');
+
+    queryBuilder
+      .leftJoin('districts.wards', 'wards')
+      .leftJoin('wards.billboards', 'billboards')
+      .leftJoin('districts.city', 'cities')
+      .where('cities.name = :name', { name: city })
+      // .orWhere(
+      //   new Brackets((qb) => {
+      //     qb.where('billboards.status = :status', {
+      //       status: StatusType.APPROVED,
+      //     }).andWhere('billboards.isRented = :isRented', { isRented: false });
+      //   }),
+      // )
+      .orWhere(
+        new Brackets((qb) => {
+          qb.where('cities.name = :name', { name: city }).andWhere(
+            'billboards.status = :status',
+            {
+              status: StatusType.APPROVED,
+            },
+          );
+        }),
+      )
+      .select('districts.id', 'id')
+      .addSelect('districts.name', 'name')
+      .addSelect('districts.abbreviation', 'abbreviation')
+      .addSelect('districts.photoUrl', 'photoUrl')
+      .addSelect('COUNT(DISTINCT(billboards.id)) as billboard_count')
+      .groupBy('districts.id');
+
+    const result = await queryBuilder.getRawMany();
+
+    return result;
   }
 }

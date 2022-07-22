@@ -5,9 +5,21 @@ import { Billboard } from './billboards/billboard.entity';
 import { BillboardsModule } from './billboards/billboards.module';
 import { PlansModule } from './plans/plans.module';
 import {
+  GetAllBillboardsController,
+  GetAllBillboardsUseCase,
+} from './useCase/billboardManagement/admin/getAll';
+import {
   ApproveBillboardController,
   ApproveBillboardUseCase,
 } from './useCase/billboardManagement/admin/operator/approveBillboard';
+import {
+  GetAllPendingBillboardsController,
+  GetAllPendingBillboardsUseCase,
+} from './useCase/billboardManagement/admin/operator/getAllPendingBillboards';
+import {
+  DeleteAndRestoreBillboardController,
+  DeleteAndRestoreBillboardUseCase,
+} from './useCase/billboardManagement/admin/softDelete';
 import {
   GetAllBillboardsByStatusController,
   GetAllBillboardsByStatusUseCase,
@@ -20,6 +32,8 @@ import {
   PublishBillboardController,
   PublishBillboardUseCase,
 } from './useCase/billboardManagement/publish';
+import { GetAllUserController } from './useCase/user/getAll/GetAllUser.controller';
+import { GetAllUserUseCase } from './useCase/user/getAll/GetAllUser.useCase';
 import { GetOneUserController, GetOneUserUseCase } from './useCase/user/getOne';
 import {
   LoggedInUserRoleCheckController,
@@ -41,22 +55,30 @@ import { UsersModule } from './users/users.module';
     AddressModule,
   ],
   controllers: [
+    GetAllBillboardsController,
     ApproveBillboardController,
-    LoggedInUserRoleCheckController,
-    DeleteAndRestoreUserController,
+    GetAllPendingBillboardsController,
+    DeleteAndRestoreBillboardController,
     GetAllBillboardsByStatusController,
     GetAllBillboardsWithFilterController,
-    GetOneUserController,
     PublishBillboardController,
+    GetAllUserController,
+    GetOneUserController,
+    LoggedInUserRoleCheckController,
+    DeleteAndRestoreUserController,
   ],
   providers: [
+    GetAllBillboardsUseCase,
     ApproveBillboardUseCase,
-    LoggedInUserRoleCheckUseCase,
-    DeleteAndRestoreUserUseCase,
+    GetAllPendingBillboardsUseCase,
+    DeleteAndRestoreBillboardUseCase,
     GetAllBillboardsByStatusUseCase,
     GetAllBillboardsWithFilterUseCase,
-    GetOneUserUseCase,
     PublishBillboardUseCase,
+    GetAllUserUseCase,
+    GetOneUserUseCase,
+    LoggedInUserRoleCheckUseCase,
+    DeleteAndRestoreUserUseCase,
   ],
 })
 export class ApiModule {}

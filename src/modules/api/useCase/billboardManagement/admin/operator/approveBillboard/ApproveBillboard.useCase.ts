@@ -6,7 +6,6 @@ import { BillboardsService } from 'src/modules/api/billboards/billboards.service
 import { Repository } from 'typeorm';
 
 @Injectable()
-// implements IUseCase<Request, Promise<Response>>
 export class ApproveBillboardUseCase {
   constructor(
     @InjectRepository(Billboard)
