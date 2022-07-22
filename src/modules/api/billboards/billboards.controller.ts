@@ -84,6 +84,20 @@ export class BillboardsController {
     );
   }
 
+  //Get All PreviousClient
+  @Get('allPreClients')
+  @ApiOperation({ summary: 'Get all previous clients' })
+  async allPreviousClient(): Promise<any>{
+    return this.billboardsService.getAllPreviousClient();
+  }
+
+  //Get One PreviousClient
+  @Get('preClient/:id')
+  @ApiOperation({ summary: 'Find 1 previous client' })
+  async onePreviousClient(@Param('id') id: string): Promise<any> {
+    return this.billboardsService.getOnePreviousClient(id);
+  }
+
   /**
    * TODO: fix (like update user)
    * ROLE: USER (OWNER)
@@ -132,7 +146,7 @@ export class BillboardsController {
    * Get ONE billboard
    */
   @Get(':id')
-  @ApiOperation({ summary: 'Update 1 billboard info' })
+  @ApiOperation({ summary: 'Find 1 billboard info' })
   async getOne(@Param('id') id: string): Promise<BillboardInfoDto> {
     return this.billboardsService.findOneWithRelations(id);
   }

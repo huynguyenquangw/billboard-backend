@@ -13,6 +13,10 @@ import {
   ApproveBillboardUseCase,
 } from './useCase/billboardManagement/admin/operator/approveBillboard';
 import {
+  RejectBillboardController,
+  RejectBillboardUseCase,
+} from './useCase/billboardManagement/admin/operator/rejectBillboard';
+import {
   GetAllPendingBillboardsController,
   GetAllPendingBillboardsUseCase,
 } from './useCase/billboardManagement/admin/operator/getAllPendingBillboards';
@@ -57,6 +61,7 @@ import { UsersModule } from './users/users.module';
   controllers: [
     GetAllBillboardsController,
     ApproveBillboardController,
+    RejectBillboardController,
     GetAllPendingBillboardsController,
     DeleteAndRestoreBillboardController,
     GetAllBillboardsByStatusController,
@@ -70,6 +75,7 @@ import { UsersModule } from './users/users.module';
   providers: [
     GetAllBillboardsUseCase,
     ApproveBillboardUseCase,
+    RejectBillboardUseCase,
     GetAllPendingBillboardsUseCase,
     DeleteAndRestoreBillboardUseCase,
     GetAllBillboardsByStatusUseCase,

@@ -7,11 +7,11 @@ import { UsersModule } from '../users/users.module';
 import { Billboard } from './billboard.entity';
 import { BillboardsController } from './billboards.controller';
 import { BillboardsService } from './billboards.service';
-import { previousClient } from './previousClients.entity';
+import { PreviousClient } from './previousClients.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Billboard, previousClient, District, User]),
+    TypeOrmModule.forFeature([Billboard, PreviousClient, District, User]),
     AddressModule,
     UsersModule,
   ],

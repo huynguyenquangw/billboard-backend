@@ -16,12 +16,15 @@ import { UsersService } from '../users/users.service';
 import { Billboard } from './billboard.entity';
 import { BillboardInfoDto } from './dto/billboard-info.dto';
 import { CreateBillboardDto } from './dto/create-billboard.dto';
+import { PreviousClient } from './previousClients.entity';
 
 @Injectable()
 export class BillboardsService {
   constructor(
     @InjectRepository(Billboard)
     private readonly _billboardRepo: Repository<Billboard>,
+    @InjectRepository(PreviousClient)
+    private readonly _previousClientRepo: Repository<PreviousClient>,
     @InjectRepository(District)
     private readonly _districtRepo: Repository<District>,
     private readonly addressService: AddressService,
@@ -212,5 +215,24 @@ export class BillboardsService {
     const result = await queryBuilder.getRawMany();
 
     return result;
+  }
+
+
+  /*
+   *Get All PreviousClient
+  */
+ async getAllPreviousClient(): Promise<PreviousClient[]>{
+   return await this._previousClientRepo.find();
+ }
+
+   /*
+   *Get One PreviousClient
+  */
+   async getOnePreviousClient(getOneId: string): Promise<PreviousClient>{
+    return await this._previousClientRepo.findOne({
+      where: {
+        id: getOneId,
+      },
+    });
   }
 }
