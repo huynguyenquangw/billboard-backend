@@ -4,9 +4,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { StatusType } from 'src/constants';
 // import { Point } from 'geojson';
-import { Brackets, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { City } from './city.entity';
 import { District } from './district.entity';
 import { CreateCityDto } from './dto/create-city.dto';
@@ -23,26 +22,7 @@ export class AddressService {
     private districtRepository: Repository<District>,
     @InjectRepository(Ward)
     private wardRepository: Repository<Ward>,
-  ) {} // private wardRepository: Repository<Ward>, // @InjectRepository(Ward) // private districtRepository: Repository<District>, // @InjectRepository(District) // private cityRepository: Repository<City>, // @InjectRepository(City)
-
-  /**
-   * Address
-   */
-  // async createAddress(): Promise<any> {
-  //   const newCity = await this.cityRepository.create(hcm);
-  //   if (!newCity) {
-  //     throw new BadRequestException();
-  //   }
-  //   return await this.cityRepository.save(newCity);
-  // }
-  // async create(location: City) {
-  //   const pointObject: Point = {
-  //     type: 'Point',
-  //     coordinates: [location.long, location.lat],
-  //   };
-  //   location.location = pointObject;
-  //   return await this.cityRepository.save(location);
-  // }
+  ) {}
 
   /**
    * City
@@ -110,40 +90,6 @@ export class AddressService {
       throw new NotFoundException(cityId);
     }
     return city.districts;
-  }
-
-  /**
-   * Get approved billboard list within district
-   *
-   */
-  async getApprovedBillboardsWithinDistrict(): Promise<any> {
-    const cityName = 'Ho Chi Minh City';
-
-    const queryBuilder =
-      this.districtRepository.createQueryBuilder('districts');
-
-    queryBuilder
-      .leftJoin('districts.wards', 'wards')
-      .leftJoin('wards.billboards', 'billboards')
-      .leftJoin('districts.city', 'cities')
-      .where('cities.name = :name', { name: cityName })
-      .orWhere(
-        new Brackets((qb) => {
-          qb.where('billboards.status = :status', {
-            status: StatusType.APPROVED,
-          }).andWhere('billboards.isRented = :isRented', { isRented: false });
-        }),
-      )
-      .select('districts.id', 'id')
-      .addSelect('districts.name', 'name')
-      .addSelect('districts.abbreviation', 'abbreviation')
-      .addSelect('districts.photoUrl', 'photoUrl')
-      .addSelect('COUNT(DISTINCT(billboards.id)) as billboard_count')
-      .groupBy('districts.id');
-
-    const result = await queryBuilder.getRawMany();
-
-    return result;
   }
 
   /**

@@ -22,24 +22,6 @@ export class AddressController {
   constructor(private readonly addressService: AddressService) {}
 
   /**
-   * Address
-   */
-  // @Post('address/create')
-  // @ApiOperation({ summary: 'Create address' })
-  // @HttpCode(HttpStatus.OK)
-  // @ApiOkResponse({
-  //   type: CreateCityDto,
-  //   description: 'Successfully create address',
-  // })
-  // async createAddress(): Promise<any> {
-  //   return this.addressService.createAddress();
-  // }
-  // @Post('mycity')
-  // createLocation(@Body() location: City): void {
-  //   this.addressService.create(location);
-  // }
-
-  /**
    * City
    */
   @Post('cities/create')
@@ -75,12 +57,6 @@ export class AddressController {
   /**
    * District
    */
-
-  @Get('districts/countBillboard')
-  getApprovedBillboardsWithinDistrict(): Promise<any> {
-    return this.addressService.getApprovedBillboardsWithinDistrict();
-  }
-
   @Post('districts/create')
   @ApiOperation({ summary: 'create a new district' })
   @HttpCode(HttpStatus.OK)
@@ -123,9 +99,4 @@ export class AddressController {
   getOneWard(@Param('id') id: string): Promise<Ward> {
     return this.addressService.getOneWard(id);
   }
-
-  // @Get('wards/all')
-  // getAllWards(): Promise<Ward[]> {
-  //   return this.addressService.getAllWards();
-  // }
 }
