@@ -3,6 +3,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -11,6 +12,8 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
+import { PageDto } from 'src/common/dtos/page.dto';
 import { RoleType } from 'src/constants';
 import { Roles } from 'src/decorators/roles.decorator';
 import { RolesGuard } from 'src/guards/roles.guard';
@@ -39,7 +42,9 @@ export class GetAllUserController {
   @HttpCode(HttpStatus.OK)
   @Roles(RoleType.ADMIN)
   @ApiBearerAuth()
-  async getAllUsers(): Promise<any> {
-    // return await this.useCase.execute();
+  async getAllUsers(
+    @Query() pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<User>> {
+    return await this.useCase.execute(pageOptionsDto);
   }
 }

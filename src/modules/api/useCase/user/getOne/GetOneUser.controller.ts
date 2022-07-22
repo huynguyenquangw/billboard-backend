@@ -47,7 +47,7 @@ export class GetOneUserController {
   })
   @HttpCode(HttpStatus.OK)
   @Roles(RoleType.ADMIN)
-  async getOneUserById(@Param('id') id: string): Promise<User> {
+  async getOne(@Param('id') id: string): Promise<User> {
     return await this.useCase.execute(id);
   }
 }

@@ -1,16 +1,25 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/modules/api/users/user.entity';
-import { UsersService } from 'src/modules/api/users/users.service';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class GetOneUserUseCase {
   constructor(
-    private readonly _usersService: UsersService, // private readonly userRepository: Repository<User>,
+    @InjectRepository(User)
+    private readonly _userRepository: Repository<User>,
   ) {}
 
+  /**
+   * Get 1 user
+   * include deleted
+   */
   async execute(id: string): Promise<User> {
     try {
-      const user = await this._usersService.findOne(id);
+      const user = await this._userRepository.findOne({
+        where: { id },
+        withDeleted: true,
+      });
       return user;
     } catch (error) {
       console.error(error);

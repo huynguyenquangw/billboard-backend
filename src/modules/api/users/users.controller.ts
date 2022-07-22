@@ -51,7 +51,7 @@ export class UsersController {
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth()
   async getMe(@Req() req): Promise<UserInfoDto> {
-    const user = await this.usersService.getOneWithAddress(req.user.id);
+    const user = await this.usersService.getOneWithRelations(req.user.id);
     return user;
   }
 
@@ -59,7 +59,6 @@ export class UsersController {
    * Update current user's info
    */
   @Patch('me/update')
-  // @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update user info' })
   @ApiOkResponse({
@@ -83,7 +82,7 @@ export class UsersController {
     @Req() req,
     @Body() body: UpdateUserDto,
   ): Promise<UserInfoDto> {
-    const updatedUser = await this.usersService.updateUser(req.user.id, body);
+    const updatedUser = await this.usersService.update(req.user.id, body);
     return updatedUser.toDto();
   }
 }

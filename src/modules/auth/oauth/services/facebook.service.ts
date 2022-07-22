@@ -58,7 +58,7 @@ export class FacebookService {
         name: response.data.name,
         avatar: response.data.picture.data.url,
       };
-      const newUser = await this.usersService.createUser(userData);
+      const newUser = await this.usersService.create(userData);
 
       userId = newUser.id;
       return userId;

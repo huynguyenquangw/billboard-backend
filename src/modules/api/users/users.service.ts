@@ -26,25 +26,25 @@ export class UsersService {
     if (user) {
       return user;
     }
-    throw new NotFoundException(id);
+    throw new NotFoundException('User with given id is not exist');
   }
 
   /**
-   * Create a user
+   * Find 1 user
+   * by email
+   * by authType
    */
-  async createUser(oauthCreateUserDto: OauthCreateUserDto): Promise<User> {
-    const newUser: User = await this.userRepository.create({
-      ...oauthCreateUserDto,
+  async findExistUser(email, authType): Promise<User> {
+    return await this.userRepository.findOne({
+      where: { email: email, authType: authType },
     });
-
-    return await this.userRepository.save(newUser);
   }
 
   /**
    * Get 1 user
    * by id
    */
-  async getOneWithAddress(id: string): Promise<User> {
+  async getOneWithRelations(id: string): Promise<User> {
     const user: User = await this.userRepository.findOne({
       where: { id },
       relations: ['ward', 'ward.district', 'ward.district.city'],
@@ -56,65 +56,20 @@ export class UsersService {
   }
 
   /**
-   * ADMIN
-   * Get 1 user
-   * no filter out soft-deleted
+   * Create a user
    */
-  async getOne(id: string): Promise<UserInfoDto> {
-    const user = await this.userRepository.findOne({
-      where: { id: id },
-      withDeleted: true,
+  async create(oauthCreateUserDto: OauthCreateUserDto): Promise<User> {
+    const newUser: User = await this.userRepository.create({
+      ...oauthCreateUserDto,
     });
-    if (user) {
-      return user;
-    }
-    throw new NotFoundException(id);
-  }
 
-  /**
-   * Get 1 user
-   * by email
-   * by authType
-   */
-  async findExistUser(email, authType): Promise<User> {
-    return await this.userRepository.findOne({
-      where: { email: email, authType: authType },
-    });
-  }
-
-  /**
-   * Get all users
-   */
-  async getAllActiveUsers(): Promise<UserInfoDto[]> {
-    const users = await this.userRepository.find({
-      relations: ['ward', 'ward.district', 'ward.district.city'],
-    });
-    if (!users) {
-      throw new NotFoundException();
-    }
-    return users;
-  }
-
-  /**
-   * ADMIN
-   * Get all users
-   * no filter out soft-deleted
-   */
-  async getAllUsers(): Promise<User[]> {
-    const users = await this.userRepository.find({
-      relations: ['ward', 'ward.district', 'ward.district.city'],
-      withDeleted: true,
-    });
-    if (users) {
-      return users;
-    }
-    throw new NotFoundException();
+    return await this.userRepository.save(newUser);
   }
 
   /**
    * Update a user
    */
-  async updateUser(id: string, body: UpdateUserDto): Promise<User> {
+  async update(id: string, body: UpdateUserDto): Promise<User> {
     const userToUpdate = await this.userRepository.findOne({ where: { id } });
 
     if (!userToUpdate) {
@@ -132,6 +87,20 @@ export class UsersService {
     }
 
     await this.userRepository.update(id, updateData);
-    return await this.getOneWithAddress(id);
+    return await this.getOneWithRelations(id);
+  }
+
+  /**
+   * TODO: admin
+   * Get all active users
+   */
+  async getAllActiveUsers(): Promise<UserInfoDto[]> {
+    const users = await this.userRepository.find({
+      relations: ['ward', 'ward.district', 'ward.district.city'],
+    });
+    if (!users) {
+      throw new NotFoundException();
+    }
+    return users;
   }
 }
