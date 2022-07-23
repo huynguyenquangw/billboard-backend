@@ -1,12 +1,12 @@
 import { AbstractEntity } from 'src/common/abstract.entity';
 import { Column, Entity } from 'typeorm';
 
-@Entity('previousClients')
-export class previousClient extends AbstractEntity {
+@Entity('previous_clients')
+export class PreviousClient extends AbstractEntity {
   @Column({ nullable: false, unique: true, default: '' })
-  clientName: string;
+  client_name: string;
 
   @Column({ nullable: true, unique: true })
-  clientLogo: string;
+  client_logo: string;
  
 }
