@@ -19,7 +19,7 @@ export class Billboard extends AbstractEntity {
   owner: User;
 
   @ManyToOne(() => Ward)
-  @JoinColumn()
+  @JoinColumn({ name: 'ward_id' })
   ward: Ward;
 
   @Column({ default: '' })
@@ -46,7 +46,7 @@ export class Billboard extends AbstractEntity {
   @Column({ default: 0 })
   circulation: number;
 
-    /*
+  /*
     TODO: Need to check
    */
   @Column('jsonb', { nullable: true })
