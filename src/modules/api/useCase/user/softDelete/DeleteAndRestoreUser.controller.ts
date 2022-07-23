@@ -21,8 +21,8 @@ import { JwtAuthGuard } from 'src/modules/auth/oauth/guards/jwt-authentication.g
 import { UpdateResult } from 'typeorm';
 import { DeleteAndRestoreUserUseCase } from './DeleteAndRestoreUser.useCase';
 
-@Controller('api/users')
-@ApiTags('Users')
+@Controller('api/admin/users')
+@ApiTags('Admin')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
 export class DeleteAndRestoreUserController {

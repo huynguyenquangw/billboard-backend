@@ -19,7 +19,7 @@ export class Billboard extends AbstractEntity {
   owner: User;
 
   @ManyToOne(() => Ward)
-  @JoinColumn()
+  @JoinColumn({ name: 'ward_id' })
   ward: Ward;
 
   @Column({ default: '' })

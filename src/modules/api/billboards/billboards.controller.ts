@@ -56,6 +56,8 @@ export class BillboardsController {
   }
 
   @Get('count')
+  @ApiOperation({ summary: 'Get billboard count by districts of a city' })
+  @HttpCode(HttpStatus.OK)
   async getCountOfBillboardsWithinDistrict(@Req() req): Promise<any> {
     return await this.billboardsService.getCountOfBillboardsWithinDistrict(
       req.body.cityName,
@@ -146,7 +148,7 @@ export class BillboardsController {
    * Get ONE billboard
    */
   @Get(':id')
-  @ApiOperation({ summary: 'Find 1 billboard info' })
+  @ApiOperation({ summary: "Get billboard's info" })
   async getOne(@Param('id') id: string): Promise<BillboardInfoDto> {
     return this.billboardsService.findOneWithRelations(id);
   }

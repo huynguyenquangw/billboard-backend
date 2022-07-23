@@ -8,7 +8,7 @@ import { PageMetaDto } from 'src/common/dtos/page-meta.dto';
 import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { PageDto } from 'src/common/dtos/page.dto';
 import { StatusType } from 'src/constants';
-import { Brackets, Repository, UpdateResult } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { AddressService } from '../address/address.service';
 import { District } from '../address/district.entity';
 import { User } from '../users/user.entity';
@@ -187,7 +187,6 @@ export class BillboardsService {
       .leftJoin('districts.wards', 'wards')
       .leftJoin('wards.billboards', 'billboards')
       .leftJoin('districts.city', 'cities')
-      .where('cities.name = :name', { name: city })
       // .orWhere(
       //   new Brackets((qb) => {
       //     qb.where('billboards.status = :status', {
@@ -195,21 +194,24 @@ export class BillboardsService {
       //     }).andWhere('billboards.isRented = :isRented', { isRented: false });
       //   }),
       // )
-      .orWhere(
-        new Brackets((qb) => {
-          qb.where('cities.name = :name', { name: city }).andWhere(
-            'billboards.status = :status',
-            {
-              status: StatusType.APPROVED,
-            },
-          );
-        }),
-      )
+      // .orWhere(
+      //   new Brackets((qb) => {
+      //     qb.where('cities.name = :name', { name: city }).andWhere(
+      //       'billboards.status = :status',
+      //       {
+      //         status: StatusType.APPROVED,
+      //       },
+      //     );
+      //   }),
+      // )
+      .where('cities.name = :name', { name: city })
       .select('districts.id', 'id')
       .addSelect('districts.name', 'name')
       .addSelect('districts.abbreviation', 'abbreviation')
       .addSelect('districts.photoUrl', 'photoUrl')
-      .addSelect('COUNT(DISTINCT(billboards.id)) as billboard_count')
+      .addSelect(
+        `COUNT(DISTINCT(billboards.id)) filter (where billboards.status = '${StatusType.APPROVED}') as billboard_count`,
+      )
       .groupBy('districts.id');
 
     const result = await queryBuilder.getRawMany();

@@ -23,7 +23,7 @@ export class LoggedInUserRoleCheckController {
   @Get('check-role')
   @Roles(RoleType.ADMIN, RoleType.OPERATOR, RoleType.USER)
   @HttpCode(HttpStatus.OK)
-  async checkRole(@Req() req): Promise<string> {
+  async checkRole(@Req() req): Promise<any> {
     return await this.useCase.execute(req.user.id);
   }
 }

@@ -11,10 +11,16 @@ export class LoggedInUserRoleCheckUseCase {
    * Find one user
    * by id
    */
-  async execute(id: string): Promise<string> {
+  async execute(id: string): Promise<any> {
     try {
       const user = await this._usersService.findOne(id);
-      return `Hello ${user.name}, your role is ${user.role.toLowerCase()}`;
+      const message = `Hello ${
+        user.name
+      }, your role is ${user.role.toLowerCase()}`;
+      return {
+        message: message,
+        role: user.role,
+      };
     } catch (error) {
       console.error(error);
       return error;

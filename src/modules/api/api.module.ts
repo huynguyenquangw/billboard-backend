@@ -68,9 +68,9 @@ import { UsersModule } from './users/users.module';
     GetAllBillboardsWithFilterController,
     PublishBillboardController,
     GetAllUserController,
-    GetOneUserController,
     LoggedInUserRoleCheckController,
     DeleteAndRestoreUserController,
+    GetOneUserController,
   ],
   providers: [
     GetAllBillboardsUseCase,
@@ -82,9 +82,9 @@ import { UsersModule } from './users/users.module';
     GetAllBillboardsWithFilterUseCase,
     PublishBillboardUseCase,
     GetAllUserUseCase,
-    GetOneUserUseCase,
     LoggedInUserRoleCheckUseCase,
     DeleteAndRestoreUserUseCase,
+    GetOneUserUseCase,
   ],
 })
 export class ApiModule {}
