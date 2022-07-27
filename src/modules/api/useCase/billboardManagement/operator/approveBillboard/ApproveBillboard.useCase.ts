@@ -26,6 +26,7 @@ export class ApproveBillboardUseCase {
       }
 
       selectedBillboard.status = StatusType.APPROVED;
+      selectedBillboard.approvedAt = new Date();
       return this._billboardRepository.save(selectedBillboard);
     } catch (error) {
       console.error(error);

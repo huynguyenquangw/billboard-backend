@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsNumber, IsString } from 'class-validator';
+import { IsArray, IsDate, IsNumber, IsString } from 'class-validator';
 import { AbstractDto } from 'src/common/dtos/abstract.dto';
 import { Ward } from '../../address/ward.entity';
 import { User } from '../../users/user.entity';
@@ -48,6 +48,9 @@ export class BillboardInfoDto extends AbstractDto {
   @IsString()
   readonly description: string;
 
+  @IsDate()
+  readonly approvedAt: Date;
+
   constructor(billboard: Billboard) {
     super(billboard);
     this.address = billboard.address;
@@ -64,5 +67,6 @@ export class BillboardInfoDto extends AbstractDto {
     this.description = billboard.description;
     this.owner = billboard.owner;
     this.ward = billboard.ward;
+    this.approvedAt = billboard.approvedAt;
   }
 }

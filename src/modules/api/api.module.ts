@@ -11,15 +11,15 @@ import {
 import {
   ApproveBillboardController,
   ApproveBillboardUseCase,
-} from './useCase/billboardManagement/admin/operator/approveBillboard';
+} from './useCase/billboardManagement/operator/approveBillboard';
 import {
   RejectBillboardController,
   RejectBillboardUseCase,
-} from './useCase/billboardManagement/admin/operator/rejectBillboard';
+} from './useCase/billboardManagement/operator/rejectBillboard';
 import {
   GetAllPendingBillboardsController,
   GetAllPendingBillboardsUseCase,
-} from './useCase/billboardManagement/admin/operator/getAllPendingBillboards';
+} from './useCase/billboardManagement/operator/getAllPendingBillboards';
 import {
   DeleteAndRestoreBillboardController,
   DeleteAndRestoreBillboardUseCase,
