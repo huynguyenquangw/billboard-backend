@@ -121,6 +121,7 @@ export class BillboardsController {
    * Soft-delete billboard
    */
   @Patch(':id/delete')
+  @UseGuards(JwtAuthGuard)
   @ApiTags('Billboards')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Owner delete billboard' })
