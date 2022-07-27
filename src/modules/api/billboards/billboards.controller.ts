@@ -89,7 +89,7 @@ export class BillboardsController {
   //Get All PreviousClient
   @Get('allPreClients')
   @ApiOperation({ summary: 'Get all previous clients' })
-  async allPreviousClient(): Promise<any>{
+  async allPreviousClient(): Promise<any> {
     return this.billboardsService.getAllPreviousClient();
   }
 
@@ -150,6 +150,7 @@ export class BillboardsController {
   @Get(':id')
   @ApiOperation({ summary: "Get billboard's info" })
   async getOne(@Param('id') id: string): Promise<BillboardInfoDto> {
-    return this.billboardsService.findOneWithRelations(id);
+    const billboard = await this.billboardsService.findOneWithRelations(id);
+    return billboard.toDto();
   }
 }

@@ -179,7 +179,6 @@ export class BillboardsService {
   async getCountOfBillboardsWithinDistrict(cityName: string): Promise<any> {
     const defaultCity = 'Ho Chi Minh City';
     const city = cityName || defaultCity;
-    console.log(city);
 
     const queryBuilder = this._districtRepo.createQueryBuilder('districts');
 
@@ -219,18 +218,17 @@ export class BillboardsService {
     return result;
   }
 
-
   /*
    *Get All PreviousClient
-  */
- async getAllPreviousClient(): Promise<PreviousClient[]>{
-   return await this._previousClientRepo.find();
- }
+   */
+  async getAllPreviousClient(): Promise<PreviousClient[]> {
+    return await this._previousClientRepo.find();
+  }
 
-   /*
+  /*
    *Get One PreviousClient
-  */
-   async getOnePreviousClient(getOneId: string): Promise<PreviousClient>{
+   */
+  async getOnePreviousClient(getOneId: string): Promise<PreviousClient> {
     return await this._previousClientRepo.findOne({
       where: {
         id: getOneId,
