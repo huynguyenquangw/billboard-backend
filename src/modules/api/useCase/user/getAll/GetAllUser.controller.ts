@@ -21,7 +21,7 @@ import { User } from 'src/modules/api/users/user.entity';
 import { JwtAuthGuard } from 'src/modules/auth/oauth/guards/jwt-authentication.guard';
 import { GetAllUserUseCase } from './GetAllUser.useCase';
 
-@Controller('api/admin/users')
+@Controller('api/admin/users/all')
 @ApiTags('Admin')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
