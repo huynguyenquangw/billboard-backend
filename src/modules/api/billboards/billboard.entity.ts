@@ -75,7 +75,7 @@ export class Billboard extends AbstractEntity {
   @Column({ default: 0 })
   likedCounter?: number = 0;
 
-  @Column()
+  @Column({ nullable: true, default: null })
   approvedAt: Date;
 
   @DeleteDateColumn({ select: false })
