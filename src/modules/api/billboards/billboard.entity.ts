@@ -75,10 +75,18 @@ export class Billboard extends AbstractEntity {
   @Column({ default: 0 })
   likedCounter?: number = 0;
 
-  @Column()
+  @Column({
+    nullable: true,
+    type: 'timestamp without time zone',
+    name: 'approved_at',
+  })
   approvedAt: Date;
 
-  @DeleteDateColumn({ select: false })
+  @DeleteDateColumn({
+    select: false,
+    type: 'timestamp without time zone',
+    name: 'deleted_at',
+  })
   deletedAt: Date;
 
   toDto(): BillboardInfoDto {

@@ -9,18 +9,6 @@ import {
   GetAllBillboardsUseCase,
 } from './useCase/billboardManagement/admin/getAll';
 import {
-  ApproveBillboardController,
-  ApproveBillboardUseCase,
-} from './useCase/billboardManagement/operator/approveBillboard';
-import {
-  RejectBillboardController,
-  RejectBillboardUseCase,
-} from './useCase/billboardManagement/operator/rejectBillboard';
-import {
-  GetAllPendingBillboardsController,
-  GetAllPendingBillboardsUseCase,
-} from './useCase/billboardManagement/operator/getAllPendingBillboards';
-import {
   DeleteAndRestoreBillboardController,
   DeleteAndRestoreBillboardUseCase,
 } from './useCase/billboardManagement/admin/softDelete';
@@ -33,11 +21,22 @@ import {
   GetAllBillboardsWithFilterUseCase,
 } from './useCase/billboardManagement/getAllWithFilter';
 import {
+  ApproveBillboardController,
+  ApproveBillboardUseCase,
+} from './useCase/billboardManagement/operator/approveBillboard';
+import {
+  GetAllPendingBillboardsController,
+  GetAllPendingBillboardsUseCase,
+} from './useCase/billboardManagement/operator/getAllPendingBillboards';
+import {
+  RejectBillboardController,
+  RejectBillboardUseCase,
+} from './useCase/billboardManagement/operator/rejectBillboard';
+import {
   PublishBillboardController,
   PublishBillboardUseCase,
 } from './useCase/billboardManagement/publish';
-import { GetAllUserController } from './useCase/user/getAll/GetAllUser.controller';
-import { GetAllUserUseCase } from './useCase/user/getAll/GetAllUser.useCase';
+import { GetAllUserController, GetAllUserUseCase } from './useCase/user/getAll';
 import { GetOneUserController, GetOneUserUseCase } from './useCase/user/getOne';
 import {
   LoggedInUserRoleCheckController,
