@@ -20,13 +20,15 @@ export class AuthController {
   @Post('login/social')
   @ApiOperation({ summary: 'Login' })
   async socialLogin(@Body() loginPayloadDto: LoginPayLoadDto): Promise<any> {
-    let ticket = {};
-    if (loginPayloadDto.auth_type === AuthType.FACEBOOK) {
-      ticket = this.facebookService.facebookLogin(loginPayloadDto);
-    } else if (loginPayloadDto.auth_type === AuthType.GOOGLE) {
-      ticket = this.googleService.authenticate(loginPayloadDto);
+    try {
+      if (loginPayloadDto.auth_type === AuthType.FACEBOOK) {
+        return await this.facebookService.facebookLogin(loginPayloadDto);
+      } else if (loginPayloadDto.auth_type === AuthType.GOOGLE) {
+        return await this.googleService.authenticate(loginPayloadDto);
+      }
+    } catch (error) {
+      console.log(error);
+      throw error;
     }
-    console.log(ticket);
-    return ticket;
   }
 }

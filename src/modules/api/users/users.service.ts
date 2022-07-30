@@ -11,7 +11,7 @@ import { User } from './user.entity';
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    private readonly _userRepository: Repository<User>,
     private readonly addressService: AddressService,
   ) {}
 
@@ -20,7 +20,7 @@ export class UsersService {
    * by id
    */
   async findOne(id: string): Promise<User> {
-    const user: User = await this.userRepository.findOne({
+    const user: User = await this._userRepository.findOne({
       where: { id: id },
     });
     if (user) {
@@ -34,10 +34,22 @@ export class UsersService {
    * by email
    * by authType
    */
-  async findExistUser(email, authType): Promise<User> {
-    return await this.userRepository.findOne({
+  async findExistUser(
+    // providerId,
+    authType,
+    email,
+  ): Promise<User> {
+    const user = await this._userRepository.findOne({
+      select: ['id', 'deletedAt'],
       where: { email: email, authType: authType },
+      withDeleted: true,
     });
+
+    if (!user) {
+      throw new NotFoundException('Not Found');
+    }
+
+    return user;
   }
 
   /**
@@ -45,32 +57,32 @@ export class UsersService {
    * by id
    */
   async getOneWithRelations(id: string): Promise<User> {
-    const user: User = await this.userRepository.findOne({
+    const user: User = await this._userRepository.findOne({
       where: { id },
       relations: ['ward', 'ward.district', 'ward.district.city'],
     });
-    if (user) {
-      return user;
+    if (!user) {
+      throw new NotFoundException(id);
     }
-    throw new NotFoundException(id);
+    return user;
   }
 
   /**
    * Create a user
    */
   async create(oauthCreateUserDto: OauthCreateUserDto): Promise<User> {
-    const newUser: User = await this.userRepository.create({
+    const newUser: User = await this._userRepository.create({
       ...oauthCreateUserDto,
     });
 
-    return await this.userRepository.save(newUser);
+    return await this._userRepository.save(newUser);
   }
 
   /**
    * Update a user
    */
   async update(id: string, body: UpdateUserDto): Promise<User> {
-    const userToUpdate = await this.userRepository.findOne({ where: { id } });
+    const userToUpdate = await this._userRepository.findOne({ where: { id } });
 
     if (!userToUpdate) {
       throw new NotFoundException();
@@ -86,7 +98,7 @@ export class UsersService {
       updateData = body;
     }
 
-    await this.userRepository.update(id, updateData);
+    await this._userRepository.update(id, updateData);
     return await this.getOneWithRelations(id);
   }
 
@@ -95,7 +107,7 @@ export class UsersService {
    * Get all active users
    */
   async getAllActiveUsers(): Promise<UserInfoDto[]> {
-    const users = await this.userRepository.find({
+    const users = await this._userRepository.find({
       relations: ['ward', 'ward.district', 'ward.district.city'],
     });
     if (!users) {
