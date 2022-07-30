@@ -78,7 +78,7 @@ export class Billboard extends AbstractEntity {
   @Column({ nullable: true, default: null })
   approvedAt: Date;
 
-  @DeleteDateColumn({ select: false })
+  @DeleteDateColumn({ select: true })
   deletedAt: Date;
 
   toDto(): BillboardInfoDto {

@@ -53,7 +53,7 @@ export class User extends AbstractEntity {
   })
   role: RoleType;
 
-  @DeleteDateColumn({ select: false })
+  @DeleteDateColumn({ select: true })
   deletedAt: Date;
 
   @ManyToOne(() => Ward)
