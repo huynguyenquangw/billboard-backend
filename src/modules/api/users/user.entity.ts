@@ -53,7 +53,11 @@ export class User extends AbstractEntity {
   })
   role: RoleType;
 
-  @DeleteDateColumn({ select: true })
+  @DeleteDateColumn({
+    select: false,
+    type: 'timestamp without time zone',
+    name: 'deleted_at',
+  })
   deletedAt: Date;
 
   @ManyToOne(() => Ward)
