@@ -1,11 +1,12 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Auth, google } from 'googleapis';
 import { sign } from 'jsonwebtoken';
 import { AuthType } from 'src/constants';
 import { User } from 'src/modules/api/users/user.entity';
+import { UsersService } from 'src/modules/api/users/users.service';
 import { Repository } from 'typeorm';
 import { LoginPayLoadDto } from '../dto/login-payload.dto';
 
@@ -16,6 +17,7 @@ export class GoogleService {
     private readonly httpService: HttpService,
     @InjectRepository(User) private userRepo: Repository<User>, // Inject Repository 'users' in to this service file
     private readonly configService: ConfigService, //Create a configService to call all the .env file
+    private readonly _usersService: UsersService,
   ) {
     const clientID = this.configService.get('GOOGLE_CLIENT_ID2');
     const clientSecret = this.configService.get('GOOGLE_CLIENT_SECRET2');
@@ -32,15 +34,19 @@ export class GoogleService {
       )
       .toPromise();
 
-    // console.log('data: ', userProfile.data);
-    const findUser = await this.userRepo.findOne({
-      where: {
-        email: loginPayload.user_name,
-        authType: loginPayload.auth_type,
-      },
-    }); //Find the user in our database that has the same email as the decryted accessToken email
+    console.log(userProfile.data.emailAddresses[0].value);
 
-    if (!findUser) {
+    //Find the user in our database that has the same email as the decryted accessToken email
+    const user = await this._usersService.findExistUser(
+      AuthType.GOOGLE,
+      userProfile.data.emailAddresses[0].value,
+    );
+
+    if (user.deletedAt) {
+      throw new UnauthorizedException('Cannot login with a banned account');
+    }
+
+    if (!user) {
       const newUser = this.userRepo.create({
         name: userProfile.data.names[0].displayName,
         email: userProfile.data.emailAddresses[0].value,
@@ -68,7 +74,7 @@ export class GoogleService {
       data: {
         access_token: sign(
           {
-            userId: findUser.id,
+            userId: user.id,
           },
           process.env.SOFTDEV_BILLBOARD_SECRET,
         ),
