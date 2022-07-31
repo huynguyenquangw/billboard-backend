@@ -9,8 +9,11 @@ import {
   Post,
   Query,
   Req,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiForbiddenResponse,
@@ -32,7 +35,7 @@ import { CreateBillboardDto } from './dto/create-billboard.dto';
 @Controller('api/billboards')
 @ApiTags('Billboards')
 export class BillboardsController {
-  constructor(private readonly billboardsService: BillboardsService) {}
+  constructor(private readonly _billboardsService: BillboardsService) {}
 
   /**
    * Create a new billboard
@@ -48,7 +51,7 @@ export class BillboardsController {
     @Req() req,
     @Body() createBillboardDto: CreateBillboardDto,
   ): Promise<BillboardInfoDto> {
-    const newBillboard: Billboard = await this.billboardsService.create(
+    const newBillboard: Billboard = await this._billboardsService.create(
       req.user.id,
       createBillboardDto,
     );
@@ -59,7 +62,7 @@ export class BillboardsController {
   @ApiOperation({ summary: 'Get billboard count by districts of a city' })
   @HttpCode(HttpStatus.OK)
   async getCountOfBillboardsWithinDistrict(@Req() req): Promise<any> {
-    return await this.billboardsService.getCountOfBillboardsWithinDistrict(
+    return await this._billboardsService.getCountOfBillboardsWithinDistrict(
       req.body.cityName,
     );
   }
@@ -76,7 +79,7 @@ export class BillboardsController {
     @Query('size_y') size_y: CreateBillboardDto['size_y'],
     @Query('district') district: string,
   ): Promise<PageDto<BillboardInfoDto>> {
-    return this.billboardsService.search(
+    return this._billboardsService.search(
       pageOptionsDto,
       address2,
       price,
@@ -90,14 +93,14 @@ export class BillboardsController {
   @Get('allPreClients')
   @ApiOperation({ summary: 'Get all previous clients' })
   async allPreviousClient(): Promise<any> {
-    return this.billboardsService.getAllPreviousClient();
+    return this._billboardsService.getAllPreviousClient();
   }
 
   //Get One PreviousClient
   @Get('preClient/:id')
   @ApiOperation({ summary: 'Find 1 previous client' })
   async onePreviousClient(@Param('id') id: string): Promise<any> {
-    return this.billboardsService.getOnePreviousClient(id);
+    return this._billboardsService.getOnePreviousClient(id);
   }
 
   /**
@@ -113,7 +116,7 @@ export class BillboardsController {
     @Param('id') id: string,
     @Body() body: CreateBillboardDto,
   ): Promise<BillboardInfoDto> {
-    return await this.billboardsService.update(id, body);
+    return await this._billboardsService.update(id, body);
   }
 
   /**
@@ -139,9 +142,20 @@ export class BillboardsController {
   })
   async delete(
     @Req() req,
-    @Param('id') id: string,
+    @Param('id') billboardId: string,
   ): Promise<UpdateResult | void> {
-    return await this.billboardsService.delete(req.user.id, id);
+    console.log(req.user);
+
+    return await this._billboardsService.delete(req.user.id, billboardId);
+  }
+
+  @Post('file')
+  // @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  async addFile(@UploadedFile() file: Express.Multer.File) {
+    console.log(file);
+
+    // return this._billboardsService.addFile(file.buffer, file.originalname);
   }
 
   /**
@@ -151,7 +165,7 @@ export class BillboardsController {
   @Get(':id')
   @ApiOperation({ summary: "Get billboard's info" })
   async getOne(@Param('id') id: string): Promise<BillboardInfoDto> {
-    const billboard = await this.billboardsService.findOneWithRelations(id);
+    const billboard = await this._billboardsService.findOneWithRelations(id);
     return billboard.toDto();
   }
 }

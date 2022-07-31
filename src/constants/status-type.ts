@@ -10,4 +10,6 @@ export enum StatusType {
   // subscription status
   SUCCESS = 'SUCCESS',
   CANCELED = 'CANCELED',
+
+  DELETED = 'DELETED',
 }

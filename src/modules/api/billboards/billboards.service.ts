@@ -7,7 +7,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PageMetaDto } from 'src/common/dtos/page-meta.dto';
 import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { PageDto } from 'src/common/dtos/page.dto';
-import { StatusType } from 'src/constants';
+import { RoleType, StatusType } from 'src/constants';
+// import { S3Service } from 'src/shared/services/aws-s3.service';
 import { Repository, UpdateResult } from 'typeorm';
 import { AddressService } from '../address/address.service';
 import { District } from '../address/district.entity';
@@ -161,20 +162,32 @@ export class BillboardsService {
       relations: ['owner'],
     });
 
-    // Check owner
-    if (billboardToDelete.owner.id !== ownerId) {
+    // Check is owner or is admin
+    if (
+      billboardToDelete.owner.role !== RoleType.ADMIN ||
+      billboardToDelete.owner.id !== ownerId
+    ) {
       throw new ForbiddenException('Cannot delete this billboard');
     }
 
     const deleteResponse = await this._billboardRepo.softDelete(billboardId);
+
     if (!deleteResponse.affected) {
       throw new NotFoundException('Draft billboard with given id is not exist');
     }
+
+    //TODO: update status for deleted billboard
+    const deletedBillboard = await this._billboardRepo.findOne({
+      where: {
+        id: billboardId,
+      },
+      withDeleted: true,
+    });
+    deletedBillboard.status = StatusType.DELETED;
     return deleteResponse;
   }
 
   /**
-   * Get approved billboard list within district
    */
   async getCountOfBillboardsWithinDistrict(cityName: string): Promise<any> {
     const defaultCity = 'Ho Chi Minh City';
