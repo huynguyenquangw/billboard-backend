@@ -9,21 +9,9 @@ import {
   GetAllBillboardsUseCase,
 } from './useCase/billboardManagement/admin/getAll';
 import {
-  ApproveBillboardController,
-  ApproveBillboardUseCase,
-} from './useCase/billboardManagement/operator/approveBillboard';
-import {
-  RejectBillboardController,
-  RejectBillboardUseCase,
-} from './useCase/billboardManagement/operator/rejectBillboard';
-import {
-  GetAllPendingBillboardsController,
-  GetAllPendingBillboardsUseCase,
-} from './useCase/billboardManagement/operator/getAllPendingBillboards';
-import {
-  DeleteAndRestoreBillboardController,
-  DeleteAndRestoreBillboardUseCase,
-} from './useCase/billboardManagement/admin/softDelete';
+  RestoreBillboardController,
+  RestoreBillboardUseCase,
+} from './useCase/billboardManagement/admin/restore';
 import {
   GetAllBillboardsByStatusController,
   GetAllBillboardsByStatusUseCase,
@@ -32,6 +20,18 @@ import {
   GetAllBillboardsWithFilterController,
   GetAllBillboardsWithFilterUseCase,
 } from './useCase/billboardManagement/getAllWithFilter';
+import {
+  ApproveBillboardController,
+  ApproveBillboardUseCase,
+} from './useCase/billboardManagement/operator/approveBillboard';
+import {
+  GetAllPendingBillboardsController,
+  GetAllPendingBillboardsUseCase,
+} from './useCase/billboardManagement/operator/getAllPendingBillboards';
+import {
+  RejectBillboardController,
+  RejectBillboardUseCase,
+} from './useCase/billboardManagement/operator/rejectBillboard';
 import {
   PublishBillboardController,
   PublishBillboardUseCase,
@@ -63,7 +63,7 @@ import { UsersModule } from './users/users.module';
     ApproveBillboardController,
     RejectBillboardController,
     GetAllPendingBillboardsController,
-    DeleteAndRestoreBillboardController,
+    RestoreBillboardController,
     GetAllBillboardsByStatusController,
     GetAllBillboardsWithFilterController,
     PublishBillboardController,
@@ -77,7 +77,7 @@ import { UsersModule } from './users/users.module';
     ApproveBillboardUseCase,
     RejectBillboardUseCase,
     GetAllPendingBillboardsUseCase,
-    DeleteAndRestoreBillboardUseCase,
+    RestoreBillboardUseCase,
     GetAllBillboardsByStatusUseCase,
     GetAllBillboardsWithFilterUseCase,
     PublishBillboardUseCase,

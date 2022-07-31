@@ -1,11 +1,4 @@
-import {
-  Controller,
-  ForbiddenException,
-  Param,
-  Patch,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Param, Patch, Req, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiForbiddenResponse,
@@ -19,13 +12,13 @@ import { Roles } from 'src/decorators/roles.decorator';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { JwtAuthGuard } from 'src/modules/auth/oauth/guards/jwt-authentication.guard';
 import { UpdateResult } from 'typeorm';
-import { DeleteAndRestoreBillboardUseCase } from './DeleteAndRestoreBillboard.useCase';
+import { RestoreBillboardUseCase } from './RestoreBillboard.useCase';
 
 @Controller()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
-export class DeleteAndRestoreBillboardController {
-  constructor(private readonly useCase: DeleteAndRestoreBillboardUseCase) {}
+export class RestoreBillboardController {
+  constructor(private readonly useCase: RestoreBillboardUseCase) {}
 
   /**
    * Restore a deleted billboard
@@ -48,12 +41,8 @@ export class DeleteAndRestoreBillboardController {
     description: 'User with given id is active or not exist',
   })
   async restore(
-    @Req() req,
-    @Param('id') id: string,
+    @Param('id') billboardId: string,
   ): Promise<UpdateResult | void> {
-    if (id === req.user.id) {
-      throw new ForbiddenException('Cannot restore yourself');
-    }
-    return await this.useCase.restore(req.user.id, id);
+    return await this.useCase.restore(billboardId);
   }
 }
