@@ -3,6 +3,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -39,6 +40,27 @@ export class GetAllBillboardsController {
   async getAll(
     @Query() pageOptionsDto: PageOptionsDto,
   ): Promise<PageDto<BillboardInfoDto>> {
-    return this.useCase.execute(pageOptionsDto);
+    return this.useCase.executeAll(pageOptionsDto);
+  }
+
+  /**
+   * ROLE: ADMIN
+   * Get all billboards
+   * with relations
+   * @params active | inactive
+   * @returns all billboards
+   */
+  @Get('all/:activeVal')
+  @ApiBearerAuth()
+  @Roles(RoleType.ADMIN)
+  @ApiOperation({
+    summary: 'Get all billboards of current user by status',
+  })
+  @HttpCode(HttpStatus.OK)
+  async getAllActive(
+    @Param('activeVal') activeVal: string = 'inactive' || 'active',
+    @Query() pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<BillboardInfoDto>> {
+    return this.useCase.execute(activeVal, pageOptionsDto);
   }
 }
