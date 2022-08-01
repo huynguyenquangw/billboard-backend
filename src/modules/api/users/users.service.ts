@@ -23,10 +23,10 @@ export class UsersService {
     const user: User = await this._userRepository.findOne({
       where: { id: id },
     });
-    if (user) {
-      return user;
+    if (!user) {
+      throw new NotFoundException('User with given id is not exist');
     }
-    throw new NotFoundException('User with given id is not exist');
+    return user;
   }
 
   /**

@@ -156,38 +156,42 @@ export class BillboardsService {
    * delete a billboard
    */
   async delete(
-    ownerId: string,
+    currentUserId: string,
     billboardId: string,
   ): Promise<UpdateResult | void> {
     const billboardToDelete = await this._billboardRepo.findOne({
-      where: { id: billboardId, status: StatusType.DRAFT },
+      where: {
+        id: billboardId,
+      },
       relations: ['owner'],
     });
+    if (!billboardToDelete) {
+      throw new NotFoundException('Billboard with given id is not exist!');
+    }
 
-const actor = await this._usersService.findOne(ownerId);
+    const currentUser = await this._usersService.findOne(currentUserId);
+    if (!currentUser) {
+      throw new NotFoundException('User with token is not exist!');
+    }
 
-    // Check is owner or is admin
     if (
-      actor.role !== RoleType.ADMIN ||
-      billboardToDelete.owner.id !== ownerId
+      currentUser.role !== RoleType.ADMIN &&
+      (billboardToDelete.owner.id !== currentUserId ||
+        billboardToDelete.status !== StatusType.DRAFT)
     ) {
       throw new ForbiddenException('Cannot delete this billboard');
     }
 
+    // DELETE billboard
+    billboardToDelete.status = StatusType.DELETED;
+    await this._billboardRepo.save(billboardToDelete);
+    console.log(billboardToDelete);
     const deleteResponse = await this._billboardRepo.softDelete(billboardId);
 
     if (!deleteResponse.affected) {
-      throw new NotFoundException('Draft billboard with given id is not exist');
+      throw new NotFoundException('Billboard with given id is not exist!');
     }
 
-    //TODO: update status for deleted billboard
-    const deletedBillboard = await this._billboardRepo.findOne({
-      where: {
-        id: billboardId,
-      },
-      withDeleted: true,
-    });
-    deletedBillboard.status = StatusType.DELETED;
     return deleteResponse;
   }
 

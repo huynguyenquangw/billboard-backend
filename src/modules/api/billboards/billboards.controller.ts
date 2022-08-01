@@ -127,10 +127,9 @@ export class BillboardsController {
    * Soft-delete billboard
    */
   @Patch(':id/delete')
-  @UseGuards(JwtAuthGuard)
   @ApiTags('Billboards')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(RoleType.USER, RoleType.ADMIN)
-  @UseGuards(RolesGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Owner delete billboard' })
   @ApiNoContentResponse({
@@ -149,8 +148,6 @@ export class BillboardsController {
     @Req() req,
     @Param('id') billboardId: string,
   ): Promise<UpdateResult | void> {
-    console.log(req.user);
-
     return await this._billboardsService.delete(req.user.id, billboardId);
   }
 
