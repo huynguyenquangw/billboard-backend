@@ -36,8 +36,7 @@ import {
   PublishBillboardController,
   PublishBillboardUseCase,
 } from './useCase/billboardManagement/publish';
-import { GetAllUserController } from './useCase/user/getAll/GetAllUser.controller';
-import { GetAllUserUseCase } from './useCase/user/getAll/GetAllUser.useCase';
+import { GetAllUserController, GetAllUserUseCase } from './useCase/user/getAll';
 import { GetOneUserController, GetOneUserUseCase } from './useCase/user/getOne';
 import {
   LoggedInUserRoleCheckController,

@@ -8,6 +8,7 @@ import { PageMetaDto } from 'src/common/dtos/page-meta.dto';
 import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { PageDto } from 'src/common/dtos/page.dto';
 import { RoleType, StatusType } from 'src/constants';
+import { S3Service } from 'src/shared/services/aws-s3.service';
 // import { S3Service } from 'src/shared/services/aws-s3.service';
 import { Repository, UpdateResult } from 'typeorm';
 import { AddressService } from '../address/address.service';
@@ -28,8 +29,9 @@ export class BillboardsService {
     private readonly _previousClientRepo: Repository<PreviousClient>,
     @InjectRepository(District)
     private readonly _districtRepo: Repository<District>,
-    private readonly addressService: AddressService,
-    private readonly usersService: UsersService,
+    private readonly _addressService: AddressService,
+    private readonly _usersService: UsersService,
+    private readonly _s3Service: S3Service,
   ) {}
 
   /**
@@ -65,12 +67,12 @@ export class BillboardsService {
     ownerId: string,
     createBillboardDto: CreateBillboardDto,
   ): Promise<Billboard> {
-    const owner: User = await this.usersService.findOne(ownerId);
+    const owner: User = await this._usersService.findOne(ownerId);
     if (!owner) {
       throw new NotFoundException(ownerId);
     }
 
-    const ward = await this.addressService.getOneWard(
+    const ward = await this._addressService.getOneWard(
       createBillboardDto.wardId,
     );
 
@@ -138,7 +140,7 @@ export class BillboardsService {
     let fullUpdateData = {};
     if (body.wardId) {
       const { wardId, ...updateData } = body;
-      const ward = await this.addressService.getOneWard(wardId);
+      const ward = await this._addressService.getOneWard(wardId);
 
       fullUpdateData = { ...updateData, ward: { ...ward } };
     } else {
@@ -247,5 +249,15 @@ export class BillboardsService {
         id: getOneId,
       },
     });
+  }
+
+  async addFile(imageBuffer: Buffer, filename: string) {
+    const avatar = await this._s3Service.uploadFile(imageBuffer, filename);
+    // const billboard = await this.findOne(billboardId);
+    // await this._billboardRepo.update(billboardId, {
+    //   ...billboard,
+    //   avatar,
+    // });
+    return avatar;
   }
 }

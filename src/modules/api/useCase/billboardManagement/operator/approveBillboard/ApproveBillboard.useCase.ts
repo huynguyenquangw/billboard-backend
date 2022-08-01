@@ -22,7 +22,12 @@ export class ApproveBillboardUseCase {
 
       // check current status - PENDING
       if (selectedBillboard.status !== StatusType.PENDING) {
-        throw new Error('Cannot approve this billboard');
+        throw new Error('Cannot approve a non-PENDING billboard!');
+      }
+
+      // check is approved already
+      if (selectedBillboard.approvedAt) {
+        throw new Error('This billboard is approved already!');
       }
 
       selectedBillboard.status = StatusType.APPROVED;

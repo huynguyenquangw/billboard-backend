@@ -24,6 +24,9 @@ import {
 } from '@nestjs/swagger';
 import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { PageDto } from 'src/common/dtos/page.dto';
+import { RoleType } from 'src/constants';
+import { Roles } from 'src/decorators/roles.decorator';
+import { RolesGuard } from 'src/guards/roles.guard';
 // import RolesGuard from 'src/guards/roles.guard';
 import { JwtAuthGuard } from 'src/modules/auth/oauth/guards/jwt-authentication.guard';
 import { UpdateResult } from 'typeorm';
@@ -126,6 +129,8 @@ export class BillboardsController {
   @Patch(':id/delete')
   @UseGuards(JwtAuthGuard)
   @ApiTags('Billboards')
+  @Roles(RoleType.USER, RoleType.ADMIN)
+  @UseGuards(RolesGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Owner delete billboard' })
   @ApiNoContentResponse({

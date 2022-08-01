@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RoleType } from 'src/constants';
 import { Roles } from 'src/decorators/roles.decorator';
 import { RolesGuard } from 'src/guards/roles.guard';
+import { Billboard } from 'src/modules/api/billboards/billboard.entity';
 import { JwtAuthGuard } from 'src/modules/auth/oauth/guards/jwt-authentication.guard';
 import { ApproveBillboardUseCase } from './ApproveBillboard.useCase';
 
@@ -19,7 +20,7 @@ export class ApproveBillboardController {
   @Patch(':id/approve')
   @Roles(RoleType.OPERATOR)
   @ApiOperation({ summary: 'OPERATOR: approve 1 billboard' })
-  async approve(@Param('id') id: string): Promise<any> {
+  async approve(@Param('id') id: string): Promise<Billboard | any> {
     return this.useCase.execute(id);
   }
 }
