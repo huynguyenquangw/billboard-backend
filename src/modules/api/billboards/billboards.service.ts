@@ -247,4 +247,16 @@ export class BillboardsService {
     // });
     return avatar;
   }
+
+  async addMultipleFiles(files: Array<Express.Multer.File>) {
+    const photos = await this._s3Service.upload(files);
+    await console.log('response: ', photos);
+
+    // const billboard = await this.findOne(billboardId);
+    // await this._billboardRepo.update(billboardId, {
+    //   ...billboard,
+    //   avatar,
+    // });
+    return photos;
+  }
 }

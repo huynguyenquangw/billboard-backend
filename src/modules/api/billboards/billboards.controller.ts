@@ -10,12 +10,14 @@ import {
   Query,
   Req,
   UploadedFile,
+  UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
+  ApiConsumes,
   ApiForbiddenResponse,
   ApiNoContentResponse,
   ApiNotFoundResponse,
@@ -151,13 +153,24 @@ export class BillboardsController {
     return await this._billboardsService.delete(req.user.id, id);
   }
 
-  @Post('file')
+  @Post('upload/file')
   // @UseGuards(JwtAuthGuard)
+  @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
   async addFile(@UploadedFile() file: Express.Multer.File) {
     console.log(file);
 
     return this._billboardsService.addFile(file.buffer, file.originalname);
+  }
+
+  @Post('upload/files')
+  @UseInterceptors(FilesInterceptor('photos', 20))
+  async uploadFile(@UploadedFiles() files: Array<Express.Multer.File>) {
+    console.log('request:', files);
+    const response = await this._billboardsService.addMultipleFiles(files);
+    console.log('response: ', response);
+
+    return response;
   }
 
   /**
