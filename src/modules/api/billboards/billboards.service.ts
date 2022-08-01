@@ -164,9 +164,11 @@ export class BillboardsService {
       relations: ['owner'],
     });
 
+const actor = await this._usersService.findOne(ownerId);
+
     // Check is owner or is admin
     if (
-      billboardToDelete.owner.role !== RoleType.ADMIN ||
+      actor.role !== RoleType.ADMIN ||
       billboardToDelete.owner.id !== ownerId
     ) {
       throw new ForbiddenException('Cannot delete this billboard');
