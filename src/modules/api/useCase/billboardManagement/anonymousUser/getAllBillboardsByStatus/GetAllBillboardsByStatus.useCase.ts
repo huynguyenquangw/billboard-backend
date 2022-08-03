@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PageMetaDto } from 'src/common/dtos/page-meta.dto';
-import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { PageDto } from 'src/common/dtos/page.dto';
 import { StatusType } from 'src/constants';
 import { Billboard } from 'src/modules/api/billboards/billboard.entity';
 import { BillboardsService } from 'src/modules/api/billboards/billboards.service';
 import { BillboardInfoDto } from 'src/modules/api/billboards/dto/billboard-info.dto';
+import { BillboardsPageOptionsDto } from 'src/modules/api/infra/dtos/BillboardsPageOptions.dto.ts/BillboardsPageOptions.dto';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -23,7 +23,7 @@ export class GetAllBillboardsByStatusUseCase {
   async execute(
     ownerId: string,
     status: StatusType,
-    pageOptionsDto: PageOptionsDto,
+    pageOptionsDto: BillboardsPageOptionsDto,
   ): Promise<PageDto<BillboardInfoDto>> {
     const queryBuilder =
       this._billboardRepository.createQueryBuilder('billboards');

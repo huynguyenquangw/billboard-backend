@@ -2,37 +2,37 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PageMetaDto } from 'src/common/dtos/page-meta.dto';
 import { PageDto } from 'src/common/dtos/page.dto';
-import { Billboard } from 'src/modules/api/billboards/billboard.entity';
-import { BillboardInfoDto } from 'src/modules/api/billboards/dto/billboard-info.dto';
-import { BillboardsPageOptionsDto } from 'src/modules/api/infra/dtos/BillboardsPageOptions.dto.ts/BillboardsPageOptions.dto';
+import { RoleType } from 'src/constants';
+import { UsersPageOptionsDto } from 'src/modules/api/infra/dtos/usersPageOptions.dto.ts/UsersPageOptions.dto';
+import { UserInfoDto } from 'src/modules/api/users/dto/user-info.dto';
+import { User } from 'src/modules/api/users/user.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
-export class GetAllBillboardsUseCase {
+export class GetAllOperatorsUseCase {
   constructor(
-    @InjectRepository(Billboard)
-    private readonly _billboardRepository: Repository<Billboard>,
+    @InjectRepository(User)
+    private readonly _userRepository: Repository<User>,
   ) {}
 
   /**
-   * Get all billboard exclude deleted
+   * Get all users include deleted
    */
   async executeAll(
-    pageOptionsDto: BillboardsPageOptionsDto,
-  ): Promise<PageDto<BillboardInfoDto>> {
-    const queryBuilder =
-      this._billboardRepository.createQueryBuilder('billboards');
+    pageOptionsDto: UsersPageOptionsDto,
+  ): Promise<PageDto<UserInfoDto>> {
+    const queryBuilder = this._userRepository.createQueryBuilder('billboards');
 
     queryBuilder
-      .orderBy('billboards.createdAt', pageOptionsDto.order)
+      .orderBy('users.createdAt', pageOptionsDto.order)
       .skip(pageOptionsDto.skip)
       .take(pageOptionsDto.take)
-      .leftJoinAndSelect('billboards.ward', 'wards')
+      .where('users.role = :role', { role: RoleType.OPERATOR })
+      .withDeleted()
+      .leftJoinAndSelect('users.ward', 'wards')
       .leftJoinAndSelect('wards.district', 'districts')
       .leftJoinAndSelect('districts.city', 'cities')
-      .leftJoinAndSelect('billboards.owner', 'users')
-      .addSelect('billboards.deletedAt')
-      .withDeleted();
+      .addSelect('users.deletedAt');
 
     const itemCount = await queryBuilder.getCount();
     const { entities } = await queryBuilder.getRawAndEntities();
@@ -47,19 +47,18 @@ export class GetAllBillboardsUseCase {
    */
   async execute(
     isActive: string,
-    pageOptionsDto: BillboardsPageOptionsDto,
-  ): Promise<PageDto<BillboardInfoDto>> {
-    const queryBuilder =
-      this._billboardRepository.createQueryBuilder('billboards');
+    pageOptionsDto: UsersPageOptionsDto,
+  ): Promise<PageDto<UserInfoDto>> {
+    const queryBuilder = this._userRepository.createQueryBuilder('users');
 
     queryBuilder
-      .orderBy('billboards.createdAt', pageOptionsDto.order)
+      .orderBy('users.createdAt', pageOptionsDto.order)
       .skip(pageOptionsDto.skip)
       .take(pageOptionsDto.take)
-      .leftJoinAndSelect('billboards.ward', 'wards')
+      .where('users.role = :role', { role: RoleType.OPERATOR })
+      .leftJoinAndSelect('users.ward', 'wards')
       .leftJoinAndSelect('wards.district', 'districts')
-      .leftJoinAndSelect('districts.city', 'cities')
-      .leftJoinAndSelect('billboards.owner', 'users');
+      .leftJoinAndSelect('districts.city', 'cities');
 
     switch (isActive) {
       case 'active':
@@ -67,8 +66,8 @@ export class GetAllBillboardsUseCase {
       case 'inactive':
         queryBuilder
           .withDeleted()
-          .addSelect('billboards.deletedAt')
-          .where('billboards.deletedAt IS NOT NULL');
+          .addSelect('users.deletedAt')
+          .where('users.deletedAt IS NOT NULL');
         break;
       default:
         break;

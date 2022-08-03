@@ -15,37 +15,47 @@ import {
 import {
   GetAllBillboardsByStatusController,
   GetAllBillboardsByStatusUseCase,
-} from './useCase/billboardManagement/getAllByStatus';
+} from './useCase/billboardManagement/anonymousUser/getAllBillboardsByStatus';
 import {
   GetAllBillboardsWithFilterController,
   GetAllBillboardsWithFilterUseCase,
-} from './useCase/billboardManagement/getAllWithFilter';
+} from './useCase/billboardManagement/anonymousUser/getAllBillboardsWithFilter';
 import {
   ApproveBillboardController,
   ApproveBillboardUseCase,
-} from './useCase/billboardManagement/operator/approveBillboard';
+} from './useCase/billboardManagement/operator/approveBillboardByOperator';
 import {
   GetAllPendingBillboardsController,
   GetAllPendingBillboardsUseCase,
-} from './useCase/billboardManagement/operator/getAllPendingBillboards';
+} from './useCase/billboardManagement/operator/getAllPendingBillboardsByOperator';
 import {
   RejectBillboardController,
   RejectBillboardUseCase,
-} from './useCase/billboardManagement/operator/rejectBillboard';
+} from './useCase/billboardManagement/operator/rejectBillboardByOperator';
 import {
-  PublishBillboardController,
-  PublishBillboardUseCase,
-} from './useCase/billboardManagement/publish';
-import { GetAllUserController, GetAllUserUseCase } from './useCase/user/getAll';
-import { GetOneUserController, GetOneUserUseCase } from './useCase/user/getOne';
+  GetAllOperatorsController,
+  GetAllOperatorsUseCase,
+} from './useCase/operationManagement/getAllOperators';
+// import {
+//   PublishBillboardController,
+//   PublishBillboardUseCase,
+// } from './useCase/billboardManagement/publishBillboard';
 import {
   LoggedInUserRoleCheckController,
   LoggedInUserRoleCheckUseCase,
-} from './useCase/user/loggedInUserRoleCheck';
+} from './useCase/userManagement/checkRoleCurrentUser';
+import {
+  GetAllUsersController,
+  GetAllUsersUseCase,
+} from './useCase/userManagement/getAllUsers';
+import {
+  GetOneUserController,
+  GetOneUserUseCase,
+} from './useCase/userManagement/getOneUser';
 import {
   DeleteAndRestoreUserController,
   DeleteAndRestoreUserUseCase,
-} from './useCase/user/softDelete';
+} from './useCase/userManagement/softDeleteUser';
 import { User } from './users/user.entity';
 import { UsersModule } from './users/users.module';
 
@@ -65,8 +75,9 @@ import { UsersModule } from './users/users.module';
     RestoreBillboardController,
     GetAllBillboardsByStatusController,
     GetAllBillboardsWithFilterController,
-    PublishBillboardController,
-    GetAllUserController,
+    // PublishBillboardController,
+    GetAllOperatorsController,
+    GetAllUsersController,
     LoggedInUserRoleCheckController,
     DeleteAndRestoreUserController,
     GetOneUserController,
@@ -79,8 +90,9 @@ import { UsersModule } from './users/users.module';
     RestoreBillboardUseCase,
     GetAllBillboardsByStatusUseCase,
     GetAllBillboardsWithFilterUseCase,
-    PublishBillboardUseCase,
-    GetAllUserUseCase,
+    // PublishBillboardUseCase,
+    GetAllOperatorsUseCase,
+    GetAllUsersUseCase,
     LoggedInUserRoleCheckUseCase,
     DeleteAndRestoreUserUseCase,
     GetOneUserUseCase,

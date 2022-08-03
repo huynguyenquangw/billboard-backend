@@ -246,6 +246,31 @@ export class BillboardsService {
     return await this._previousClientRepo.find();
   }
 
+  /**
+   * Publish a billboard
+   */
+  async publish(ownerId: string, billboardId: string): Promise<Billboard> {
+    try {
+      const selectedBillboard = await this.findOneWithRelations(billboardId);
+
+      // check right owner
+      if (selectedBillboard.owner.id !== ownerId) {
+        throw new ForbiddenException('Forbidden');
+      }
+
+      // check current status - DRAFT
+      if (selectedBillboard.status !== StatusType.DRAFT) {
+        throw new Error('Cannot publish this billboard');
+      }
+
+      selectedBillboard.status = StatusType.PENDING;
+      return this._billboardRepo.save(selectedBillboard);
+    } catch (error) {
+      console.error(error);
+      return error;
+    }
+  }
+
   /*
    *Get One PreviousClient
    */
