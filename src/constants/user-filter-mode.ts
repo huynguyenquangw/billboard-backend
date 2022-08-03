@@ -1,3 +1,2 @@
-export enum UserFilterMode {
-  DEFAULT = 'approvedAt',
-}
+export enum UserFilterMode {}
+// DEFAULT = 'approvedAt',
