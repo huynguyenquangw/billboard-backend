@@ -156,38 +156,42 @@ export class BillboardsService {
    * delete a billboard
    */
   async delete(
-    ownerId: string,
+    currentUserId: string,
     billboardId: string,
   ): Promise<UpdateResult | void> {
     const billboardToDelete = await this._billboardRepo.findOne({
-      where: { id: billboardId, status: StatusType.DRAFT },
+      where: {
+        id: billboardId,
+      },
       relations: ['owner'],
     });
+    if (!billboardToDelete) {
+      throw new NotFoundException('Billboard with given id is not exist!');
+    }
 
-const actor = await this._usersService.findOne(ownerId);
+    const currentUser = await this._usersService.findOne(currentUserId);
+    if (!currentUser) {
+      throw new NotFoundException('User with token is not exist!');
+    }
 
-    // Check is owner or is admin
     if (
-      actor.role !== RoleType.ADMIN ||
-      billboardToDelete.owner.id !== ownerId
+      currentUser.role !== RoleType.ADMIN &&
+      (billboardToDelete.owner.id !== currentUserId ||
+        billboardToDelete.status !== StatusType.DRAFT)
     ) {
       throw new ForbiddenException('Cannot delete this billboard');
     }
 
+    // DELETE billboard
+    billboardToDelete.status = StatusType.DELETED;
+    await this._billboardRepo.save(billboardToDelete);
+    console.log(billboardToDelete);
     const deleteResponse = await this._billboardRepo.softDelete(billboardId);
 
     if (!deleteResponse.affected) {
-      throw new NotFoundException('Draft billboard with given id is not exist');
+      throw new NotFoundException('Billboard with given id is not exist!');
     }
 
-    //TODO: update status for deleted billboard
-    const deletedBillboard = await this._billboardRepo.findOne({
-      where: {
-        id: billboardId,
-      },
-      withDeleted: true,
-    });
-    deletedBillboard.status = StatusType.DELETED;
     return deleteResponse;
   }
 
@@ -242,6 +246,31 @@ const actor = await this._usersService.findOne(ownerId);
     return await this._previousClientRepo.find();
   }
 
+  /**
+   * Publish a billboard
+   */
+  async publish(ownerId: string, billboardId: string): Promise<Billboard> {
+    try {
+      const selectedBillboard = await this.findOneWithRelations(billboardId);
+
+      // check right owner
+      if (selectedBillboard.owner.id !== ownerId) {
+        throw new ForbiddenException('Forbidden');
+      }
+
+      // check current status - DRAFT
+      if (selectedBillboard.status !== StatusType.DRAFT) {
+        throw new Error('Cannot publish this billboard');
+      }
+
+      selectedBillboard.status = StatusType.PENDING;
+      return this._billboardRepo.save(selectedBillboard);
+    } catch (error) {
+      console.error(error);
+      return error;
+    }
+  }
+
   /*
    *Get One PreviousClient
    */
@@ -261,5 +290,17 @@ const actor = await this._usersService.findOne(ownerId);
     //   avatar,
     // });
     return avatar;
+  }
+
+  async addMultipleFiles(files: Array<Express.Multer.File>) {
+    const photos = await this._s3Service.upload(files);
+    await console.log('response: ', photos);
+
+    // const billboard = await this.findOne(billboardId);
+    // await this._billboardRepo.update(billboardId, {
+    //   ...billboard,
+    //   avatar,
+    // });
+    return photos;
   }
 }

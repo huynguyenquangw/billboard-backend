@@ -1,19 +1,16 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { StatusType } from 'src/constants';
 import { Billboard } from 'src/modules/api/billboards/billboard.entity';
-import { Repository, UpdateResult } from 'typeorm';
+import { BillboardsService } from 'src/modules/api/billboards/billboards.service';
+import { IsNull, Not, Repository, UpdateResult } from 'typeorm';
 
 @Injectable()
 export class RestoreBillboardUseCase {
-  private _billboardsService: any;
   constructor(
     @InjectRepository(Billboard)
     private readonly _billboardRepo: Repository<Billboard>,
+    private readonly _billboardsService: BillboardsService,
   ) {}
 
   /**
@@ -22,26 +19,25 @@ export class RestoreBillboardUseCase {
    */
   async restore(billboardId: string): Promise<UpdateResult> {
     const billboardToRestore = await this._billboardRepo.findOne({
-      where: { id: billboardId },
+      where: { id: billboardId, deletedAt: Not(IsNull()) },
       withDeleted: true,
     });
 
     // Check active
-    if (billboardToRestore && !billboardToRestore.deletedAt) {
-      throw new ForbiddenException('Billboard with given id is active');
+    if (!billboardToRestore) {
+      throw new NotFoundException(
+        'Cannot find deleted billboard with given id to restore',
+      );
     }
 
+    //TODO: change status to DRAFT, save and restore billboard
+    billboardToRestore.status = StatusType.DRAFT;
+    await this._billboardRepo.save(billboardToRestore);
     const restoreResponse = await this._billboardRepo.restore(billboardId);
 
     if (!restoreResponse.affected) {
-      throw new NotFoundException('Billboard with given id is not exist');
+      throw new NotFoundException('Restore failed!');
     }
-
-    //TODO: change status to DRAFT after restore
-    const restoredBillboard = await this._billboardsService.findOne(
-      billboardId,
-    );
-    restoredBillboard.status = StatusType.DRAFT;
 
     return restoreResponse;
   }

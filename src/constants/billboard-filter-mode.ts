@@ -1,4 +1,4 @@
-export enum FilterMode {
+export enum BillboardFilterMode {
   DEFAULT = 'createdAt',
   PRICE = 'rentalPrice',
   CIRCULATION = 'circulation',
