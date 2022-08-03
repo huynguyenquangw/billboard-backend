@@ -174,6 +174,22 @@ export class BillboardsController {
   }
 
   /**
+   * CURRENT USER - OWNER
+   * Publish billboard
+   * @returns draft billboard list with pagination
+   */
+  @Post(':id/publish')
+  @ApiOperation({
+    summary: 'Submit a draft billboard to operation',
+  })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  async publish(@Req() req, @Param('id') id: string): Promise<any> {
+    return this._billboardsService.publish(req.user.id, id);
+  }
+
+  /**
    * ROLE: any
    * Get ONE billboard
    */

@@ -1,41 +1,38 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PageMetaDto } from 'src/common/dtos/page-meta.dto';
-import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { PageDto } from 'src/common/dtos/page.dto';
 import { StatusType } from 'src/constants';
 import { Billboard } from 'src/modules/api/billboards/billboard.entity';
-import { BillboardsService } from 'src/modules/api/billboards/billboards.service';
 import { BillboardInfoDto } from 'src/modules/api/billboards/dto/billboard-info.dto';
+import { BillboardsPageOptionsDto } from 'src/modules/api/infra/dtos/BillboardsPageOptions.dto.ts/BillboardsPageOptions.dto';
 import { Repository } from 'typeorm';
 
 @Injectable()
-// implements IUseCase<Request, Promise<Response>>
-export class GetAllBillboardsWithFilterUseCase {
+export class GetAllPendingBillboardsUseCase {
   constructor(
     @InjectRepository(Billboard)
     private readonly _billboardRepository: Repository<Billboard>,
-    private readonly _billboardsService: BillboardsService,
   ) {}
 
   /**
-   * Get approved billboard list
-   *
+   * Get all billboard include deleted
    */
   async execute(
-    pageOptionsDto: PageOptionsDto,
+    pageOptionsDto: BillboardsPageOptionsDto,
   ): Promise<PageDto<BillboardInfoDto>> {
     const queryBuilder =
       this._billboardRepository.createQueryBuilder('billboards');
+
     queryBuilder
-      .orderBy(`billboards.${pageOptionsDto.filterMode}`, pageOptionsDto.order)
+      .orderBy('billboards.createdAt', pageOptionsDto.order)
       .skip(pageOptionsDto.skip)
       .take(pageOptionsDto.take)
       .leftJoinAndSelect('billboards.ward', 'wards')
       .leftJoinAndSelect('wards.district', 'districts')
       .leftJoinAndSelect('districts.city', 'cities')
       .leftJoinAndSelect('billboards.owner', 'users')
-      .where({ status: StatusType.APPROVED });
+      .where('billboards.status = :status', { status: StatusType.PENDING });
 
     const itemCount = await queryBuilder.getCount();
     const { entities } = await queryBuilder.getRawAndEntities();

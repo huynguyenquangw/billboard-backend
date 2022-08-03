@@ -9,10 +9,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { PageDto } from 'src/common/dtos/page.dto';
 import { StatusType } from 'src/constants';
 import { BillboardInfoDto } from 'src/modules/api/billboards/dto/billboard-info.dto';
+import { BillboardsPageOptionsDto } from 'src/modules/api/infra/dtos/BillboardsPageOptions.dto.ts/BillboardsPageOptions.dto';
 import { JwtAuthGuard } from 'src/modules/auth/oauth/guards/jwt-authentication.guard';
 import { GetAllBillboardsByStatusUseCase } from './GetAllBillboardsByStatus.useCase';
 
@@ -38,7 +38,7 @@ export class GetAllBillboardsByStatusController {
   async getAllByStatus(
     @Req() req,
     @Param('status') status: StatusType,
-    @Query() pageOptionsDto: PageOptionsDto,
+    @Query() pageOptionsDto: BillboardsPageOptionsDto,
   ): Promise<PageDto<BillboardInfoDto>> {
     return this.useCase.execute(req.user.id, status, pageOptionsDto);
   }
