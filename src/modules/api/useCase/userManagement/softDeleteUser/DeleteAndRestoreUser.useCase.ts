@@ -1,11 +1,7 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/modules/api/users/user.entity';
-import { Repository, UpdateResult } from 'typeorm';
+import { IsNull, Not, Repository, UpdateResult } from 'typeorm';
 
 @Injectable()
 export class DeleteAndRestoreUserUseCase {
@@ -30,15 +26,18 @@ export class DeleteAndRestoreUserUseCase {
    */
   async restore(id: string): Promise<UpdateResult> {
     const userToRestore = await this._userRepo.findOne({
-      where: { id: id },
+      where: { id: id, deletedAt: Not(IsNull()) },
       withDeleted: true,
     });
 
     // Check active
-    if (!userToRestore.deletedAt) {
-      throw new ForbiddenException('User with given id is active');
+    if (!userToRestore) {
+      throw new NotFoundException(
+        'Cannot find deleted user with given id to restore',
+      );
     }
 
+    //TODO: change status to DRAFT, save and restore billboard
     const restoreResponse = await this._userRepo.restore(id);
     if (!restoreResponse.affected) {
       throw new NotFoundException('User with given id is not exist');

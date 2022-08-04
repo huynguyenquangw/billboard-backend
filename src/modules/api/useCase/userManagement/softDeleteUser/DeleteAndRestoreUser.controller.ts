@@ -78,7 +78,7 @@ export class DeleteAndRestoreUserController {
     @Req() req,
     @Param('id') id: string,
   ): Promise<UpdateResult | void> {
-    if (id === req.user.id) {
+    if (id == req.user.id) {
       throw new ForbiddenException('Cannot restore yourself');
     }
     return await this.useCase.restore(id);
