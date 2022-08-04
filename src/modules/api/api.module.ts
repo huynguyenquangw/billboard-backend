@@ -36,6 +36,22 @@ import {
   GetAllOperatorsController,
   GetAllOperatorsUseCase,
 } from './useCase/operationManagement/getAllOperators';
+import { 
+  CreatePlansController,
+  CreatePlansUseCase 
+} from './useCase/planManagement/admin/createPlans';
+import { 
+  DeletePlansController, 
+  DeletePlansUseCase 
+} from './useCase/planManagement/admin/deletePlans';
+import { 
+  GetAllPlansController, 
+  GetAllPlansUseCase 
+} from './useCase/planManagement/admin/getPlans';
+import { 
+  RestorePlansController, 
+  RestorePlansUseCase 
+} from './useCase/planManagement/admin/restorePlans';
 // import {
 //   PublishBillboardController,
 //   PublishBillboardUseCase,
@@ -81,6 +97,10 @@ import { UsersModule } from './users/users.module';
     LoggedInUserRoleCheckController,
     DeleteAndRestoreUserController,
     GetOneUserController,
+    CreatePlansController,
+    GetAllPlansController,
+    DeletePlansController,
+    RestorePlansController,
   ],
   providers: [
     GetAllBillboardsUseCase,
@@ -96,6 +116,10 @@ import { UsersModule } from './users/users.module';
     LoggedInUserRoleCheckUseCase,
     DeleteAndRestoreUserUseCase,
     GetOneUserUseCase,
+    CreatePlansUseCase,
+    GetAllPlansUseCase,
+    DeletePlansUseCase,
+    RestorePlansUseCase,
   ],
 })
 export class ApiModule {}
