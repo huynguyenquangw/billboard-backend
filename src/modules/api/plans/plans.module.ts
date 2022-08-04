@@ -10,5 +10,6 @@ import { Transaction } from './transaction.entity';
   imports: [TypeOrmModule.forFeature([Plan, Subscription, Transaction])],
   controllers: [PlansController],
   providers: [PlansService],
+  exports:[PlansService]
 })
 export class PlansModule {}

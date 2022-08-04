@@ -1,4 +1,5 @@
-import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { StatusType } from 'src/constants';
 
 export class PlanInfoDto {
   // @ApiProperty()
@@ -26,8 +27,10 @@ export class PlanInfoDto {
   @IsOptional()
   postLimit: number;
 
-  @IsBoolean()
+  @IsEnum(StatusType)
   @IsOptional()
+  status: StatusType;
+
   @IsString()
   @IsOptional()
   description: string;

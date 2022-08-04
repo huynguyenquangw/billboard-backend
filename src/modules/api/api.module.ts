@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AddressModule } from './address/address.module';
 import { Billboard } from './billboards/billboard.entity';
 import { BillboardsModule } from './billboards/billboards.module';
+import { Plan } from './plans/plans.entity';
 import { PlansModule } from './plans/plans.module';
 import {
   GetAllBillboardsController,
@@ -36,22 +37,10 @@ import {
   GetAllOperatorsController,
   GetAllOperatorsUseCase,
 } from './useCase/operationManagement/getAllOperators';
-// import {
-//   CreatePlansController,
-//   CreatePlansUseCase
-// } from './useCase/planManagement/admin/createPlans';
-// import {
-//   DeletePlansController,
-//   DeletePlansUseCase
-// } from './useCase/planManagement/admin/deletePlans';
-// import {
-//   GetAllPlansController,
-//   GetAllPlansUseCase
-// } from './useCase/planManagement/admin/getPlans';
-// import {
-//   RestorePlansController,
-//   RestorePlansUseCase
-// } from './useCase/planManagement/admin/restorePlans';
+import { 
+  DeleteAndRestorePlansController, 
+  DeleteAndRestorePlansUseCase, 
+} from './useCase/planManagement/admin/softDeletePlans';
 // import {
 //   PublishBillboardController,
 //   PublishBillboardUseCase,
@@ -77,7 +66,7 @@ import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Billboard]),
+    TypeOrmModule.forFeature([User, Billboard, Plan]),
     UsersModule,
     BillboardsModule,
     PlansModule,
@@ -97,10 +86,7 @@ import { UsersModule } from './users/users.module';
     LoggedInUserRoleCheckController,
     DeleteAndRestoreUserController,
     GetOneUserController,
-    // CreatePlansController,
-    // GetAllPlansController,
-    // DeletePlansController,
-    // RestorePlansController,
+    DeleteAndRestorePlansController,
   ],
   providers: [
     GetAllBillboardsUseCase,
@@ -116,10 +102,7 @@ import { UsersModule } from './users/users.module';
     LoggedInUserRoleCheckUseCase,
     DeleteAndRestoreUserUseCase,
     GetOneUserUseCase,
-    // CreatePlansUseCase,
-    // GetAllPlansUseCase,
-    // DeletePlansUseCase,
-    // RestorePlansUseCase,
+    DeleteAndRestorePlansUseCase,
   ],
 })
 export class ApiModule {}
