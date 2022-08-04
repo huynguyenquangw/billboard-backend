@@ -7,10 +7,7 @@ import { Subscription } from './subscriptions.entity';
 import { Transaction } from './transaction.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Plan, Subscription, Transaction]),
-
-  ],
+  imports: [TypeOrmModule.forFeature([Plan, Subscription, Transaction])],
   controllers: [PlansController],
   providers: [PlansService],
 })

@@ -1,14 +1,9 @@
-import { AbstractEntity } from 'src/common/abstract.entity';
-import {
-  Column,
-  Entity,
-  ManyToOne,
-} from 'typeorm';
-import { Plan } from './plans.entity';
-import { User } from '../users/user.entity';
-import { StatusType } from 'src/constants';
 import { Exclude } from 'class-transformer';
-
+import { AbstractEntity } from 'src/common/abstract.entity';
+import { StatusType } from 'src/constants';
+import { Column, Entity, ManyToOne } from 'typeorm';
+import { User } from '../users/user.entity';
+import { Plan } from './plans.entity';
 
 @Entity({ name: 'subcriptions' })
 export class Subscription extends AbstractEntity {
@@ -18,11 +13,15 @@ export class Subscription extends AbstractEntity {
   @ManyToOne(() => User, (user) => user.subscriptions)
   subscriber: User;
 
+  // TODO: default remainingPost is postLimit
   @Column({ default: 0 })
-  remaining_post: number;
+  remainingPost: number;
 
-  @Column({ nullable: true })
-  end_at: Date;
+  // TODO: endAt = subscribed day + duration
+  // TODO: used for checking publish billboard
+  // TODO: used for checking billboard
+  @Column({ name: 'expired_at', nullable: true })
+  expiredAt: Date;
 
   @Column({
     type: 'enum',
@@ -31,6 +30,4 @@ export class Subscription extends AbstractEntity {
   })
   @Exclude()
   status: StatusType;
-
-
 }

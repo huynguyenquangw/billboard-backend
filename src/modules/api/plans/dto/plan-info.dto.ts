@@ -1,13 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsBoolean,
-  IsNumber,
-  IsOptional,
-  IsString,
-  IsUUID,
-} from 'class-validator';
+import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 
-export class PlanDto {
+export class PlanInfoDto {
   // @ApiProperty()
   // @IsUUID()
   // @IsOptional()
@@ -31,13 +24,11 @@ export class PlanDto {
 
   @IsNumber()
   @IsOptional()
-  post_limit: number;
+  postLimit: number;
 
   @IsBoolean()
   @IsOptional()
-
   @IsString()
   @IsOptional()
   description: string;
 }
-

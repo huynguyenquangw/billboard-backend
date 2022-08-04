@@ -1,25 +1,18 @@
 import { AbstractEntity } from 'src/common/abstract.entity';
-import {
-  Column,
-  DeleteDateColumn,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-} from 'typeorm';
-import { User } from '../users/user.entity';
+import { StatusType } from 'src/constants';
+import { Column, DeleteDateColumn, Entity, OneToMany } from 'typeorm';
 import { Subscription } from './subscriptions.entity';
 // import { UserEntity } from '../users/user.entity';
 
 @Entity({ name: 'plans' })
 export class Plan extends AbstractEntity {
-  @OneToMany(() => Subscription, subscription => subscription.plan)
+  @OneToMany(() => Subscription, (subscription) => subscription.plan)
   public subscriptions: Subscription[];
-  
-  @Column({ default: '' })
+
+  @Column()
   code: string;
 
-  @Column({ default: '' })
+  @Column()
   name: string;
 
   @Column({ default: 0 })
@@ -28,13 +21,14 @@ export class Plan extends AbstractEntity {
   @Column({ default: 0 })
   duration: number;
 
+  // TODO: 1 user with 10 post limit = PENDING + APPROVED
   @Column({ default: 0 })
-  post_limit: number;
+  postLimit: number;
 
-  @Column({type: 'bool', default: 0 })
-  is_active: boolean;
+  @Column({ type: 'enum', enum: StatusType, default: StatusType.HIDDEN })
+  status: StatusType;
 
-  @Column({default:''})
+  @Column({ default: '' })
   description: string;
 
   @DeleteDateColumn({

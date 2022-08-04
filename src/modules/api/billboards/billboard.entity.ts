@@ -1,4 +1,3 @@
-import { Exclude } from 'class-transformer';
 import { AbstractEntity } from 'src/common/abstract.entity';
 import { StatusType } from 'src/constants';
 import {
@@ -63,7 +62,7 @@ export class Billboard extends AbstractEntity {
     enum: StatusType,
     default: StatusType.DRAFT,
   })
-  @Exclude()
+  // @Exclude()
   status: StatusType;
 
   @Column({ type: 'bool', default: 0 })

@@ -20,7 +20,7 @@ export class GetAllUsersUseCase {
   async executeAll(
     pageOptionsDto: UsersPageOptionsDto,
   ): Promise<PageDto<UserInfoDto>> {
-    const queryBuilder = this._userRepository.createQueryBuilder('billboards');
+    const queryBuilder = this._userRepository.createQueryBuilder('users');
 
     queryBuilder
       .orderBy('users.createdAt', pageOptionsDto.order)
