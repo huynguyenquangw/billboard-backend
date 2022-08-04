@@ -94,6 +94,7 @@ export class BillboardsService {
     selectedSize_x: number,
     selectedSize_y: number,
     selectedDistrict: string,
+    selectedName: string,
   ): Promise<PageDto<BillboardInfoDto>> {
     const searchBillboard = await this._billboardRepo.findAndCount({
       order: {
@@ -101,7 +102,7 @@ export class BillboardsService {
       },
       skip: pageOptionsDto.skip,
       take: pageOptionsDto.take,
-      relations: ['ward', 'ward.district', 'ward.district.city'],
+      relations: ['ward', 'ward.district', 'ward.district.city', 'owner'],
       where: {
         address2: selectedAdrress2,
         rentalPrice: selectedPrice,
@@ -113,6 +114,7 @@ export class BillboardsService {
             name: selectedDistrict,
           },
         },
+        name: selectedName,
       },
     });
 

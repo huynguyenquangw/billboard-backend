@@ -72,7 +72,7 @@ export class BillboardsController {
     );
   }
 
-  //Search and get all billbaord by address2
+  //Search and get all billbaord 
   @Get('search')
   @ApiOperation({ summary: 'Search billboards' })
   @HttpCode(HttpStatus.OK)
@@ -83,6 +83,7 @@ export class BillboardsController {
     @Query('size_x') size_x: CreateBillboardDto['size_x'],
     @Query('size_y') size_y: CreateBillboardDto['size_y'],
     @Query('district') district: string,
+    @Query('name') name: CreateBillboardDto['name'],
   ): Promise<PageDto<BillboardInfoDto>> {
     return this._billboardsService.search(
       pageOptionsDto,
@@ -91,6 +92,7 @@ export class BillboardsController {
       size_x,
       size_y,
       district,
+      name,
     );
   }
 

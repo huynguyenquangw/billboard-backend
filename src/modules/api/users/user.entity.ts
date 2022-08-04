@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { Ward } from '../address/ward.entity';
 import { Billboard } from '../billboards/billboard.entity';
+import { Subscription } from '../plans/subscriptions.entity';
 import { UserInfoDto } from './dto/user-info.dto';
 
 @Entity({ name: 'users' })
@@ -66,6 +67,9 @@ export class User extends AbstractEntity {
 
   @OneToMany(() => Billboard, (billboard) => billboard.owner)
   billboards: Billboard[];
+
+  @OneToMany(() => Subscription, (subscription) => subscription.subscriber)
+  subscriptions: Billboard[];
 
   toDto(): UserInfoDto {
     return new UserInfoDto(this);
