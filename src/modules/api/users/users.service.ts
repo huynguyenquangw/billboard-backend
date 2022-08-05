@@ -45,10 +45,6 @@ export class UsersService {
       withDeleted: true,
     });
 
-    if (!user) {
-      throw new NotFoundException('Not Found');
-    }
-
     return user;
   }
 
