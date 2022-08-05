@@ -46,6 +46,7 @@ export class DeleteAndRestorePlansUseCase {
 
     //Soft Delete
     planToDelete.status = StatusType.DELETED;
+    await this.plansRepo.save(planToDelete);
     const deleteResponse = await this.plansRepo.softDelete(planId);
 
     if (!deleteResponse.affected) {
