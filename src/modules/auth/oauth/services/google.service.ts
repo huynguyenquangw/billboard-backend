@@ -42,7 +42,7 @@ export class GoogleService {
       userProfile.data.emailAddresses[0].value,
     );
 
-    if (user.deletedAt) {
+    if (user && user.deletedAt) {
       throw new UnauthorizedException('Cannot login with a banned account');
     }
 

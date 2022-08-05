@@ -45,7 +45,7 @@ export class FacebookService {
       response.data.email,
     );
 
-    if (user.deletedAt) {
+    if (user?.deletedAt) {
       throw new UnauthorizedException('Cannot login with a banned account');
     }
 
