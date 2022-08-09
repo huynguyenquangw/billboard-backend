@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsDate, IsNumber, IsString } from 'class-validator';
+import { IsArray, IsDate, IsLatitude, IsLongitude, IsNumber, IsString } from 'class-validator';
 import { AbstractDto } from 'src/common/dtos/abstract.dto';
 import { Ward } from '../../address/ward.entity';
 import { User } from '../../users/user.entity';
@@ -51,6 +51,12 @@ export class BillboardInfoDto extends AbstractDto {
   @IsDate()
   readonly approvedAt: Date;
 
+  @IsLatitude()
+  readonly lat: number;
+
+  @IsLongitude()
+  readonly long: number;
+
   constructor(billboard: Billboard) {
     super(billboard);
     this.address = billboard.address;
@@ -68,5 +74,7 @@ export class BillboardInfoDto extends AbstractDto {
     this.owner = billboard.owner;
     this.ward = billboard.ward;
     this.approvedAt = billboard.approvedAt;
+    this.lat = billboard.lat;
+    this.long = billboard.long
   }
 }

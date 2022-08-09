@@ -1,6 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsArray,
+  IsLatitude,
+  IsLongitude,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -61,4 +63,12 @@ export class CreateBillboardDto {
   @IsString()
   @IsOptional()
   description: string;
+
+  @IsLatitude()
+  @IsOptional()
+  lat: number;
+
+  @IsLongitude()
+  @IsOptional()
+  long: number;
 }

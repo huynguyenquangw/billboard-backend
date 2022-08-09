@@ -81,6 +81,12 @@ export class Billboard extends AbstractEntity {
   })
   approvedAt: Date;
 
+  @Column({ type: 'double precision', name: 'lat', nullable: true })
+  lat: number;
+
+  @Column({ type: 'double precision', name: 'long', nullable: true })
+  long: number;
+
   @DeleteDateColumn({
     select: false,
     type: 'timestamp without time zone',
