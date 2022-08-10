@@ -50,7 +50,7 @@ export class CreateBillboardDto {
 
   @IsArray()
   @IsOptional()
-  previousClient: object[];  //{id, client_name, client_logo} taken from PreviousClient enitity
+  previousClient: object[]; //{id, client_name, client_logo} taken from PreviousClient enitity
 
   @IsNumber()
   @IsOptional()

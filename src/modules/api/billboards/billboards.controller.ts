@@ -72,7 +72,7 @@ export class BillboardsController {
     );
   }
 
-  //Search and get all billbaord 
+  //Search and get all billbaord
   @Get('search')
   @ApiOperation({ summary: 'Search billboards' })
   @HttpCode(HttpStatus.OK)

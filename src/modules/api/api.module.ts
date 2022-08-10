@@ -14,10 +14,6 @@ import {
   RestoreBillboardUseCase,
 } from './useCase/billboardManagement/admin/restore';
 import {
-  GetAllBillboardsByStatusController,
-  GetAllBillboardsByStatusUseCase,
-} from './useCase/billboardManagement/anonymousUser/getAllBillboardsByStatus';
-import {
   GetAllBillboardsWithFilterController,
   GetAllBillboardsWithFilterUseCase,
 } from './useCase/billboardManagement/anonymousUser/getAllBillboardsWithFilter';
@@ -34,12 +30,16 @@ import {
   RejectBillboardUseCase,
 } from './useCase/billboardManagement/operator/rejectBillboardByOperator';
 import {
+  GetAllBillboardsByStatusController,
+  GetAllBillboardsByStatusUseCase,
+} from './useCase/billboardManagement/owner/getAllBillboardsByStatus';
+import {
   GetAllOperatorsController,
   GetAllOperatorsUseCase,
 } from './useCase/operationManagement/getAllOperators';
-import { 
-  DeleteAndRestorePlansController, 
-  DeleteAndRestorePlansUseCase, 
+import {
+  DeleteAndRestorePlansController,
+  DeleteAndRestorePlansUseCase,
 } from './useCase/planManagement/admin/softDeletePlans';
 // import {
 //   PublishBillboardController,
