@@ -7,9 +7,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PageMetaDto } from 'src/common/dtos/page-meta.dto';
 import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { PageDto } from 'src/common/dtos/page.dto';
+import { isArrayDifferent } from 'src/common/helper';
 import { RoleType, StatusType } from 'src/constants';
 import { S3Service } from 'src/shared/services/aws-s3.service';
-// import { S3Service } from 'src/shared/services/aws-s3.service';
 import { Repository, UpdateResult } from 'typeorm';
 import { AddressService } from '../address/address.service';
 import { District } from '../address/district.entity';
@@ -18,6 +18,8 @@ import { UsersService } from '../users/users.service';
 import { Billboard } from './billboard.entity';
 import { BillboardInfoDto } from './dto/billboard-info.dto';
 import { CreateBillboardDto } from './dto/create-billboard.dto';
+import { UpdateBillboardDto } from './dto/update-billboard.dto';
+import { Picture } from './entities/picture.entity';
 import { PreviousClient } from './previousClients.entity';
 
 @Injectable()
@@ -29,6 +31,8 @@ export class BillboardsService {
     private readonly _previousClientRepo: Repository<PreviousClient>,
     @InjectRepository(District)
     private readonly _districtRepo: Repository<District>,
+    @InjectRepository(Picture)
+    private readonly _pictureRepo: Repository<Picture>,
     private readonly _addressService: AddressService,
     private readonly _usersService: UsersService,
     private readonly _s3Service: S3Service,
@@ -64,17 +68,21 @@ export class BillboardsService {
    * Create a billboard
    */
   async create(
-    ownerId: string,
     createBillboardDto: CreateBillboardDto,
+    ownerId: string,
+    files?: Array<Express.Multer.File>,
   ): Promise<Billboard> {
     const owner: User = await this._usersService.findOne(ownerId);
-    if (!owner) {
-      throw new NotFoundException(ownerId);
-    }
-
     const ward = await this._addressService.getOneWard(
       createBillboardDto.wardId,
     );
+
+    if (!owner) {
+      throw new NotFoundException('User not found');
+    }
+    if (!ward) {
+      throw new NotFoundException('Address not found');
+    }
 
     const newBillboard: Billboard = await this._billboardRepo.create({
       ...createBillboardDto,
@@ -83,6 +91,12 @@ export class BillboardsService {
     });
 
     await this._billboardRepo.save(newBillboard);
+
+    // Save images using S3
+    if (files.length > 0) {
+      return await this._s3Service.s3AddFiles(newBillboard.id, files);
+    }
+
     return newBillboard;
   }
 
@@ -129,7 +143,8 @@ export class BillboardsService {
    */
   async update(
     id: string,
-    body: CreateBillboardDto,
+    body: UpdateBillboardDto,
+    files?: Array<Express.Multer.File>,
   ): Promise<BillboardInfoDto> {
     const billboardToUpdate = await this._billboardRepo.findOne({
       where: { id: id, status: StatusType.DRAFT },
@@ -140,7 +155,7 @@ export class BillboardsService {
     }
 
     let fullUpdateData = {};
-    if (body.wardId) {
+    if (body?.wardId && body.wardId !== billboardToUpdate.ward.id) {
       const { wardId, ...updateData } = body;
       const ward = await this._addressService.getOneWard(wardId);
 
@@ -148,8 +163,15 @@ export class BillboardsService {
     } else {
       fullUpdateData = body;
     }
-
     await this._billboardRepo.update(id, fullUpdateData);
+
+    if (
+      files?.length > 0 &&
+      isArrayDifferent(files, billboardToUpdate.pictures)
+    ) {
+      await this._s3Service.updateBillboardFiles(billboardToUpdate, files);
+    }
+
     const updatedBillboard = await this.findOneWithRelations(id);
     return updatedBillboard.toDto();
   }
@@ -284,25 +306,38 @@ export class BillboardsService {
     });
   }
 
-  async addFile(imageBuffer: Buffer, filename: string) {
-    const avatar = await this._s3Service.uploadFile(imageBuffer, filename);
-    // const billboard = await this.findOne(billboardId);
-    // await this._billboardRepo.update(billboardId, {
-    //   ...billboard,
-    //   avatar,
-    // });
-    return avatar;
-  }
+  // async addPictures(
+  //   billboardId: string,
+  //   files: Array<Express.Multer.File>,
+  // ): Promise<any> {
+  //   const newPictures = await this._s3Service.s3AddFiles(billboardId, files);
+  //   const billboardToUpdate = await this.findOneWithRelations(billboardId);
+  //   // TODO: fix-query from pictures side
+  //   if (billboardToUpdate?.pictures) {
+  //     await this._billboardRepo.update(billboardId, {
+  //       ...billboardToUpdate,
+  //       pictures: null,
+  //     });
+  //     billboardToUpdate?.pictures.forEach(async (picture) => {
+  //       await this._s3Service.s3DeleteFile(picture.key);
+  //     });
+  //   }
+  //   await this._billboardRepo.update(billboardId, {
+  //     ...billboardToUpdate,
+  //     pictures: newPictures,
+  //   });
+  //   // return newPictures;
+  // }
 
-  async addMultipleFiles(files: Array<Express.Multer.File>) {
-    const photos = await this._s3Service.upload(files);
-    await console.log('response: ', photos);
+  // async addMultipleFiles(files: Array<Express.Multer.File>) {
+  //   const photos = await this._s3Service.upload(files);
+  //   await console.log('response: ', photos);
 
-    // const billboard = await this.findOne(billboardId);
-    // await this._billboardRepo.update(billboardId, {
-    //   ...billboard,
-    //   avatar,
-    // });
-    return photos;
-  }
+  //   // const billboard = await this.findOne(billboardId);
+  //   // await this._billboardRepo.update(billboardId, {
+  //   //   ...billboard,
+  //   //   avatar,
+  //   // });
+  //   return photos;
+  // }
 }

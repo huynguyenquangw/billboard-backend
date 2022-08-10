@@ -1,14 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsArray,
-  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
   IsUUID,
 } from 'class-validator';
 
-export class CreateBillboardDto {
+export class UpdateBillboardDto {
   @ApiProperty()
   @IsUUID()
   @IsOptional()
@@ -23,7 +22,7 @@ export class CreateBillboardDto {
   address2: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   name: string;
 
   @IsString()
@@ -44,7 +43,7 @@ export class CreateBillboardDto {
 
   @IsArray()
   @IsOptional()
-  previousClient: object[]; //{id, client_name, client_logo} taken from PreviousClient enitity
+  previousClient: object[];
 
   @IsNumber()
   @IsOptional()
