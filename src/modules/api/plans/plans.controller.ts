@@ -80,6 +80,15 @@ export class PlansController {
     ): Promise<Plan> {
       return await this.plansService.update(id, body);
     }
+
+    @Post('pay')
+    @ApiOperation({ summary: 'Pay to create a subscription using stripe' })
+    async pay(
+        @Body('amount') amount: number,
+        @Body('id') id: string,
+    ): Promise<any>{
+        return await this.plansService.pay(amount, id);
+    }
     
     /**
      * Get one plan

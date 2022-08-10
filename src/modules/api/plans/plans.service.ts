@@ -1,18 +1,24 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PageMetaDto } from 'src/common/dtos/page-meta.dto';
 import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { PageDto } from 'src/common/dtos/page.dto';
+import Stripe from 'stripe';
 import { Repository } from 'typeorm';
 import { PlanInfoDto } from './dto/plan-info.dto';
 import { Plan } from './plans.entity';
 
 @Injectable()
 export class PlansService {
-      constructor(
+  private stripe: Stripe;
+  constructor(
+    private config: ConfigService,
     @InjectRepository(Plan)
     private readonly plansRepo: Repository<Plan>,
-  ) {}
+  ) {
+    this.stripe = new Stripe(config.get('STRIPE_SECRET_KEY'),{apiVersion: '2022-08-01'})
+  }
 
   /**
    * Create a plan
@@ -72,6 +78,26 @@ export class PlansService {
     await this.plansRepo.update(planId, fullUpdateData);
     const updatedPlan = await this.getOne(planId);
     return updatedPlan
+  }
+
+  /**
+   * Pay to subscribe to a plan
+   */
+  async pay(payAmount: number, customerId: string): Promise<any>{
+    try {
+      const payment= await this.stripe.paymentIntents.create({
+        amount: payAmount,
+        currency: "USD",
+        description: "Plan Purchased",
+        payment_method: customerId,
+        confirm: true,
+      })
+      return payment
+      
+    } catch (error) {
+      console.log("Error: ", error)
+    }
+
   }
 
   /**
