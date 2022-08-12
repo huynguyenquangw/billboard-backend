@@ -160,11 +160,18 @@ export class BillboardsService {
   ): Promise<BillboardInfoDto> {
     const billboardToUpdate = await this._billboardRepo.findOne({
       where: { id: id, status: StatusType.DRAFT },
-      relations: { ward: true },
+      relations: ['ward'],
     });
+    const ward = await this._addressService.getOneWard(body.wardId);
 
     if (!billboardToUpdate) {
       throw new NotFoundException();
+    }
+
+    if (ward) {
+      await this._billboardRepo.update(id, { ...body, ward });
+    } else {
+      await this._billboardRepo.update(id, { ...body });
     }
 
     // string -> int
@@ -181,16 +188,16 @@ export class BillboardsService {
     //   body.rentalPrice = parseInt(body.rentalPrice);
     // }
 
-    let fullUpdateData = {};
-    if (body?.wardId && body.wardId !== billboardToUpdate.ward.id) {
-      const { wardId, ...updateData } = body;
-      const ward = await this._addressService.getOneWard(wardId);
+    // let fullUpdateData = {};
+    // if (ward && ward.id !== billboardToUpdate.ward.id) {
+    //   // const { wardId, ...updateData } = body;
+    //   // const ward = await this._addressService.getOneWard(wardId);
 
-      fullUpdateData = { ...updateData, ward: { ...ward } };
-    } else {
-      fullUpdateData = body;
-    }
-    await this._billboardRepo.update(id, fullUpdateData);
+    //   fullUpdateData = { ...body, ward: ward };
+    // } else {
+    //   fullUpdateData = body;
+    // }
+    // await this._billboardRepo.update(id, fullUpdateData);
 
     if (
       files?.length > 0 &&
