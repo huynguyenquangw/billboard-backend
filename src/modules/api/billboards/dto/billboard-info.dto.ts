@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsDate, IsLatitude, IsLongitude, IsNumber, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsDate,
+  IsLatitude,
+  IsLongitude,
+  IsNumber,
+  IsString,
+} from 'class-validator';
 import { AbstractDto } from 'src/common/dtos/abstract.dto';
 import { StatusType } from 'src/constants';
 import { Ward } from '../../address/ward.entity';
@@ -80,6 +87,6 @@ export class BillboardInfoDto extends AbstractDto {
     this.ward = billboard.ward;
     this.approvedAt = billboard.approvedAt;
     this.lat = billboard.lat;
-    this.long = billboard.long
+    this.long = billboard.long;
   }
 }
