@@ -63,7 +63,10 @@ export class GetAllBillboardsWithFilterUseCase {
 
     if (pageOptionsDto.searchText) {
       queryBuilder
-        .andWhere('billboards.address like :searchText', {
+        .andWhere('billboards.name like :searchText', {
+          searchText: `%${pageOptionsDto.searchText}%`,
+        })
+        .orWhere('billboards.address like :searchText', {
           searchText: `%${pageOptionsDto.searchText}%`,
         })
         .orWhere('billboards.address2 like :searchText', {
