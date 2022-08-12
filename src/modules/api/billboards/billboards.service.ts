@@ -160,6 +160,7 @@ export class BillboardsService {
   ): Promise<BillboardInfoDto> {
     const billboardToUpdate = await this._billboardRepo.findOne({
       where: { id: id, status: StatusType.DRAFT },
+      relations: { ward: true },
     });
 
     if (!billboardToUpdate) {
