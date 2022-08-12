@@ -7,7 +7,7 @@ import { Billboard } from 'src/modules/api/billboards/billboard.entity';
 import { BillboardsService } from 'src/modules/api/billboards/billboards.service';
 import { BillboardInfoDto } from 'src/modules/api/billboards/dto/billboard-info.dto';
 import { SearchBillboardsPageOptionsDto } from 'src/modules/api/infra/dtos/BillboardsPageOptions.dto.ts/SearchBillboardsPageOptions.dto';
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 
 @Injectable()
 // implements IUseCase<Request, Promise<Response>>
@@ -26,6 +26,8 @@ export class GetAllBillboardsWithFilterUseCase {
     pageOptionsDto: SearchBillboardsPageOptionsDto,
   ): Promise<PageDto<BillboardInfoDto>> {
     const searchText = pageOptionsDto.searchText?.trim();
+    console.log(searchText);
+
     const queryBuilder =
       this._billboardRepository.createQueryBuilder('billboards');
     queryBuilder
@@ -63,16 +65,28 @@ export class GetAllBillboardsWithFilterUseCase {
     }
 
     if (searchText) {
-      queryBuilder
-        .andWhere('billboards.name like :searchText', {
-          searchText: `%${searchText}%`,
-        })
-        .orWhere('billboards.address like :searchText', {
-          searchText: `%${searchText}%`,
-        })
-        .orWhere('billboards.address2 like :searchText', {
-          searchText: `%${searchText}%`,
-        });
+      queryBuilder.andWhere(
+        new Brackets((qb) => {
+          qb.where('billboards.name like :searchText', {
+            searchText: `%${searchText}%`,
+          })
+            .orWhere('billboards.address like :searchText', {
+              searchText: `%${searchText}%`,
+            })
+            .orWhere('billboards.address2 like :searchText', {
+              searchText: `%${searchText}%`,
+            });
+        }),
+      );
+      // .andWhere('billboards.name like :searchText', {
+      //   searchText: `%${searchText}%`,
+      // })
+      // .orWhere('billboards.address like :searchText', {
+      //   searchText: `%${searchText}%`,
+      // })
+      // .orWhere('billboards.address2 like :searchText', {
+      //   searchText: `%${searchText}%`,
+      // });
     }
 
     const itemCount = await queryBuilder.getCount();
