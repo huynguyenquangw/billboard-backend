@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
+  IsArray,
   IsLatitude,
   IsLongitude,
   IsNotEmpty,
@@ -8,9 +9,7 @@ import {
   IsOptional,
   IsString,
   IsUUID,
-  ValidateNested,
 } from 'class-validator';
-import { PreviousClient } from '../previousClients.entity';
 
 export class CreateBillboardDto {
   @ApiProperty()
@@ -49,11 +48,11 @@ export class CreateBillboardDto {
   @IsOptional()
   circulation: number;
 
-  // @IsArray()
+  @IsArray()
   // @Type(() => PreviousClient)
   @IsOptional()
-  @ValidateNested({ each: true })
-  @Type(() => PreviousClient)
+  // @ValidateNested({ each: true })
+  // @Type(() => PreviousClient)
   previousClient: object[]; //{id, client_name, client_logo} taken from PreviousClient enitity
 
   @IsNumber()

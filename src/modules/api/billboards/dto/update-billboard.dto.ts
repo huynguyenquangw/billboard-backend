@@ -1,13 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
+  IsArray,
   IsNumber,
   IsOptional,
   IsString,
   IsUUID,
-  ValidateNested,
 } from 'class-validator';
-import { PreviousClient } from '../previousClients.entity';
 
 export class UpdateBillboardDto {
   @ApiProperty()
@@ -46,10 +45,10 @@ export class UpdateBillboardDto {
   @IsOptional()
   circulation: number;
 
-  // @IsArray()
+  @IsArray()
   @IsOptional()
-  @ValidateNested({ each: true })
-  @Type(() => PreviousClient)
+  // @ValidateNested({ each: true })
+  // @Type(() => PreviousClient)
   previousClient: object[];
 
   @IsNumber()
