@@ -162,13 +162,14 @@ export class BillboardsService {
       where: { id: id, status: StatusType.DRAFT },
       relations: ['ward'],
     });
-    const ward = await this._addressService.getOneWard(body.wardId);
 
     if (!billboardToUpdate) {
       throw new NotFoundException();
     }
 
-    if (ward) {
+    if (body.wardId) {
+      const ward = await this._addressService.getOneWard(body.wardId);
+
       await this._billboardRepo.update(id, { ...body, ward });
     } else {
       await this._billboardRepo.update(id, { ...body });
