@@ -37,7 +37,8 @@ export class GetAllBillboardsWithFilterUseCase {
       .leftJoinAndSelect('billboards.ward', 'wards')
       .leftJoinAndSelect('wards.district', 'districts')
       .leftJoinAndSelect('districts.city', 'cities')
-      .leftJoinAndSelect('billboards.owner', 'users');
+      .leftJoinAndSelect('billboards.owner', 'users')
+      .leftJoinAndSelect('billboards.pictures', 'pictures');
 
     switch (pageOptionsDto.filterMode) {
       case BillboardFilterMode.APPROVED:

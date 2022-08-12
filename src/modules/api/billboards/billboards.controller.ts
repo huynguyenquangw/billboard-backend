@@ -76,43 +76,43 @@ export class BillboardsController {
     );
   }
 
-  //Search and get all billbaord
-  @Get('search')
-  @ApiOperation({ summary: 'Search billboards' })
-  @HttpCode(HttpStatus.OK)
-  async search(
-    @Query() pageOptionsDto: PageOptionsDto,
-    @Query('address2') address2: CreateBillboardDto['address2'],
-    @Query('rentalPrice') price: CreateBillboardDto['rentalPrice'],
-    @Query('size_x') size_x: CreateBillboardDto['size_x'],
-    @Query('size_y') size_y: CreateBillboardDto['size_y'],
-    @Query('district') district: string,
-    @Query('name') name: CreateBillboardDto['name'],
-  ): Promise<PageDto<BillboardInfoDto>> {
-    return this._billboardsService.search(
-      pageOptionsDto,
-      address2,
-      price,
-      size_x,
-      size_y,
-      district,
-      name,
-    );
-  }
+  // //Search and get all billbaord
+  // @Get('search')
+  // @ApiOperation({ summary: 'Search billboards' })
+  // @HttpCode(HttpStatus.OK)
+  // async search(
+  //   @Query() pageOptionsDto: PageOptionsDto,
+  //   @Query('address2') address2: CreateBillboardDto['address2'],
+  //   @Query('rentalPrice') price: CreateBillboardDto['rentalPrice'],
+  //   @Query('size_x') size_x: CreateBillboardDto['size_x'],
+  //   @Query('size_y') size_y: CreateBillboardDto['size_y'],
+  //   @Query('district') district: string,
+  //   @Query('name') name: CreateBillboardDto['name'],
+  // ): Promise<PageDto<BillboardInfoDto>> {
+  //   return this._billboardsService.search(
+  //     pageOptionsDto,
+  //     address2,
+  //     price,
+  //     size_x,
+  //     size_y,
+  //     district,
+  //     name,
+  //   );
+  // }
 
-  //Get All PreviousClient
-  @Get('allPreClients')
-  @ApiOperation({ summary: 'Get all previous clients' })
-  async allPreviousClient(): Promise<any> {
-    return this._billboardsService.getAllPreviousClient();
-  }
+  // //Get All PreviousClient
+  // @Get('allPreClients')
+  // @ApiOperation({ summary: 'Get all previous clients' })
+  // async allPreviousClient(): Promise<any> {
+  //   return this._billboardsService.getAllPreviousClient();
+  // }
 
-  //Get One PreviousClient
-  @Get('preClient/:id')
-  @ApiOperation({ summary: 'Find 1 previous client' })
-  async onePreviousClient(@Param('id') id: string): Promise<any> {
-    return this._billboardsService.getOnePreviousClient(id);
-  }
+  // //Get One PreviousClient
+  // @Get('preClient/:id')
+  // @ApiOperation({ summary: 'Find 1 previous client' })
+  // async onePreviousClient(@Param('id') id: string): Promise<any> {
+  //   return this._billboardsService.getOnePreviousClient(id);
+  // }
 
   /**
    * TODO: fix (like update user)
