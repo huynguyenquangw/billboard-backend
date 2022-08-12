@@ -83,18 +83,18 @@ export class BillboardsService {
     }
 
     // string -> int
-    if (body.size_x && typeof body.size_x === 'string') {
-      body.size_x = parseInt(body.size_x);
-    }
-    if (body.size_y && typeof body.size_y === 'string') {
-      body.size_y = parseInt(body.size_y);
-    }
-    if (body.circulation && typeof body.circulation === 'string') {
-      body.circulation = parseInt(body.circulation);
-    }
-    if (body.rentalPrice && typeof body.rentalPrice === 'string') {
-      body.rentalPrice = parseInt(body.rentalPrice);
-    }
+    // if (body.size_x && typeof body.size_x === 'string') {
+    //   body.size_x = parseInt(body.size_x);
+    // }
+    // if (body.size_y && typeof body.size_y === 'string') {
+    //   body.size_y = parseInt(body.size_y);
+    // }
+    // if (body.circulation && typeof body.circulation === 'string') {
+    //   body.circulation = parseInt(body.circulation);
+    // }
+    // if (body.rentalPrice && typeof body.rentalPrice === 'string') {
+    //   body.rentalPrice = parseInt(body.rentalPrice);
+    // }
 
     const newBillboard: Billboard = await this._billboardRepo.create({
       ...body,
@@ -167,18 +167,18 @@ export class BillboardsService {
     }
 
     // string -> int
-    if (body.size_x && typeof body.size_x === 'string') {
-      body.size_x = parseInt(body.size_x);
-    }
-    if (body.size_y && typeof body.size_y === 'string') {
-      body.size_y = parseInt(body.size_y);
-    }
-    if (body.circulation && typeof body.circulation === 'string') {
-      body.circulation = parseInt(body.circulation);
-    }
-    if (body.rentalPrice && typeof body.rentalPrice === 'string') {
-      body.rentalPrice = parseInt(body.rentalPrice);
-    }
+    // if (body.size_x && typeof body.size_x === 'string') {
+    //   body.size_x = parseInt(body.size_x);
+    // }
+    // if (body.size_y && typeof body.size_y === 'string') {
+    //   body.size_y = parseInt(body.size_y);
+    // }
+    // if (body.circulation && typeof body.circulation === 'string') {
+    //   body.circulation = parseInt(body.circulation);
+    // }
+    // if (body.rentalPrice && typeof body.rentalPrice === 'string') {
+    //   body.rentalPrice = parseInt(body.rentalPrice);
+    // }
 
     let fullUpdateData = {};
     if (body?.wardId && body.wardId !== billboardToUpdate.ward.id) {

@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsArray,
   IsNumber,
@@ -30,14 +31,17 @@ export class UpdateBillboardDto {
   video: string;
 
   @IsNumber()
+  @Type(() => Number)
   @IsOptional()
   size_x: number;
 
   @IsNumber()
+  @Type(() => Number)
   @IsOptional()
   size_y: number;
 
   @IsNumber()
+  @Type(() => Number)
   @IsOptional()
   circulation: number;
 
@@ -46,6 +50,7 @@ export class UpdateBillboardDto {
   previousClient: object[];
 
   @IsNumber()
+  @Type(() => Number)
   @IsOptional()
   rentalPrice: number;
 
