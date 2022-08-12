@@ -6,10 +6,12 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
 } from 'typeorm';
 import { Ward } from '../address/ward.entity';
 import { User } from '../users/user.entity';
 import { BillboardInfoDto } from './dto/billboard-info.dto';
+import { Picture } from './entities/picture.entity';
 // import { UserEntity } from '../users/user.entity';
 
 @Entity({ name: 'billboards' })
@@ -21,6 +23,12 @@ export class Billboard extends AbstractEntity {
   @JoinColumn({ name: 'ward_id' })
   ward: Ward;
 
+  @OneToMany(() => Picture, (picture) => picture.billboard, {
+    eager: true,
+    cascade: true,
+  })
+  pictures: Picture[];
+
   @Column({ default: '' })
   address: string;
 
@@ -29,9 +37,6 @@ export class Billboard extends AbstractEntity {
 
   @Column({ default: '' })
   name: string;
-
-  @Column('jsonb', { nullable: true })
-  picture: object[];
 
   @Column({ default: '' })
   video: string;
@@ -62,7 +67,6 @@ export class Billboard extends AbstractEntity {
     enum: StatusType,
     default: StatusType.DRAFT,
   })
-  // @Exclude()
   status: StatusType;
 
   @Column({ type: 'bool', default: 0 })

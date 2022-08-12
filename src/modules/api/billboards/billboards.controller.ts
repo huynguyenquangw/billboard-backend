@@ -9,12 +9,11 @@ import {
   Post,
   Query,
   Req,
-  UploadedFile,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiConsumes,
@@ -36,6 +35,7 @@ import { Billboard } from './billboard.entity';
 import { BillboardsService } from './billboards.service';
 import { BillboardInfoDto } from './dto/billboard-info.dto';
 import { CreateBillboardDto } from './dto/create-billboard.dto';
+import { UpdateBillboardDto } from './dto/update-billboard.dto';
 
 @Controller('api/billboards')
 @ApiTags('Billboards')
@@ -49,16 +49,20 @@ export class BillboardsController {
    * @returns BillboardInfoDto
    */
   @Post('create')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create billboard' })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FilesInterceptor('pictures'))
   async create(
     @Req() req,
     @Body() createBillboardDto: CreateBillboardDto,
+    @UploadedFiles() files?: Array<Express.Multer.File>,
   ): Promise<BillboardInfoDto> {
     const newBillboard: Billboard = await this._billboardsService.create(
-      req.user.id,
       createBillboardDto,
+      req.user.id,
+      files,
     );
     return newBillboard.toDto();
   }
@@ -72,7 +76,106 @@ export class BillboardsController {
     );
   }
 
-  //Search and get all billbaord 
+  /**
+   * TODO: fix (like update user)
+   * ROLE: USER (OWNER)
+   * Update billboard
+   */
+  @Patch(':id/update')
+  @ApiOperation({ summary: 'Update billboard info' })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FilesInterceptor('pictures'))
+  async update(
+    @Param('id') id: string,
+    @Body() body: UpdateBillboardDto,
+    @UploadedFiles() files?: Array<Express.Multer.File>,
+  ): Promise<BillboardInfoDto> {
+    return await this._billboardsService.update(id, body, files);
+  }
+
+  /**
+   * only OWNER can
+   * Soft-delete billboard
+   */
+  @Patch(':id/delete')
+  @ApiTags('Billboards')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(RoleType.USER, RoleType.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Owner delete billboard' })
+  @ApiNoContentResponse({
+    status: 204,
+    description: 'Billboard with given id has been successfully deleted',
+  })
+  @ApiForbiddenResponse({
+    status: 403,
+    description: 'Forbidden',
+  })
+  @ApiNotFoundResponse({
+    status: 404,
+    description: 'Billboard with given id is not exist',
+  })
+  async delete(
+    @Req() req,
+    @Param('id') billboardId: string,
+  ): Promise<UpdateResult | void> {
+    return await this._billboardsService.delete(req.user.id, billboardId);
+  }
+
+  // @Post('upload')
+  // // @UseGuards(JwtAuthGuard)
+  // @ApiConsumes('multipart/form-data')
+  // @UseInterceptors(FilesInterceptor('images'))
+  // async addFile(
+  //   @UploadedFiles() files: Array<Express.Multer.File>,
+  //   @Res() res: Response,
+  // ) {
+  //   const billboardId = '42b1cdc1-81e0-43c9-83ca-d7ecd59test2';
+  //   // console.log(photo);
+  //   try {
+  //     const results = await this._billboardsService.addPictures(
+  //       billboardId,
+  //       files,
+  //     );
+  //     console.log(results);
+  //     return res.json({
+  //       status: { code: 200, message: 'Success' },
+  //       data: results,
+  //     });
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
+
+  // @Post('upload/files')
+  // @UseInterceptors(FilesInterceptor('photos', 20))
+  // async uploadFile(@UploadedFiles() files: Array<Express.Multer.File>) {
+  //   console.log('request:', files);
+  //   const response = await this._billboardsService.addMultipleFiles(files);
+  //   console.log('response: ', response);
+
+  //   return response;
+  // }
+
+  /**
+   * CURRENT USER - OWNER
+   * Publish billboard
+   * @returns draft billboard list with pagination
+   */
+  @Post(':id/publish')
+  @ApiOperation({
+    summary: 'Submit a draft billboard to operation',
+  })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  async publish(@Req() req, @Param('id') id: string): Promise<any> {
+    return this._billboardsService.publish(req.user.id, id);
+  }
+
+  //Search and get all billbaord
   @Get('search')
   @ApiOperation({ summary: 'Search billboards' })
   @HttpCode(HttpStatus.OK)
@@ -108,87 +211,6 @@ export class BillboardsController {
   @ApiOperation({ summary: 'Find 1 previous client' })
   async onePreviousClient(@Param('id') id: string): Promise<any> {
     return this._billboardsService.getOnePreviousClient(id);
-  }
-
-  /**
-   * TODO: fix (like update user)
-   * ROLE: USER (OWNER)
-   * Update billboard
-   */
-  @Patch(':id/update')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Update billboard info' })
-  async update(
-    @Param('id') id: string,
-    @Body() body: CreateBillboardDto,
-  ): Promise<BillboardInfoDto> {
-    return await this._billboardsService.update(id, body);
-  }
-
-  /**
-   * only OWNER can
-   * Soft-delete billboard
-   */
-  @Patch(':id/delete')
-  @ApiTags('Billboards')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(RoleType.USER, RoleType.ADMIN)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Owner delete billboard' })
-  @ApiNoContentResponse({
-    status: 204,
-    description: 'Billboard with given id has been successfully deleted',
-  })
-  @ApiForbiddenResponse({
-    status: 403,
-    description: 'Forbidden',
-  })
-  @ApiNotFoundResponse({
-    status: 404,
-    description: 'Billboard with given id is not exist',
-  })
-  async delete(
-    @Req() req,
-    @Param('id') billboardId: string,
-  ): Promise<UpdateResult | void> {
-    return await this._billboardsService.delete(req.user.id, billboardId);
-  }
-
-  @Post('upload/file')
-  // @UseGuards(JwtAuthGuard)
-  @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('file'))
-  async addFile(@UploadedFile() file: Express.Multer.File) {
-    console.log(file);
-
-    // return this._billboardsService.addFile(file.buffer, file.originalname);
-  }
-
-  @Post('upload/files')
-  @UseInterceptors(FilesInterceptor('photos', 20))
-  async uploadFile(@UploadedFiles() files: Array<Express.Multer.File>) {
-    console.log('request:', files);
-    const response = await this._billboardsService.addMultipleFiles(files);
-    console.log('response: ', response);
-
-    return response;
-  }
-
-  /**
-   * CURRENT USER - OWNER
-   * Publish billboard
-   * @returns draft billboard list with pagination
-   */
-  @Post(':id/publish')
-  @ApiOperation({
-    summary: 'Submit a draft billboard to operation',
-  })
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @HttpCode(HttpStatus.OK)
-  async publish(@Req() req, @Param('id') id: string): Promise<any> {
-    return this._billboardsService.publish(req.user.id, id);
   }
 
   /**
