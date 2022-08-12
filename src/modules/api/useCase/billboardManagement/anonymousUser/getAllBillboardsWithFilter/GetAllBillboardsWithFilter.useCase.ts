@@ -25,6 +25,7 @@ export class GetAllBillboardsWithFilterUseCase {
   async execute(
     pageOptionsDto: SearchBillboardsPageOptionsDto,
   ): Promise<PageDto<BillboardInfoDto>> {
+    const searchText = pageOptionsDto.searchText?.trim();
     const queryBuilder =
       this._billboardRepository.createQueryBuilder('billboards');
     queryBuilder
@@ -61,16 +62,16 @@ export class GetAllBillboardsWithFilterUseCase {
       });
     }
 
-    if (pageOptionsDto.searchText) {
+    if (searchText) {
       queryBuilder
         .andWhere('billboards.name like :searchText', {
-          searchText: `%${pageOptionsDto.searchText}%`,
+          searchText: `%${searchText}%`,
         })
         .orWhere('billboards.address like :searchText', {
-          searchText: `%${pageOptionsDto.searchText}%`,
+          searchText: `%${searchText}%`,
         })
         .orWhere('billboards.address2 like :searchText', {
-          searchText: `%${pageOptionsDto.searchText}%`,
+          searchText: `%${searchText}%`,
         });
     }
 
