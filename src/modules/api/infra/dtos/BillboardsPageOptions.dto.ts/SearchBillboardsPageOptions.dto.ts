@@ -13,6 +13,12 @@ export class SearchBillboardsPageOptionsDto extends BillboardsPageOptionsDto {
   readonly district?: string; // district id
 
   @ApiPropertyOptional({
+    default: 'null',
+  })
+  @IsOptional()
+  readonly searchText?: string; // search text
+
+  @ApiPropertyOptional({
     default: BillboardSortMode.DEFAULT,
   })
   @IsOptional()

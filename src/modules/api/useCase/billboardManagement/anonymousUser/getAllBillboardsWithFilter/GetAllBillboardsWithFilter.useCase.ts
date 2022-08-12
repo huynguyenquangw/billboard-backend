@@ -35,7 +35,6 @@ export class GetAllBillboardsWithFilterUseCase {
       .leftJoinAndSelect('wards.district', 'districts')
       .leftJoinAndSelect('districts.city', 'cities')
       .leftJoinAndSelect('billboards.owner', 'users');
-    // .where({ status: StatusType.APPROVED });
 
     switch (pageOptionsDto.filterMode) {
       case BillboardFilterMode.APPROVED:
@@ -57,9 +56,19 @@ export class GetAllBillboardsWithFilterUseCase {
     }
 
     if (pageOptionsDto.district) {
-      queryBuilder.where('districts.id = :districtId', {
+      queryBuilder.andWhere('districts.id = :districtId', {
         districtId: pageOptionsDto.district,
       });
+    }
+
+    if (pageOptionsDto.searchText) {
+      queryBuilder
+        .andWhere('billboards.address like :searchText', {
+          searchText: `%${pageOptionsDto.searchText}%`,
+        })
+        .orWhere('billboards.address2 like :searchText', {
+          searchText: `%${pageOptionsDto.searchText}%`,
+        });
     }
 
     const itemCount = await queryBuilder.getCount();
