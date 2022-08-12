@@ -68,14 +68,12 @@ export class BillboardsService {
    * Create a billboard
    */
   async create(
-    createBillboardDto: CreateBillboardDto,
+    body: CreateBillboardDto,
     ownerId: string,
     files?: Array<Express.Multer.File>,
   ): Promise<Billboard> {
     const owner: User = await this._usersService.findOne(ownerId);
-    const ward = await this._addressService.getOneWard(
-      createBillboardDto.wardId,
-    );
+    const ward = await this._addressService.getOneWard(body.wardId);
 
     if (!owner) {
       throw new NotFoundException('User not found');
@@ -84,8 +82,22 @@ export class BillboardsService {
       throw new NotFoundException('Address not found');
     }
 
+    // string -> int
+    if (body.size_x && typeof body.size_x === 'string') {
+      body.size_x = parseInt(body.size_x);
+    }
+    if (body.size_y && typeof body.size_y === 'string') {
+      body.size_y = parseInt(body.size_y);
+    }
+    if (body.circulation && typeof body.circulation === 'string') {
+      body.circulation = parseInt(body.circulation);
+    }
+    if (body.rentalPrice && typeof body.rentalPrice === 'string') {
+      body.rentalPrice = parseInt(body.rentalPrice);
+    }
+
     const newBillboard: Billboard = await this._billboardRepo.create({
-      ...createBillboardDto,
+      ...body,
       owner: owner,
       ward: ward,
     });
@@ -152,6 +164,20 @@ export class BillboardsService {
 
     if (!billboardToUpdate) {
       throw new NotFoundException();
+    }
+
+    // string -> int
+    if (body.size_x && typeof body.size_x === 'string') {
+      body.size_x = parseInt(body.size_x);
+    }
+    if (body.size_y && typeof body.size_y === 'string') {
+      body.size_y = parseInt(body.size_y);
+    }
+    if (body.circulation && typeof body.circulation === 'string') {
+      body.circulation = parseInt(body.circulation);
+    }
+    if (body.rentalPrice && typeof body.rentalPrice === 'string') {
+      body.rentalPrice = parseInt(body.rentalPrice);
     }
 
     let fullUpdateData = {};
