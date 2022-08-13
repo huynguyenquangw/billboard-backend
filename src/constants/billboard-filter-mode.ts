@@ -1,6 +1,9 @@
 export enum BillboardFilterMode {
-  DEFAULT = 'createdAt',
-  PRICE = 'rentalPrice',
-  CIRCULATION = 'circulation',
-  APPROVEDTIME = 'approvedAt',
+  DEFAULT = 'all',
+  APPROVED = 'approved',
+  RENTED = 'rented',
 }
+//   DEFAULT = 'default',
+//   DISTRICT = 'DISTRICT',
+//   APPROVED = 'circulation',
+//   APPROVEDTIME = 'approvedAt',

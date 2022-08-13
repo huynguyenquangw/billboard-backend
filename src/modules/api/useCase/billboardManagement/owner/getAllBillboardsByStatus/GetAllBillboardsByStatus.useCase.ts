@@ -36,6 +36,7 @@ export class GetAllBillboardsByStatusUseCase {
       .leftJoinAndSelect('wards.district', 'districts')
       .leftJoinAndSelect('districts.city', 'cities')
       .leftJoinAndSelect('billboards.owner', 'users')
+      .leftJoinAndSelect('billboards.pictures', 'pictures')
       .where('users.id = :id', { id: ownerId })
       .andWhere({ status: status });
 

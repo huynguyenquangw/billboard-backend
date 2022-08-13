@@ -8,5 +8,4 @@ export class PreviousClient extends AbstractEntity {
 
   @Column({ nullable: true, unique: true })
   client_logo: string;
- 
 }

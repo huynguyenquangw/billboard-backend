@@ -1,5 +1,6 @@
 export * from './auth-type';
 export * from './billboard-filter-mode';
+export * from './billboard-sort-mode';
 export * from './order-type';
 export * from './role-type';
 export * from './status-type';

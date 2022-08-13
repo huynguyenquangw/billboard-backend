@@ -1,6 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsDate, IsLatitude, IsLongitude, IsNumber, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsDate,
+  IsLatitude,
+  IsLongitude,
+  IsNumber,
+  IsString,
+} from 'class-validator';
 import { AbstractDto } from 'src/common/dtos/abstract.dto';
+import { StatusType } from 'src/constants';
 import { Ward } from '../../address/ward.entity';
 import { User } from '../../users/user.entity';
 import { Billboard } from '../billboard.entity';
@@ -21,8 +29,11 @@ export class BillboardInfoDto extends AbstractDto {
   @IsString()
   readonly name: string;
 
+  @IsString()
+  readonly status: StatusType;
+
   @IsArray()
-  readonly picture: object[];
+  readonly pictures: object[];
 
   @IsString()
   readonly video: string;
@@ -62,7 +73,8 @@ export class BillboardInfoDto extends AbstractDto {
     this.address = billboard.address;
     this.address2 = billboard.address2;
     this.name = billboard.name;
-    this.picture = billboard.picture;
+    this.status = billboard.status;
+    this.pictures = billboard.pictures;
     this.video = billboard.video;
     this.size_x = billboard.size_x;
     this.size_y = billboard.size_y;
@@ -75,6 +87,6 @@ export class BillboardInfoDto extends AbstractDto {
     this.ward = billboard.ward;
     this.approvedAt = billboard.approvedAt;
     this.lat = billboard.lat;
-    this.long = billboard.long
+    this.long = billboard.long;
   }
 }

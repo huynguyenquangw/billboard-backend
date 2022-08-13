@@ -32,6 +32,7 @@ export class GetAllPendingBillboardsUseCase {
       .leftJoinAndSelect('wards.district', 'districts')
       .leftJoinAndSelect('districts.city', 'cities')
       .leftJoinAndSelect('billboards.owner', 'users')
+      .leftJoinAndSelect('billboards.pictures', 'pictures')
       .where('billboards.status = :status', { status: StatusType.PENDING });
 
     const itemCount = await queryBuilder.getCount();
