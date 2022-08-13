@@ -18,7 +18,7 @@ export class ApproveBillboardController {
    * Approve billboard
    */
   @Patch(':id/approve')
-  @Roles(RoleType.OPERATOR)
+  @Roles(RoleType.OPERATOR, RoleType.ADMIN)
   @ApiOperation({ summary: 'OPERATOR: approve 1 billboard' })
   async approve(@Param('id') id: string): Promise<Billboard | any> {
     return this.useCase.execute(id);
