@@ -28,6 +28,7 @@ import { PageDto } from 'src/common/dtos/page.dto';
 import { RoleType } from 'src/constants';
 import { Roles } from 'src/decorators/roles.decorator';
 import { RolesGuard } from 'src/guards/roles.guard';
+import { TransformInterceptor } from 'src/interceptors/TransformInterceptor.service';
 // import RolesGuard from 'src/guards/roles.guard';
 import { JwtAuthGuard } from 'src/modules/auth/oauth/guards/jwt-authentication.guard';
 import { UpdateResult } from 'typeorm';
@@ -52,19 +53,58 @@ export class BillboardsController {
   @ApiOperation({ summary: 'Create billboard' })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FilesInterceptor('pictures'))
+  // @ApiConsumes('multipart/form-data')
+  // @UseInterceptors(FilesInterceptor('pictures'))
   async create(
     @Req() req,
     @Body() createBillboardDto: CreateBillboardDto,
-    @UploadedFiles() files?: Array<Express.Multer.File>,
+    // @UploadedFiles() files?: Array<Express.Multer.File>,
   ): Promise<BillboardInfoDto> {
     const newBillboard: Billboard = await this._billboardsService.create(
       createBillboardDto,
       req.user.id,
-      files,
+      // files,
     );
     return newBillboard.toDto();
+  }
+
+  /**
+   * TODO: fix (like update user)
+   * ROLE: USER (OWNER)
+   * Update billboard
+   */
+  @Patch(':id/update')
+  @ApiOperation({ summary: 'Update billboard info' })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async update(
+    @Param('id') billboardId: string,
+    @Body() body: UpdateBillboardDto,
+  ): Promise<BillboardInfoDto> {
+    return await this._billboardsService.update(billboardId, body);
+  }
+
+  /**
+   * Create a new billboard
+   * @param req
+   * @returns BillboardInfoDto
+   */
+  @Post(':id/addpictures')
+  @ApiOperation({ summary: "Add billboard's pictures" })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FilesInterceptor('pictures'), TransformInterceptor)
+  async addPictures(
+    @Param('id') billboardId: string,
+    @UploadedFiles() files: Array<Express.Multer.File>,
+  ) {
+    const result = await this._billboardsService.addPictures(
+      billboardId,
+      files,
+    );
+
+    return { message: "Add billboard's pictures successfully", result };
   }
 
   @Get('count')
@@ -113,25 +153,6 @@ export class BillboardsController {
   // async onePreviousClient(@Param('id') id: string): Promise<any> {
   //   return this._billboardsService.getOnePreviousClient(id);
   // }
-
-  /**
-   * TODO: fix (like update user)
-   * ROLE: USER (OWNER)
-   * Update billboard
-   */
-  @Patch(':id/update')
-  @ApiOperation({ summary: 'Update billboard info' })
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
-  @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FilesInterceptor('pictures'))
-  async update(
-    @Param('id') id: string,
-    @Body() body: UpdateBillboardDto,
-    @UploadedFiles() files?: Array<Express.Multer.File>,
-  ): Promise<BillboardInfoDto> {
-    return await this._billboardsService.update(id, body, files);
-  }
 
   /**
    * only OWNER can

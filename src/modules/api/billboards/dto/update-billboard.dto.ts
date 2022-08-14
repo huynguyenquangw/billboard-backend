@@ -14,6 +14,10 @@ export class UpdateBillboardDto {
   @IsOptional()
   readonly wardId: string;
 
+  @IsArray()
+  @IsOptional()
+  previousClientIds: string[];
+
   @IsString()
   @IsOptional()
   address: string;
@@ -45,11 +49,30 @@ export class UpdateBillboardDto {
   @IsOptional()
   circulation: number;
 
-  @IsArray()
-  @IsOptional()
-  // @ValidateNested({ each: true })
+  // @IsArray()
+  // @IsOptional()
+  // // @ValidateNested({ each: true })
+  // // @Type(() => PreviousClient)
+  // previousClient: object[];
+
+  // @IsArray()
+  // // @ValidateNested({ each: true })
+  // @IsObject({ each: true })
+  // @Transform((previousClient) => JSON.parse(previousClient))
   // @Type(() => PreviousClient)
-  previousClient: object[];
+  // previousClient: object[];
+
+  // @IsArray()
+  // @ValidateNested({ each: true })
+  // @Transform((previousClient) =>
+  //   plainToInstance(PreviousClient, JSON.parse(JSON.stringify(previousClient))),
+  // )
+  // @Type(() => PreviousClient)
+  // previousClient: PreviousClient[];
+
+  // @IsArrayOfObjects()
+  // @ValidateNested()
+  // @Type(() => PreviousClientDto)
 
   @IsNumber()
   @Type(() => Number)
