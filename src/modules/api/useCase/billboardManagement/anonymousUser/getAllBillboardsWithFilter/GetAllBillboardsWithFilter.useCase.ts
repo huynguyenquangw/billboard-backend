@@ -48,14 +48,22 @@ export class GetAllBillboardsWithFilterUseCase {
         queryBuilder.where({ status: StatusType.RENTED });
         break;
       case BillboardFilterMode.DEFAULT:
-        queryBuilder
-          .where({ status: StatusType.APPROVED })
-          .orWhere({ status: StatusType.RENTED });
+        queryBuilder.where(
+          new Brackets((qb) => {
+            qb.where({ status: StatusType.APPROVED }).orWhere({
+              status: StatusType.RENTED,
+            });
+          }),
+        );
         break;
       default:
-        queryBuilder
-          .where({ status: StatusType.APPROVED })
-          .orWhere({ status: StatusType.RENTED });
+        queryBuilder.where(
+          new Brackets((qb) => {
+            qb.where({ status: StatusType.APPROVED }).orWhere({
+              status: StatusType.RENTED,
+            });
+          }),
+        );
         break;
     }
 

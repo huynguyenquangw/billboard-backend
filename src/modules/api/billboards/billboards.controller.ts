@@ -53,17 +53,13 @@ export class BillboardsController {
   @ApiOperation({ summary: 'Create billboard' })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  // @ApiConsumes('multipart/form-data')
-  // @UseInterceptors(FilesInterceptor('pictures'))
   async create(
     @Req() req,
     @Body() createBillboardDto: CreateBillboardDto,
-    // @UploadedFiles() files?: Array<Express.Multer.File>,
   ): Promise<BillboardInfoDto> {
     const newBillboard: Billboard = await this._billboardsService.create(
       createBillboardDto,
       req.user.id,
-      // files,
     );
     return newBillboard.toDto();
   }
