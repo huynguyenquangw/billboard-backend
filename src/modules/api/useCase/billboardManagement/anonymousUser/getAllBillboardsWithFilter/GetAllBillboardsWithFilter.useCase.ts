@@ -76,14 +76,14 @@ export class GetAllBillboardsWithFilterUseCase {
     if (searchText) {
       queryBuilder.andWhere(
         new Brackets((qb) => {
-          qb.where('billboards.name like :searchText', {
-            searchText: `%${searchText}%`,
+          qb.where('lower(billboards.name) like :searchText', {
+            searchText: `%${searchText.toLowerCase()}%`,
           })
-            .orWhere('billboards.address like :searchText', {
-              searchText: `%${searchText}%`,
+            .orWhere('lower(billboards.address) like :searchText', {
+              searchText: `%${searchText.toLowerCase()}%`,
             })
-            .orWhere('billboards.address2 like :searchText', {
-              searchText: `%${searchText}%`,
+            .orWhere('lower(billboards.address2) like :searchText', {
+              searchText: `%${searchText.toLowerCase()}%`,
             });
         }),
       );
