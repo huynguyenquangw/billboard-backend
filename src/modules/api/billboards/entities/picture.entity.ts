@@ -4,7 +4,9 @@ import { Billboard } from '../billboard.entity';
 
 @Entity({ name: 'pictures' })
 export class Picture extends File {
-  @ManyToOne(() => Billboard, (billboard: Billboard) => billboard.pictures)
+  @ManyToOne(() => Billboard, (billboard: Billboard) => billboard.pictures, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'billboard_id' })
   billboard: Billboard;
 }
