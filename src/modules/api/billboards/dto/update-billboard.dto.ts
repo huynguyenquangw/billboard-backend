@@ -2,6 +2,8 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsArray,
+  IsLatitude,
+  IsLongitude,
   IsNumber,
   IsOptional,
   IsString,
@@ -62,4 +64,12 @@ export class UpdateBillboardDto {
   @IsString()
   @IsOptional()
   description: string;
+
+  @IsLatitude()
+  @IsOptional()
+  lat: number;
+
+  @IsLongitude()
+  @IsOptional()
+  long: number;
 }
