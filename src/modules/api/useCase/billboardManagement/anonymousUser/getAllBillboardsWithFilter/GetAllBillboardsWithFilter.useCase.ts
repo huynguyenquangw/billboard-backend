@@ -87,15 +87,6 @@ export class GetAllBillboardsWithFilterUseCase {
             });
         }),
       );
-      // .andWhere('billboards.name like :searchText', {
-      //   searchText: `%${searchText}%`,
-      // })
-      // .orWhere('billboards.address like :searchText', {
-      //   searchText: `%${searchText}%`,
-      // })
-      // .orWhere('billboards.address2 like :searchText', {
-      //   searchText: `%${searchText}%`,
-      // });
     }
 
     const itemCount = await queryBuilder.getCount();

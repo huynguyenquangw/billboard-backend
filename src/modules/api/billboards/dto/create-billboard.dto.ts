@@ -55,21 +55,15 @@ export class CreateBillboardDto {
   @IsOptional()
   circulation: number;
 
-  // @IsArray()
-  // // @Type(() => PreviousClient)
-  // @IsOptional()
-  // // @ValidateNested({ each: true })
-  // // @Type(() => PreviousClient)
-  // previousClients: string[]; //{id, client_name, client_logo} taken from PreviousClient enitity
-
   @IsNumber()
   @Type(() => Number)
   @IsOptional()
   rentalPrice: number;
 
-  @IsString()
+  @IsNumber()
+  @Type(() => Number)
   @IsOptional()
-  rentalDuration: string;
+  rentalDuration: number;
 
   @IsString()
   @IsOptional()

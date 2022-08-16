@@ -54,8 +54,8 @@ export class BillboardInfoDto extends AbstractDto {
   @IsNumber()
   readonly rentalPrice: number;
 
-  @IsString()
-  readonly rentalDuration: string;
+  @IsNumber()
+  readonly rentalDuration: number;
 
   @IsString()
   readonly description: string;

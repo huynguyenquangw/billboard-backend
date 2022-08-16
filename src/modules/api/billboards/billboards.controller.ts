@@ -136,20 +136,6 @@ export class BillboardsController {
   //   );
   // }
 
-  // //Get All PreviousClient
-  // @Get('allPreClients')
-  // @ApiOperation({ summary: 'Get all previous clients' })
-  // async allPreviousClient(): Promise<any> {
-  //   return this._billboardsService.getAllPreviousClient();
-  // }
-
-  // //Get One PreviousClient
-  // @Get('preClient/:id')
-  // @ApiOperation({ summary: 'Find 1 previous client' })
-  // async onePreviousClient(@Param('id') id: string): Promise<any> {
-  //   return this._billboardsService.getOnePreviousClient(id);
-  // }
-
   /**
    * only OWNER can
    * Soft-delete billboard
@@ -178,41 +164,6 @@ export class BillboardsController {
   ): Promise<UpdateResult | void> {
     return await this._billboardsService.delete(req.user.id, billboardId);
   }
-
-  // @Post('upload')
-  // // @UseGuards(JwtAuthGuard)
-  // @ApiConsumes('multipart/form-data')
-  // @UseInterceptors(FilesInterceptor('images'))
-  // async addFile(
-  //   @UploadedFiles() files: Array<Express.Multer.File>,
-  //   @Res() res: Response,
-  // ) {
-  //   const billboardId = '42b1cdc1-81e0-43c9-83ca-d7ecd59test2';
-  //   // console.log(photo);
-  //   try {
-  //     const results = await this._billboardsService.addPictures(
-  //       billboardId,
-  //       files,
-  //     );
-  //     console.log(results);
-  //     return res.json({
-  //       status: { code: 200, message: 'Success' },
-  //       data: results,
-  //     });
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }
-
-  // @Post('upload/files')
-  // @UseInterceptors(FilesInterceptor('photos', 20))
-  // async uploadFile(@UploadedFiles() files: Array<Express.Multer.File>) {
-  //   console.log('request:', files);
-  //   const response = await this._billboardsService.addMultipleFiles(files);
-  //   console.log('response: ', response);
-
-  //   return response;
-  // }
 
   /**
    * CURRENT USER - OWNER

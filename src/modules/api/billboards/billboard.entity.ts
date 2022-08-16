@@ -13,7 +13,6 @@ import { User } from '../users/user.entity';
 import { BillboardInfoDto } from './dto/billboard-info.dto';
 import { Picture } from './entities/picture.entity';
 import { PreviousClient } from './previousClients.entity';
-// import { UserEntity } from '../users/user.entity';
 
 @Entity({ name: 'billboards' })
 export class Billboard extends AbstractEntity {
@@ -51,20 +50,17 @@ export class Billboard extends AbstractEntity {
   @Column({ default: 0 })
   circulation: number;
 
-  @Column('jsonb', { nullable: true })
-  previousClients: PreviousClient[];
-
-  // @Column({ type: 'text', array: true, default: [], nullable: true })
-  // previousClients: PreviousClient[];
-
   @Column({ default: 0 })
   rentalPrice: number;
 
-  @Column({ default: '' })
-  rentalDuration: string;
+  @Column({ default: 0 })
+  rentalDuration: number;
 
   @Column({ default: '' })
   description: string;
+
+  @Column('jsonb', { nullable: true })
+  previousClients: PreviousClient[];
 
   @Column({
     type: 'enum',
