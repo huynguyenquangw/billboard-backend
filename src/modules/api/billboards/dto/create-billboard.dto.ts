@@ -4,7 +4,6 @@ import {
   IsArray,
   IsLatitude,
   IsLongitude,
-  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
@@ -17,6 +16,13 @@ export class CreateBillboardDto {
   @IsOptional()
   readonly wardId: string;
 
+  @IsArray()
+  // @Transform(({ previousClientIds }) => JSON.parse(previousClientIds))
+  @IsOptional()
+  // // @ValidateNested({ each: true })
+  // // @Type(() => PreviousClient)
+  previousClientIds: string[];
+
   @IsString()
   @IsOptional()
   address: string;
@@ -26,7 +32,8 @@ export class CreateBillboardDto {
   address2: string;
 
   @IsString()
-  @IsNotEmpty()
+  // @IsNotEmpty()
+  @IsOptional()
   name: string;
 
   @IsString()
@@ -48,21 +55,15 @@ export class CreateBillboardDto {
   @IsOptional()
   circulation: number;
 
-  @IsArray()
-  // @Type(() => PreviousClient)
-  @IsOptional()
-  // @ValidateNested({ each: true })
-  // @Type(() => PreviousClient)
-  previousClient: object[]; //{id, client_name, client_logo} taken from PreviousClient enitity
-
   @IsNumber()
   @Type(() => Number)
   @IsOptional()
   rentalPrice: number;
 
-  @IsString()
+  @IsNumber()
+  @Type(() => Number)
   @IsOptional()
-  rentalDuration: string;
+  rentalDuration: number;
 
   @IsString()
   @IsOptional()

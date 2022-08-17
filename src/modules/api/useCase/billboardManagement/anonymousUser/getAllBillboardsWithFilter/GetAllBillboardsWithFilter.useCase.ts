@@ -48,14 +48,22 @@ export class GetAllBillboardsWithFilterUseCase {
         queryBuilder.where({ status: StatusType.RENTED });
         break;
       case BillboardFilterMode.DEFAULT:
-        queryBuilder
-          .where({ status: StatusType.APPROVED })
-          .orWhere({ status: StatusType.RENTED });
+        queryBuilder.where(
+          new Brackets((qb) => {
+            qb.where({ status: StatusType.APPROVED }).orWhere({
+              status: StatusType.RENTED,
+            });
+          }),
+        );
         break;
       default:
-        queryBuilder
-          .where({ status: StatusType.APPROVED })
-          .orWhere({ status: StatusType.RENTED });
+        queryBuilder.where(
+          new Brackets((qb) => {
+            qb.where({ status: StatusType.APPROVED }).orWhere({
+              status: StatusType.RENTED,
+            });
+          }),
+        );
         break;
     }
 
@@ -68,26 +76,17 @@ export class GetAllBillboardsWithFilterUseCase {
     if (searchText) {
       queryBuilder.andWhere(
         new Brackets((qb) => {
-          qb.where('billboards.name like :searchText', {
-            searchText: `%${searchText}%`,
+          qb.where('lower(billboards.name) like :searchText', {
+            searchText: `%${searchText.toLowerCase()}%`,
           })
-            .orWhere('billboards.address like :searchText', {
-              searchText: `%${searchText}%`,
+            .orWhere('lower(billboards.address) like :searchText', {
+              searchText: `%${searchText.toLowerCase()}%`,
             })
-            .orWhere('billboards.address2 like :searchText', {
-              searchText: `%${searchText}%`,
+            .orWhere('lower(billboards.address2) like :searchText', {
+              searchText: `%${searchText.toLowerCase()}%`,
             });
         }),
       );
-      // .andWhere('billboards.name like :searchText', {
-      //   searchText: `%${searchText}%`,
-      // })
-      // .orWhere('billboards.address like :searchText', {
-      //   searchText: `%${searchText}%`,
-      // })
-      // .orWhere('billboards.address2 like :searchText', {
-      //   searchText: `%${searchText}%`,
-      // });
     }
 
     const itemCount = await queryBuilder.getCount();

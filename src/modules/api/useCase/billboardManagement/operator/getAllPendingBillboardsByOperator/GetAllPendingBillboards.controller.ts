@@ -30,7 +30,7 @@ export class GetAllPendingBillboardsController {
    */
   @Get('pending')
   @ApiBearerAuth()
-  @Roles(RoleType.OPERATOR)
+  @Roles(RoleType.OPERATOR, RoleType.ADMIN)
   @ApiOperation({
     summary: 'Get all billboards of current user by status',
   })

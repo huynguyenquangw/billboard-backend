@@ -2,6 +2,8 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsArray,
+  IsLatitude,
+  IsLongitude,
   IsNumber,
   IsOptional,
   IsString,
@@ -13,6 +15,10 @@ export class UpdateBillboardDto {
   @IsUUID()
   @IsOptional()
   readonly wardId: string;
+
+  @IsArray()
+  @IsOptional()
+  previousClientIds: string[];
 
   @IsString()
   @IsOptional()
@@ -45,22 +51,25 @@ export class UpdateBillboardDto {
   @IsOptional()
   circulation: number;
 
-  @IsArray()
-  @IsOptional()
-  // @ValidateNested({ each: true })
-  // @Type(() => PreviousClient)
-  previousClient: object[];
-
   @IsNumber()
   @Type(() => Number)
   @IsOptional()
   rentalPrice: number;
 
-  @IsString()
+  @IsNumber()
+  @Type(() => Number)
   @IsOptional()
-  rentalDuration: string;
+  rentalDuration: number;
 
   @IsString()
   @IsOptional()
   description: string;
+
+  @IsLatitude()
+  @IsOptional()
+  lat: number;
+
+  @IsLongitude()
+  @IsOptional()
+  long: number;
 }

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -7,10 +8,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PageMetaDto } from 'src/common/dtos/page-meta.dto';
 import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { PageDto } from 'src/common/dtos/page.dto';
-import { isArrayDifferent } from 'src/common/helper';
+import { isStringArrayEqual } from 'src/common/helper/isStringArrayEqual.helper';
 import { RoleType, StatusType } from 'src/constants';
 import { S3Service } from 'src/shared/services/aws-s3.service';
-import { Repository, UpdateResult } from 'typeorm';
+import { In, Repository, UpdateResult } from 'typeorm';
 import { AddressService } from '../address/address.service';
 import { District } from '../address/district.entity';
 import { User } from '../users/user.entity';
@@ -70,8 +71,9 @@ export class BillboardsService {
   async create(
     body: CreateBillboardDto,
     ownerId: string,
-    files?: Array<Express.Multer.File>,
+    // files?: Array<Express.Multer.File>,
   ): Promise<Billboard> {
+    const preClientIds = body.previousClientIds ? body.previousClientIds : [];
     const owner: User = await this._usersService.findOne(ownerId);
     const ward = await this._addressService.getOneWard(body.wardId);
 
@@ -82,72 +84,21 @@ export class BillboardsService {
       throw new NotFoundException('Address not found');
     }
 
-    // string -> int
-    // if (body.size_x && typeof body.size_x === 'string') {
-    //   body.size_x = parseInt(body.size_x);
-    // }
-    // if (body.size_y && typeof body.size_y === 'string') {
-    //   body.size_y = parseInt(body.size_y);
-    // }
-    // if (body.circulation && typeof body.circulation === 'string') {
-    //   body.circulation = parseInt(body.circulation);
-    // }
-    // if (body.rentalPrice && typeof body.rentalPrice === 'string') {
-    //   body.rentalPrice = parseInt(body.rentalPrice);
-    // }
+    let preClients: PreviousClient[] = [];
+    preClients = await this._previousClientRepo.find({
+      where: { id: In(preClientIds) },
+    });
 
     const newBillboard: Billboard = await this._billboardRepo.create({
       ...body,
       owner: owner,
       ward: ward,
+      previousClients: preClients,
     });
 
     await this._billboardRepo.save(newBillboard);
 
-    // Save images using S3
-    if (files.length > 0) {
-      return await this._s3Service.s3AddFiles(newBillboard.id, files);
-    }
-
     return newBillboard;
-  }
-
-  //Search and get all billboard by address2, rentalPrice, size_x, size_y, district(not done)
-  async search(
-    pageOptionsDto: PageOptionsDto,
-    selectedAdrress2: string,
-    selectedPrice: number,
-    selectedSize_x: number,
-    selectedSize_y: number,
-    selectedDistrict: string,
-    selectedName: string,
-  ): Promise<PageDto<BillboardInfoDto>> {
-    const searchBillboard = await this._billboardRepo.findAndCount({
-      order: {
-        createdAt: pageOptionsDto.order,
-      },
-      skip: pageOptionsDto.skip,
-      take: pageOptionsDto.take,
-      relations: ['ward', 'ward.district', 'ward.district.city', 'owner'],
-      where: {
-        address2: selectedAdrress2,
-        rentalPrice: selectedPrice,
-        size_x: selectedSize_x,
-        size_y: selectedSize_y,
-        status: StatusType.APPROVED,
-        ward: {
-          district: {
-            name: selectedDistrict,
-          },
-        },
-        name: selectedName,
-      },
-    });
-
-    const itemCount = searchBillboard[1];
-    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
-
-    return new PageDto(searchBillboard[0], pageMetaDto);
   }
 
   /**
@@ -156,7 +107,6 @@ export class BillboardsService {
   async update(
     id: string,
     body: UpdateBillboardDto,
-    files?: Array<Express.Multer.File>,
   ): Promise<BillboardInfoDto> {
     const billboardToUpdate = await this._billboardRepo.findOne({
       where: { id: id, status: StatusType.DRAFT },
@@ -164,48 +114,50 @@ export class BillboardsService {
     });
 
     if (!billboardToUpdate) {
-      throw new NotFoundException();
+      throw new NotFoundException('Billboard with given id is not exist!');
     }
 
-    if (body.wardId) {
-      const ward = await this._addressService.getOneWard(body.wardId);
+    const preClientIds = body.previousClientIds ? body.previousClientIds : [];
 
-      await this._billboardRepo.update(id, { ...body, ward });
-    } else {
-      await this._billboardRepo.update(id, { ...body });
-    }
+    const { previousClientIds, wardId, ...info } = body;
+    let updateBody = { ...info };
 
-    // string -> int
-    // if (body.size_x && typeof body.size_x === 'string') {
-    //   body.size_x = parseInt(body.size_x);
-    // }
-    // if (body.size_y && typeof body.size_y === 'string') {
-    //   body.size_y = parseInt(body.size_y);
-    // }
-    // if (body.circulation && typeof body.circulation === 'string') {
-    //   body.circulation = parseInt(body.circulation);
-    // }
-    // if (body.rentalPrice && typeof body.rentalPrice === 'string') {
-    //   body.rentalPrice = parseInt(body.rentalPrice);
-    // }
-
-    // let fullUpdateData = {};
-    // if (ward && ward.id !== billboardToUpdate.ward.id) {
-    //   // const { wardId, ...updateData } = body;
-    //   // const ward = await this._addressService.getOneWard(wardId);
-
-    //   fullUpdateData = { ...body, ward: ward };
-    // } else {
-    //   fullUpdateData = body;
-    // }
-    // await this._billboardRepo.update(id, fullUpdateData);
-
+    // check pre Clients
+    let preClients: PreviousClient[] = billboardToUpdate.previousClients;
+    const currentPreClientIds = billboardToUpdate.previousClients.map(
+      (a) => a.id,
+    );
     if (
-      files?.length > 0 &&
-      isArrayDifferent(files, billboardToUpdate.pictures)
+      body.previousClientIds &&
+      !isStringArrayEqual(body.previousClientIds, currentPreClientIds)
     ) {
-      await this._s3Service.updateBillboardFiles(billboardToUpdate, files);
+      preClients = await this._previousClientRepo.find({
+        where: { id: In(preClientIds) },
+      });
+      const updateBodyWithClients = {
+        ...updateBody,
+        previousClients: preClients,
+      };
+      updateBody = updateBodyWithClients;
     }
+
+    // check ward
+    if (
+      body.wardId &&
+      billboardToUpdate.ward.id &&
+      body.wardId != billboardToUpdate.ward.id
+    ) {
+      const ward = await this._addressService.getOneWard(body.wardId);
+      const updateBodyWithWard = {
+        ...updateBody,
+        ward: ward,
+      };
+      updateBody = { ...updateBodyWithWard };
+    }
+
+    await this._billboardRepo.update(id, {
+      ...updateBody,
+    });
 
     const updatedBillboard = await this.findOneWithRelations(id);
     return updatedBillboard.toDto();
@@ -252,6 +204,44 @@ export class BillboardsService {
     }
 
     return deleteResponse;
+  }
+
+  //Search and get all billboard by address2, rentalPrice, size_x, size_y, district(not done)
+  async search(
+    pageOptionsDto: PageOptionsDto,
+    selectedAdrress2: string,
+    selectedPrice: number,
+    selectedSize_x: number,
+    selectedSize_y: number,
+    selectedDistrict: string,
+    selectedName: string,
+  ): Promise<PageDto<BillboardInfoDto>> {
+    const searchBillboard = await this._billboardRepo.findAndCount({
+      order: {
+        createdAt: pageOptionsDto.order,
+      },
+      skip: pageOptionsDto.skip,
+      take: pageOptionsDto.take,
+      relations: ['ward', 'ward.district', 'ward.district.city', 'owner'],
+      where: {
+        address2: selectedAdrress2,
+        rentalPrice: selectedPrice,
+        size_x: selectedSize_x,
+        size_y: selectedSize_y,
+        status: StatusType.APPROVED,
+        ward: {
+          district: {
+            name: selectedDistrict,
+          },
+        },
+        name: selectedName,
+      },
+    });
+
+    const itemCount = searchBillboard[1];
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+
+    return new PageDto(searchBillboard[0], pageMetaDto);
   }
 
   /**
@@ -328,6 +318,54 @@ export class BillboardsService {
       console.error(error);
       return error;
     }
+  }
+
+  /**
+   * Add billboard's pictures
+   */
+  async addPictures(
+    billboardId: string,
+    uploadPictures: Array<Express.Multer.File>,
+  ) {
+    const billboardToAddPictures = await this._billboardRepo.findOne({
+      where: { id: billboardId, status: StatusType.DRAFT },
+    });
+
+    if (!billboardToAddPictures) {
+      throw new NotFoundException('Billboard with given id does not exist!');
+    }
+
+    if (!uploadPictures) {
+      throw new BadRequestException(
+        'Uploading list is empty. A billboard must has at least 5 pictures',
+      );
+    }
+
+    const isBillboardFilesUpdated =
+      await this._s3Service.isBillboardFilesUpdated(
+        billboardToAddPictures,
+        uploadPictures,
+      );
+
+    if (!isBillboardFilesUpdated) {
+      throw new Error('Upload failed!');
+    }
+    return { uploaded_billboard_id: billboardId };
+
+    // if (uploadPictures?.length < 1) {
+    //   throw new BadRequestException('List of pictures is empty');
+    // }
+
+    // // check if upload picture list different from billboard's pictures
+    // if (isArrayDifferent(uploadPictures, billboardToAddPictures.pictures)) {
+    //   await this._s3Service.updateBillboardFiles(
+    //     billboardToAddPictures,
+    //     uploadPictures,
+    //   );
+    // }
+
+    // const updatedBillboard = await this.findOneWithRelations(billboardId);
+    // return updatedBillboard;
   }
 
   /*

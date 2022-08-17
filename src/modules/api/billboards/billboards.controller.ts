@@ -28,6 +28,7 @@ import { PageDto } from 'src/common/dtos/page.dto';
 import { RoleType } from 'src/constants';
 import { Roles } from 'src/decorators/roles.decorator';
 import { RolesGuard } from 'src/guards/roles.guard';
+import { TransformInterceptor } from 'src/interceptors/TransformInterceptor.service';
 // import RolesGuard from 'src/guards/roles.guard';
 import { JwtAuthGuard } from 'src/modules/auth/oauth/guards/jwt-authentication.guard';
 import { UpdateResult } from 'typeorm';
@@ -52,19 +53,54 @@ export class BillboardsController {
   @ApiOperation({ summary: 'Create billboard' })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FilesInterceptor('pictures'))
   async create(
     @Req() req,
     @Body() createBillboardDto: CreateBillboardDto,
-    @UploadedFiles() files?: Array<Express.Multer.File>,
   ): Promise<BillboardInfoDto> {
     const newBillboard: Billboard = await this._billboardsService.create(
       createBillboardDto,
       req.user.id,
-      files,
     );
     return newBillboard.toDto();
+  }
+
+  /**
+   * TODO: fix (like update user)
+   * ROLE: USER (OWNER)
+   * Update billboard
+   */
+  @Patch(':id/update')
+  @ApiOperation({ summary: 'Update billboard info' })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async update(
+    @Param('id') billboardId: string,
+    @Body() body: UpdateBillboardDto,
+  ): Promise<BillboardInfoDto> {
+    return await this._billboardsService.update(billboardId, body);
+  }
+
+  /**
+   * Create a new billboard
+   * @param req
+   * @returns BillboardInfoDto
+   */
+  @Post(':id/addpictures')
+  @ApiOperation({ summary: "Add billboard's pictures" })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FilesInterceptor('pictures'), TransformInterceptor)
+  async addPictures(
+    @Param('id') billboardId: string,
+    @UploadedFiles() files: Array<Express.Multer.File>,
+  ) {
+    const result = await this._billboardsService.addPictures(
+      billboardId,
+      files,
+    );
+
+    return { message: "Add billboard's pictures successfully", result };
   }
 
   @Get('count')
@@ -100,39 +136,6 @@ export class BillboardsController {
   //   );
   // }
 
-  // //Get All PreviousClient
-  // @Get('allPreClients')
-  // @ApiOperation({ summary: 'Get all previous clients' })
-  // async allPreviousClient(): Promise<any> {
-  //   return this._billboardsService.getAllPreviousClient();
-  // }
-
-  // //Get One PreviousClient
-  // @Get('preClient/:id')
-  // @ApiOperation({ summary: 'Find 1 previous client' })
-  // async onePreviousClient(@Param('id') id: string): Promise<any> {
-  //   return this._billboardsService.getOnePreviousClient(id);
-  // }
-
-  /**
-   * TODO: fix (like update user)
-   * ROLE: USER (OWNER)
-   * Update billboard
-   */
-  @Patch(':id/update')
-  @ApiOperation({ summary: 'Update billboard info' })
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
-  @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FilesInterceptor('pictures'))
-  async update(
-    @Param('id') id: string,
-    @Body() body: UpdateBillboardDto,
-    @UploadedFiles() files?: Array<Express.Multer.File>,
-  ): Promise<BillboardInfoDto> {
-    return await this._billboardsService.update(id, body, files);
-  }
-
   /**
    * only OWNER can
    * Soft-delete billboard
@@ -162,41 +165,6 @@ export class BillboardsController {
     return await this._billboardsService.delete(req.user.id, billboardId);
   }
 
-  // @Post('upload')
-  // // @UseGuards(JwtAuthGuard)
-  // @ApiConsumes('multipart/form-data')
-  // @UseInterceptors(FilesInterceptor('images'))
-  // async addFile(
-  //   @UploadedFiles() files: Array<Express.Multer.File>,
-  //   @Res() res: Response,
-  // ) {
-  //   const billboardId = '42b1cdc1-81e0-43c9-83ca-d7ecd59test2';
-  //   // console.log(photo);
-  //   try {
-  //     const results = await this._billboardsService.addPictures(
-  //       billboardId,
-  //       files,
-  //     );
-  //     console.log(results);
-  //     return res.json({
-  //       status: { code: 200, message: 'Success' },
-  //       data: results,
-  //     });
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }
-
-  // @Post('upload/files')
-  // @UseInterceptors(FilesInterceptor('photos', 20))
-  // async uploadFile(@UploadedFiles() files: Array<Express.Multer.File>) {
-  //   console.log('request:', files);
-  //   const response = await this._billboardsService.addMultipleFiles(files);
-  //   console.log('response: ', response);
-
-  //   return response;
-  // }
-
   /**
    * CURRENT USER - OWNER
    * Publish billboard
@@ -213,29 +181,29 @@ export class BillboardsController {
     return this._billboardsService.publish(req.user.id, id);
   }
 
-  //Search and get all billbaord
-  @Get('search')
-  @ApiOperation({ summary: 'Search billboards' })
-  @HttpCode(HttpStatus.OK)
-  async search(
-    @Query() pageOptionsDto: PageOptionsDto,
-    @Query('address2') address2: CreateBillboardDto['address2'],
-    @Query('rentalPrice') price: CreateBillboardDto['rentalPrice'],
-    @Query('size_x') size_x: CreateBillboardDto['size_x'],
-    @Query('size_y') size_y: CreateBillboardDto['size_y'],
-    @Query('district') district: string,
-    @Query('name') name: CreateBillboardDto['name'],
-  ): Promise<PageDto<BillboardInfoDto>> {
-    return this._billboardsService.search(
-      pageOptionsDto,
-      address2,
-      price,
-      size_x,
-      size_y,
-      district,
-      name,
-    );
-  }
+  // //Search and get all billbaord
+  // @Get('search')
+  // @ApiOperation({ summary: 'Search billboards' })
+  // @HttpCode(HttpStatus.OK)
+  // async search(
+  //   @Query() pageOptionsDto: PageOptionsDto,
+  //   @Query('address2') address2: CreateBillboardDto['address2'],
+  //   @Query('rentalPrice') price: CreateBillboardDto['rentalPrice'],
+  //   @Query('size_x') size_x: CreateBillboardDto['size_x'],
+  //   @Query('size_y') size_y: CreateBillboardDto['size_y'],
+  //   @Query('district') district: string,
+  //   @Query('name') name: CreateBillboardDto['name'],
+  // ): Promise<PageDto<BillboardInfoDto>> {
+  //   return this._billboardsService.search(
+  //     pageOptionsDto,
+  //     address2,
+  //     price,
+  //     size_x,
+  //     size_y,
+  //     district,
+  //     name,
+  //   );
+  // }
 
   //Get All PreviousClient
   @Get('allPreClients')

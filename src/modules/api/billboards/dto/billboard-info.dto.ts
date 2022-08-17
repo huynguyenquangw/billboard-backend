@@ -12,6 +12,7 @@ import { StatusType } from 'src/constants';
 import { Ward } from '../../address/ward.entity';
 import { User } from '../../users/user.entity';
 import { Billboard } from '../billboard.entity';
+import { PreviousClient } from '../previousClients.entity';
 
 export class BillboardInfoDto extends AbstractDto {
   @ApiProperty()
@@ -19,6 +20,9 @@ export class BillboardInfoDto extends AbstractDto {
 
   @ApiProperty()
   readonly ward: Ward;
+
+  @IsArray()
+  readonly previousClients: PreviousClient[];
 
   @IsString()
   readonly address: string;
@@ -47,14 +51,11 @@ export class BillboardInfoDto extends AbstractDto {
   @IsNumber()
   readonly circulation: number;
 
-  @IsArray()
-  readonly previousClient: object[];
-
   @IsNumber()
   readonly rentalPrice: number;
 
-  @IsString()
-  readonly rentalDuration: string;
+  @IsNumber()
+  readonly rentalDuration: number;
 
   @IsString()
   readonly description: string;
@@ -79,7 +80,7 @@ export class BillboardInfoDto extends AbstractDto {
     this.size_x = billboard.size_x;
     this.size_y = billboard.size_y;
     this.circulation = billboard.circulation;
-    this.previousClient = billboard.previousClient;
+    this.previousClients = billboard.previousClients;
     this.rentalPrice = billboard.rentalPrice;
     this.rentalDuration = billboard.rentalDuration;
     this.description = billboard.description;

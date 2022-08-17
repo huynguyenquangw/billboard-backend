@@ -17,7 +17,7 @@ export class RejectBillboardController {
    * Reject billboard
    */
   @Patch(':id/reject')
-  @Roles(RoleType.OPERATOR)
+  @Roles(RoleType.OPERATOR, RoleType.ADMIN)
   @ApiOperation({ summary: 'OPERATOR: reeject 1 billboard' })
   async reject(@Param('id') id: string): Promise<any> {
     return this.useCase.execute(id);
