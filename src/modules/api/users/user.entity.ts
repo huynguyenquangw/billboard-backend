@@ -12,7 +12,7 @@ import {
 } from 'typeorm';
 import { Ward } from '../address/ward.entity';
 import { Billboard } from '../billboards/billboard.entity';
-import { Subscription } from '../plans/subscriptions.entity';
+import { Subscription } from '../plans/entities/subscriptions.entity';
 import { UserInfoDto } from './dto/user-info.dto';
 
 @Entity({ name: 'users' })

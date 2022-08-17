@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AddressModule } from './address/address.module';
 import { Billboard } from './billboards/billboard.entity';
 import { BillboardsModule } from './billboards/billboards.module';
-import { Plan } from './plans/plans.entity';
+import { Plan } from './plans/entities/plans.entity';
 import { PlansModule } from './plans/plans.module';
 import {
   GetAllBillboardsController,

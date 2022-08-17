@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RoleType, StatusType } from 'src/constants';
-import { Plan } from 'src/modules/api/plans/plans.entity';
+import { Plan } from 'src/modules/api/plans/entities/plans.entity';
 import { UsersService } from 'src/modules/api/users/users.service';
 import { IsNull, Not, Repository, UpdateResult } from 'typeorm';
 

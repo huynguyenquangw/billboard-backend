@@ -1,6 +1,7 @@
 import {
     Body,
     Controller,
+    Delete,
     Get,
     HttpCode,
     HttpStatus,
@@ -8,7 +9,9 @@ import {
     Patch,
     Post,
     Query,
-    UseGuards
+    Req,
+    UseGuards,
+    UseInterceptors,
 } from '@nestjs/common';
 import {
     ApiBearerAuth,
@@ -22,13 +25,17 @@ import { Roles } from 'src/decorators/roles.decorator';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { JwtAuthGuard } from 'src/modules/auth/oauth/guards/jwt-authentication.guard';
 import { PlanInfoDto } from './dto/plan-info.dto';
-import { Plan } from './plans.entity';
+import { Plan } from './entities/plans.entity';
 import { PlansService } from './plans.service';
+import { Subscription } from './entities/subscriptions.entity';
 
 @Controller('api/plans')
 @ApiTags('Plans')
 export class PlansController {
     constructor(private readonly plansService: PlansService) { }
+    /**
+     * TODO: Add TransformInterceptor
+     */
 
     /**
      * Create a plan
@@ -41,11 +48,29 @@ export class PlansController {
     @ApiOperation({
         summary: 'Admin Create a plan',
     })
+   // @UseInterceptors(TransformInterceptor)
     async createPlans(
         @Body() planDto: PlanInfoDto
-        ): Promise<Plan> {
-        return this.plansService.create(planDto);
+    ){
+        const result = this.plansService.create(planDto)
+        return { message: 'Create plan succesfully' , result};
     }
+
+    /**
+     * Find the subcription of the user
+     */
+     @Get('subscription/find')
+     @UseGuards(JwtAuthGuard)
+     @ApiBearerAuth()
+     @ApiOperation({
+         summary: 'Find the subscription of the user',
+     })
+    // @UseInterceptors(TransformInterceptor)
+     async checkSub(
+         @Req() req, 
+     ): Promise<Subscription> {
+         return this.plansService.checkSub(req.user.id);
+     }
 
     /**
      * Get all plans
@@ -58,38 +83,77 @@ export class PlansController {
     @ApiOperation({
         summary: 'Admin Get all plans',
     })
-    @HttpCode(HttpStatus.OK)
+    // @UseInterceptors(TransformInterceptor)
     async getAll(
         @Query() pageOptionsDto: PageOptionsDto,
     ): Promise<PageDto<Plan>> {
         return this.plansService.getAll(pageOptionsDto);
     }
 
-   /**
-     * Update a plan
-     * by Admin
+    /**
+     * Get all published plans
      */
+    @Get('all/published')
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @ApiOperation({
+        summary: 'Get all published plans',
+    })
+    // @UseInterceptors(TransformInterceptor)
+    async getAllPublished(
+        @Query() pageOptionsDto: PageOptionsDto,
+    ): Promise<PageDto<Plan>> {
+        return this.plansService.getAllPublished(pageOptionsDto);
+    }
+
+    /**
+      * Update a plan
+      * by Admin
+      */
     @Patch('update/:id')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(RoleType.ADMIN)
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Admin Update a plan info' })
+    // @UseInterceptors(TransformInterceptor)
     async update(
-      @Param('id') id: string,
-      @Body() body: PlanInfoDto,
+        @Param('id') id: string,
+        @Body() body: PlanInfoDto,
     ): Promise<Plan> {
-      return await this.plansService.update(id, body);
+        return await this.plansService.update(id, body);
     }
 
+    /**
+     * Pay to create a subscription
+     */
     @Post('pay')
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Pay to create a subscription using stripe' })
+    // @UseInterceptors(TransformInterceptor)
     async pay(
+        @Req() req,
+        @Body('planId') planId: string,
         @Body('amount') amount: number,
-        @Body('id') id: string,
-    ): Promise<any>{
-        return await this.plansService.pay(amount, id);
+        @Body('id') paymentId: string,
+    ): Promise<any> {
+        return await this.plansService.pay(req.user.id, planId, amount, paymentId);
     }
-    
+
+    /**
+     * Unsubscribe a subscription
+     */
+    @Delete('unsubscribe/:id')
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @ApiOperation({ summary: 'Unsubscribe a plan' })
+    // @UseInterceptors(TransformInterceptor)
+    async unSub(
+        @Param('id') planId: string,
+    ): Promise<Subscription>{
+        return await this.plansService.unsubscribe(planId)
+    }
+
     /**
      * Get one plan
      * Any
@@ -98,9 +162,10 @@ export class PlansController {
     @ApiOperation({
         summary: 'Get one  plan info',
     })
+    // @UseInterceptors(TransformInterceptor)
     async GetOne(
         @Param('id') planId: string,
-    ): Promise<Plan>{
+    ): Promise<Plan> {
         return await this.plansService.getOne(planId)
     }
 
