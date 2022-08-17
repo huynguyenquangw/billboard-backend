@@ -53,7 +53,7 @@ export class PlansController {
         @Body() planDto: PlanInfoDto
     ){
         const result = this.plansService.create(planDto)
-        return { message: 'Create plan succesfully' , result};
+        return  result;
     }
 
     /**
