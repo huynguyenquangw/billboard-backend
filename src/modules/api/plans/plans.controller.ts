@@ -57,22 +57,6 @@ export class PlansController {
     }
 
     /**
-     * Find the subcription of the user
-     */
-     @Get('subscription/find')
-     @UseGuards(JwtAuthGuard)
-     @ApiBearerAuth()
-     @ApiOperation({
-         summary: 'Find the subscription of the user',
-     })
-    // @UseInterceptors(TransformInterceptor)
-     async checkSub(
-         @Req() req, 
-     ): Promise<Subscription> {
-         return this.plansService.checkSub(req.user.id);
-     }
-
-    /**
      * Get all plans
      * by Admin
      */
@@ -87,7 +71,7 @@ export class PlansController {
     async getAll(
         @Query() pageOptionsDto: PageOptionsDto,
     ): Promise<PageDto<Plan>> {
-        return this.plansService.getAll(pageOptionsDto);
+        return this.plansService.getAllPlan(pageOptionsDto);
     }
 
     /**
@@ -135,15 +119,15 @@ export class PlansController {
         @Req() req,
         @Body('planId') planId: string,
         @Body('amount') amount: number,
-        @Body('id') paymentId: string,
+        @Body('id') id: string,
     ): Promise<any> {
-        return await this.plansService.pay(req.user.id, planId, amount, paymentId);
+        return await this.plansService.pay(req.user.id, planId, amount, id);
     }
 
     /**
      * Unsubscribe a subscription
      */
-    @Delete('unsubscribe/:id')
+    @Patch('unsubscribe/:id')
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Unsubscribe a plan' })
@@ -155,6 +139,38 @@ export class PlansController {
     }
 
     /**
+     * Find the subcription of the user id
+     */
+     @Get('subscription/find')
+     @UseGuards(JwtAuthGuard)
+     @ApiBearerAuth()
+     @ApiOperation({
+         summary: 'Find the subscription by the user id',
+     })
+    // @UseInterceptors(TransformInterceptor)
+     async checkSub(
+         @Req() req, 
+     ): Promise<Subscription> {
+         return this.plansService.checkSubByUser(req.user.id);
+     }
+
+    /**
+     * Get one subcription by id
+     */
+     @Get('subscription/:id')
+     @UseGuards(JwtAuthGuard)
+     @ApiBearerAuth()
+     @ApiOperation({
+         summary: 'Get one subscriptions by id',
+     })
+    // @UseInterceptors(TransformInterceptor)
+     async GetOneSub(
+         @Param('id') subId :string, 
+     ): Promise<Subscription> {
+         return this.plansService.getOneSub(subId);
+     }
+
+    /**
      * Get one plan
      * Any
      */
@@ -163,10 +179,10 @@ export class PlansController {
         summary: 'Get one  plan info',
     })
     // @UseInterceptors(TransformInterceptor)
-    async GetOne(
+    async GetOnePlan(
         @Param('id') planId: string,
     ): Promise<Plan> {
-        return await this.plansService.getOne(planId)
+        return await this.plansService.getOnePlan(planId)
     }
 
 }

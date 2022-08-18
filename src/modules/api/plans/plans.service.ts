@@ -42,7 +42,7 @@ export class PlansService {
    * Get all plans
    * by ADMIN
    */
-  async getAll(
+  async getAllPlan(
     pageOptionsDto: PageOptionsDto,
   ): Promise<PageDto<Plan>> {
     const queryBuilder =
@@ -87,6 +87,33 @@ export class PlansService {
   }
 
   /**
+   * Get one plan info
+   */
+   async getOnePlan(planId: string): Promise<Plan>{
+    return await this.plansRepo.findOne({
+        where:{ id: planId }
+    })
+  }
+
+  /**
+   * Get One Subscription info
+   */
+   async getOneSub(subId :string): Promise<Subscription>{
+    const sub = await this.SubRepo.findOne({
+      relations: ['plan', 'subscriber'],
+      where:{
+        id: subId,
+        status: StatusType.SUCCESS,
+      }
+    })
+
+    if(sub){
+      return sub
+    }
+    throw new NotFoundException(subId)
+  }
+
+  /**
    * Update a plan info
    */
    async update(
@@ -105,7 +132,7 @@ export class PlansService {
     fullUpdateData = body;
 
     await this.plansRepo.update(planId, fullUpdateData);
-    const updatedPlan = await this.getOne(planId);
+    const updatedPlan = await this.getOnePlan(planId);
     return updatedPlan
   }
 
@@ -122,9 +149,9 @@ export class PlansService {
         confirm: true,
       })
  
-      const plan = await this.getOne(planId)
+      const plan = await this.getOnePlan(planId)
       const user = await this._usersService.findOne(userId);
-      const newSub= await this.SubRepo.create({
+      const newSub= this.SubRepo.create({
         plan: plan,
         subscriber: user,
         code: payment.id,
@@ -132,8 +159,9 @@ export class PlansService {
         status: StatusType.SUCCESS,
       })
 
-      newSub.expiredAt = new Date(newSub.createdAt.setMonth(newSub.createdAt.getMonth()+plan.duration));
-      this.SubRepo.save(newSub);
+      const paidDate = new Date();
+      newSub.expiredAt = new Date(paidDate.setMonth(paidDate.getMonth()+plan.duration));
+      await this.SubRepo.save(newSub);
       return payment
       
     } catch (error) {
@@ -146,21 +174,18 @@ export class PlansService {
    * Unsubscribe a subscription
    */
   async unsubscribe(subId :string): Promise<Subscription>{
-    const findSub = await this.SubRepo.findOne({
-      where:{
-        id: subId,
-      }
-    })
+    const findSub = await this.getOneSub(subId);
+    findSub.status = StatusType.CANCELED;
 
-    return await this.SubRepo.remove(findSub)
+    return await this.SubRepo.save(findSub)
   }
 
   /**
-   * Check if the user is sub
+   * Check if the user is subscribed
    */
-  async checkSub(subscriberId: string): Promise<Subscription>{
+  async checkSubByUser(subscriberId: string): Promise<Subscription>{
     const findSub = await this.SubRepo.findOne({
-      relations:['subscriber'],
+      relations:['plan', 'subscriber'],
       where:{
         subscriber:{
           id: subscriberId,
@@ -173,14 +198,5 @@ export class PlansService {
     }
     throw new NotFoundException(subscriberId)
 
-  }
-
-  /**
-   * Get one plan info
-   */
-  async getOne(planId: string): Promise<Plan>{
-    return await this.plansRepo.findOne({
-        where:{ id: planId }
-    })
   }
 }

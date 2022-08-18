@@ -31,6 +31,5 @@ export class Subscription extends AbstractEntity {
     enum: StatusType,
     default: StatusType.PENDING,
   })
-  @Exclude()
   status: StatusType;
 }
