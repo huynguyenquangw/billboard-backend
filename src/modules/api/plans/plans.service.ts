@@ -4,9 +4,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PageMetaDto } from 'src/common/dtos/page-meta.dto';
 import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { PageDto } from 'src/common/dtos/page.dto';
-import { StatusType } from 'src/constants';
+import { StatusType, UserType } from 'src/constants';
 import Stripe from 'stripe';
 import { Repository } from 'typeorm';
+import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
 import { PlanInfoDto } from './dto/plan-info.dto';
 import { Plan } from './entities/plans.entity';
@@ -21,6 +22,8 @@ export class PlansService {
     private readonly plansRepo: Repository<Plan>,
     @InjectRepository(Subscription)
     private readonly SubRepo: Repository<Subscription>,
+    @InjectRepository(User)
+    private readonly _userRepository: Repository<User>,
     private readonly _usersService: UsersService,
   ) {
     this.stripe = new Stripe(config.get('STRIPE_SECRET_KEY'),{apiVersion: '2022-08-01'})
@@ -151,6 +154,9 @@ export class PlansService {
  
       const plan = await this.getOnePlan(planId)
       const user = await this._usersService.findOne(userId);
+      user.userType = UserType.SUBSCRIBED;
+      await this._userRepository.save(user)
+
       const newSub= this.SubRepo.create({
         plan: plan,
         subscriber: user,
@@ -176,6 +182,10 @@ export class PlansService {
   async unsubscribe(subId :string): Promise<Subscription>{
     const findSub = await this.getOneSub(subId);
     findSub.status = StatusType.CANCELED;
+
+    const user = await this._usersService.findOne(findSub.subscriber.id);
+    user.userType = UserType.FREE;
+    await this._userRepository.save(user);
 
     return await this.SubRepo.save(findSub)
   }

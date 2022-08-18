@@ -6,9 +6,10 @@ import { Plan } from './entities/plans.entity';
 import { PlansService } from './plans.service';
 import { Subscription } from './entities/subscriptions.entity';
 import { Transaction } from './entities/transaction.entity';
+import { User } from '../users/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Plan, Subscription, Transaction]),
+  imports: [TypeOrmModule.forFeature([Plan, Subscription, Transaction, User]),
   UsersModule
   ],
   controllers: [PlansController],
