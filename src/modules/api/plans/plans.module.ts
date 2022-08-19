@@ -7,9 +7,9 @@ import { PlansService } from './plans.service';
 import { Subscription } from './entities/subscriptions.entity';
 import { Transaction } from './entities/transaction.entity';
 import { User } from '../users/user.entity';
-
+import { Billboard } from '../billboards/billboard.entity';
 @Module({
-  imports: [TypeOrmModule.forFeature([Plan, Subscription, Transaction, User]),
+  imports: [TypeOrmModule.forFeature([Plan, Subscription, Transaction, User, Billboard]),
   UsersModule
   ],
   controllers: [PlansController],

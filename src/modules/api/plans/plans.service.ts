@@ -7,7 +7,8 @@ import { PageDto } from 'src/common/dtos/page.dto';
 import { StatusType, UserType } from 'src/constants';
 import { ActionType } from 'src/constants/action-type';
 import Stripe from 'stripe';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
+import { Billboard } from '../billboards/billboard.entity';
 import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
 import { PlanInfoDto } from './dto/plan-info.dto';
@@ -25,9 +26,12 @@ export class PlansService {
     private readonly SubRepo: Repository<Subscription>,
     @InjectRepository(User)
     private readonly _userRepository: Repository<User>,
+    @InjectRepository(Billboard)
+    private readonly _billboardRepository: Repository<Billboard>,
     private readonly _usersService: UsersService,
+    // private readonly _billboardsService: BillboardsService,
   ) {
-    this.stripe = new Stripe(config.get('STRIPE_SECRET_KEY'),{apiVersion: '2022-08-01'})
+    this.stripe = new Stripe(config.get('STRIPE_SECRET_KEY'), { apiVersion: '2022-08-01' })
   }
 
   /**
@@ -93,26 +97,26 @@ export class PlansService {
   /**
    * Get one plan info
    */
-   async getOnePlan(planId: string): Promise<Plan>{
+  async getOnePlan(planId: string): Promise<Plan> {
     return await this.plansRepo.findOne({
-        where:{ id: planId }
+      where: { id: planId }
     })
   }
 
   /**
    * Get One Subscription info
    */
-   async getOneSub(subId :string): Promise<Subscription>{
+  async getOneSub(subId: string): Promise<Subscription> {
     const oneSub = await this.SubRepo.findOne({
       relations: ['plan', 'subscriber'],
-      where:{
+      where: {
         id: subId,
         status: StatusType.SUCCESS,
       }
     })
-    
+
     const sub = await this.checkExpire(oneSub)
-    if(sub){
+    if (sub) {
       return sub
     }
     throw new NotFoundException(subId)
@@ -121,12 +125,12 @@ export class PlansService {
   /**
    * Update a plan info
    */
-   async update(
+  async update(
     planId: string,
     body: PlanInfoDto,
   ): Promise<Plan> {
     const planToUpdate = await this.plansRepo.findOne({
-      where: { id: planId},
+      where: { id: planId },
     });
 
     if (!planToUpdate) {
@@ -144,22 +148,22 @@ export class PlansService {
   /**
    * Pay to subscribe to a plan
    */
-  async pay(userId: string , planId: string , payAmount: number, cardId: string): Promise<any>{
+  async pay(userId: string, planId: string, payAmount: number, cardId: string): Promise<any> {
     try {
-      const payment= await this.stripe.paymentIntents.create({
+      const payment = await this.stripe.paymentIntents.create({
         amount: payAmount,
         currency: "VND",
         description: "Plan Purchased",
         payment_method: cardId,
         confirm: true,
       })
- 
+
       const plan = await this.getOnePlan(planId)
       const user = await this._usersService.findOne(userId);
       user.userType = UserType.SUBSCRIBED;
       await this._userRepository.save(user)
 
-      const newSub= this.SubRepo.create({
+      const newSub = this.SubRepo.create({
         plan: plan,
         subscriber: user,
         code: payment.id,
@@ -168,10 +172,10 @@ export class PlansService {
       })
 
       const paidDate = new Date();
-      newSub.expiredAt = new Date(paidDate.setMonth(paidDate.getMonth()+plan.duration));
+      newSub.expiredAt = new Date(paidDate.setMonth(paidDate.getMonth() + plan.duration));
       await this.SubRepo.save(newSub);
       return payment
-      
+
     } catch (error) {
       console.log("Error: ", error)
     }
@@ -181,10 +185,10 @@ export class PlansService {
   /**
    * Unsubscribe a subscription
    */
-  async unsubscribe(subId :string): Promise<Subscription>{
+  async unsubscribe(subId: string): Promise<Subscription> {
     const findSub = await this.SubRepo.findOne({
       relations: ['plan', 'subscriber'],
-      where:{
+      where: {
         id: subId,
         status: StatusType.SUCCESS,
       }
@@ -195,17 +199,28 @@ export class PlansService {
     user.userType = UserType.FREE;
     await this._userRepository.save(user);
 
+    const billboards = await this._billboardRepository.update({
+      owner: {
+        id: user.id
+      },
+      status: Not(StatusType.DELETED),
+    },
+      {
+        status: StatusType.DRAFT,
+      }
+    )
+
     return await this.SubRepo.save(findSub);
   }
 
   /**
    * Check if the user is subscribed
    */
-  async checkSubByUser(subscriberId: string): Promise<Subscription>{
+  async checkSubByUser(subscriberId: string): Promise<Subscription> {
     const userSub = await this.SubRepo.findOne({
-      relations:['plan', 'subscriber'],
-      where:{
-        subscriber:{
+      relations: ['plan', 'subscriber'],
+      where: {
+        subscriber: {
           id: subscriberId,
         },
         status: StatusType.SUCCESS
@@ -213,7 +228,7 @@ export class PlansService {
     })
     const findSub = await this.checkExpire(userSub);
 
-    if(findSub){
+    if (findSub) {
       return findSub
     }
     throw new NotFoundException(subscriberId);
@@ -223,30 +238,30 @@ export class PlansService {
   /**
    * Increase and decrease RemainingPost for one 
    */
-  async handleRemainingPost(sub: Subscription, type: ActionType): Promise<Subscription>{
-    if(type == ActionType.DEC && sub.remainingPost > 0){
+  async handleRemainingPost(sub: Subscription, type: ActionType): Promise<Subscription> {
+    if (type == ActionType.DEC && sub.remainingPost > 0) {
       sub.remainingPost--;
 
       return await this.SubRepo.save(sub);
-    } 
-    if(type == ActionType.INC && sub.remainingPost < sub.plan.postLimit){
+    }
+    if (type == ActionType.INC && sub.remainingPost < sub.plan.postLimit) {
       sub.remainingPost++;
 
       return await this.SubRepo.save(sub);
     }
-    
+
     throw new ForbiddenException(sub);
   }
 
   /**
    * Check expireDate
    */
-  async checkExpire(checkSub: Subscription):Promise<Subscription>{
-    if(!checkSub){
+  async checkExpire(checkSub: Subscription): Promise<Subscription> {
+    if (!checkSub) {
       return undefined;
     }
     const presentDate = new Date();
-    if(presentDate >= checkSub.expiredAt){
+    if (presentDate >= checkSub.expiredAt) {
       await this.unsubscribe(checkSub.id);
 
       return undefined;
