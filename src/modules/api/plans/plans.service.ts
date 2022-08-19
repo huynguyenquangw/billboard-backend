@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PageMetaDto } from 'src/common/dtos/page-meta.dto';
 import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { PageDto } from 'src/common/dtos/page.dto';
 import { StatusType, UserType } from 'src/constants';
+import { ActionType } from 'src/constants/action-type';
 import Stripe from 'stripe';
 import { Repository } from 'typeorm';
 import { User } from '../users/user.entity';
@@ -102,14 +103,15 @@ export class PlansService {
    * Get One Subscription info
    */
    async getOneSub(subId :string): Promise<Subscription>{
-    const sub = await this.SubRepo.findOne({
+    const oneSub = await this.SubRepo.findOne({
       relations: ['plan', 'subscriber'],
       where:{
         id: subId,
         status: StatusType.SUCCESS,
       }
     })
-
+    
+    const sub = await this.checkExpire(oneSub)
     if(sub){
       return sub
     }
@@ -180,21 +182,27 @@ export class PlansService {
    * Unsubscribe a subscription
    */
   async unsubscribe(subId :string): Promise<Subscription>{
-    const findSub = await this.getOneSub(subId);
+    const findSub = await this.SubRepo.findOne({
+      relations: ['plan', 'subscriber'],
+      where:{
+        id: subId,
+        status: StatusType.SUCCESS,
+      }
+    })
     findSub.status = StatusType.CANCELED;
 
     const user = await this._usersService.findOne(findSub.subscriber.id);
     user.userType = UserType.FREE;
     await this._userRepository.save(user);
 
-    return await this.SubRepo.save(findSub)
+    return await this.SubRepo.save(findSub);
   }
 
   /**
    * Check if the user is subscribed
    */
   async checkSubByUser(subscriberId: string): Promise<Subscription>{
-    const findSub = await this.SubRepo.findOne({
+    const userSub = await this.SubRepo.findOne({
       relations:['plan', 'subscriber'],
       where:{
         subscriber:{
@@ -203,10 +211,46 @@ export class PlansService {
         status: StatusType.SUCCESS
       }
     })
+    const findSub = await this.checkExpire(userSub);
+
     if(findSub){
       return findSub
     }
-    throw new NotFoundException(subscriberId)
+    throw new NotFoundException(subscriberId);
 
+  }
+
+  /**
+   * Increase and decrease RemainingPost for one 
+   */
+  async handleRemainingPost(sub: Subscription, type: ActionType): Promise<Subscription>{
+    if(type == ActionType.DEC && sub.remainingPost > 0){
+      sub.remainingPost--;
+
+      return await this.SubRepo.save(sub);
+    } 
+    if(type == ActionType.INC && sub.remainingPost < sub.plan.postLimit){
+      sub.remainingPost++;
+
+      return await this.SubRepo.save(sub);
+    }
+    
+    throw new ForbiddenException(sub);
+  }
+
+  /**
+   * Check expireDate
+   */
+  async checkExpire(checkSub: Subscription):Promise<Subscription>{
+    if(!checkSub){
+      return undefined;
+    }
+    const presentDate = new Date();
+    if(presentDate >= checkSub.expiredAt){
+      await this.unsubscribe(checkSub.id);
+
+      return undefined;
+    }
+    return checkSub
   }
 }

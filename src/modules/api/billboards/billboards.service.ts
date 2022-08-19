@@ -10,10 +10,12 @@ import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { PageDto } from 'src/common/dtos/page.dto';
 import { isStringArrayEqual } from 'src/common/helper/isStringArrayEqual.helper';
 import { RoleType, StatusType } from 'src/constants';
+import { ActionType } from 'src/constants/action-type';
 import { S3Service } from 'src/shared/services/aws-s3.service';
 import { In, Repository, UpdateResult } from 'typeorm';
 import { AddressService } from '../address/address.service';
 import { District } from '../address/district.entity';
+import { PlansService } from '../plans/plans.service';
 import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
 import { Billboard } from './billboard.entity';
@@ -37,6 +39,7 @@ export class BillboardsService {
     private readonly _addressService: AddressService,
     private readonly _usersService: UsersService,
     private readonly _s3Service: S3Service,
+    private readonly _planService: PlansService
   ) {}
 
   /**
@@ -312,6 +315,16 @@ export class BillboardsService {
         throw new Error('Cannot publish this billboard');
       }
 
+      // Check subscription
+      const sub = await this._planService.checkSubByUser(ownerId);
+      if (!sub) {
+        throw new NotFoundException('Subscription not found');
+      }
+      if (sub.remainingPost < 1) {
+        throw new ForbiddenException('You have reach the maximum amount of your posts');
+      }
+  
+      await this._planService.handleRemainingPost(sub, ActionType.DEC);
       selectedBillboard.status = StatusType.PENDING;
       return this._billboardRepo.save(selectedBillboard);
     } catch (error) {

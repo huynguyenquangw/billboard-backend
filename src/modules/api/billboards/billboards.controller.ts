@@ -176,6 +176,18 @@ export class BillboardsController {
   })
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @ApiNoContentResponse({
+    status: 204,
+    description: 'Billboard with given id has been successfully deleted',
+  })
+  @ApiForbiddenResponse({
+    status: 403,
+    description: 'Forbidden',
+  })
+  @ApiNotFoundResponse({
+    status: 404,
+    description: 'Billboard with given id is not exist',
+  })
   @HttpCode(HttpStatus.OK)
   async publish(@Req() req, @Param('id') id: string): Promise<any> {
     return this._billboardsService.publish(req.user.id, id);

@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { S3Service } from 'src/shared/services/aws-s3.service';
 import { AddressModule } from '../address/address.module';
 import { District } from '../address/district.entity';
+import { PlansModule } from '../plans/plans.module';
 import { User } from '../users/user.entity';
 import { UsersModule } from '../users/users.module';
 import { Billboard } from './billboard.entity';
@@ -22,6 +23,7 @@ import { PreviousClient } from './previousClients.entity';
     ]),
     AddressModule,
     UsersModule,
+    PlansModule,
   ],
   controllers: [BillboardsController],
   providers: [BillboardsService, S3Service],
