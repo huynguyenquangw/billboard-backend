@@ -156,7 +156,7 @@ export class BillboardsController {
   })
   @ApiNotFoundResponse({
     status: 404,
-    description: 'Billboard with given id is not exist',
+    description: 'Billboard with given id does not exist',
   })
   async delete(
     @Req() req,
@@ -186,7 +186,7 @@ export class BillboardsController {
   })
   @ApiNotFoundResponse({
     status: 404,
-    description: 'Billboard with given id is not exist',
+    description: 'Billboard with given id does not exist',
   })
   @HttpCode(HttpStatus.OK)
   async publish(@Req() req, @Param('id') id: string): Promise<any> {

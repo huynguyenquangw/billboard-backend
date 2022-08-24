@@ -44,7 +44,7 @@ export class DeleteAndRestoreUserController {
   })
   @ApiNotFoundResponse({
     status: 404,
-    description: 'User with given id is not exist',
+    description: 'User with given id does not exist',
   })
   async delete(
     @Req() req,

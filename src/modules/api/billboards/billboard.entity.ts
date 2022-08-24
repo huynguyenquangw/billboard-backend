@@ -9,6 +9,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Ward } from '../address/ward.entity';
+import { Contract } from '../contracts/entities/contract.entity';
 import { User } from '../users/user.entity';
 import { BillboardInfoDto } from './dto/billboard-info.dto';
 import { Picture } from './entities/picture.entity';
@@ -28,6 +29,9 @@ export class Billboard extends AbstractEntity {
     cascade: true,
   })
   pictures: Picture[];
+
+  @OneToMany(() => Contract, (contract) => contract.billboard)
+  contracts: Contract[];
 
   @Column({ default: '' })
   address: string;

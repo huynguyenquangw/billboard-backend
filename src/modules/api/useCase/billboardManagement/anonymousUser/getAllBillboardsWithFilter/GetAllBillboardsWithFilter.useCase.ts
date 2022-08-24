@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PageMetaDto } from 'src/common/dtos/page-meta.dto';
 import { PageDto } from 'src/common/dtos/page.dto';
-import { BillboardFilterMode, StatusType } from 'src/constants';
+import { BillboardFilterMode, StatusType, UserType } from 'src/constants';
 import { Billboard } from 'src/modules/api/billboards/billboard.entity';
 import { BillboardsService } from 'src/modules/api/billboards/billboards.service';
 import { BillboardInfoDto } from 'src/modules/api/billboards/dto/billboard-info.dto';
@@ -38,17 +38,20 @@ export class GetAllBillboardsWithFilterUseCase {
       .leftJoinAndSelect('wards.district', 'districts')
       .leftJoinAndSelect('districts.city', 'cities')
       .leftJoinAndSelect('billboards.owner', 'users')
-      .leftJoinAndSelect('billboards.pictures', 'pictures');
+      .leftJoinAndSelect('billboards.pictures', 'pictures')
+      .where('users.userType = :subcribedUser', {
+        subcribedUser: UserType.SUBSCRIBED,
+      });
 
     switch (pageOptionsDto.filterMode) {
       case BillboardFilterMode.APPROVED:
-        queryBuilder.where({ status: StatusType.APPROVED });
+        queryBuilder.andWhere({ status: StatusType.APPROVED });
         break;
       case BillboardFilterMode.RENTED:
-        queryBuilder.where({ status: StatusType.RENTED });
+        queryBuilder.andWhere({ status: StatusType.RENTED });
         break;
       case BillboardFilterMode.DEFAULT:
-        queryBuilder.where(
+        queryBuilder.andWhere(
           new Brackets((qb) => {
             qb.where({ status: StatusType.APPROVED }).orWhere({
               status: StatusType.RENTED,
@@ -57,7 +60,7 @@ export class GetAllBillboardsWithFilterUseCase {
         );
         break;
       default:
-        queryBuilder.where(
+        queryBuilder.andWhere(
           new Brackets((qb) => {
             qb.where({ status: StatusType.APPROVED }).orWhere({
               status: StatusType.RENTED,
