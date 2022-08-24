@@ -3,7 +3,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AddressModule } from './address/address.module';
 import { Billboard } from './billboards/billboard.entity';
 import { BillboardsModule } from './billboards/billboards.module';
+import { ContractsModule } from './contracts/contracts.module';
+import { Contract } from './contracts/entities/contract.entity';
 import { Plan } from './plans/entities/plans.entity';
+import { Subscription } from './plans/entities/subscriptions.entity';
 import { PlansModule } from './plans/plans.module';
 import {
   GetAllBillboardsController,
@@ -41,6 +44,9 @@ import {
   DeleteAndRestorePlansController,
   DeleteAndRestorePlansUseCase,
 } from './useCase/planManagement/admin/softDeletePlans';
+import { CheckExpiredContractService } from './useCase/taskScheduling/checkExpiredContract';
+import { CheckExpiredSubscriberService } from './useCase/taskScheduling/checkExpiredSubscriber';
+import { TestCronService } from './useCase/taskScheduling/testCron';
 // import {
 //   PublishBillboardController,
 //   PublishBillboardUseCase,
@@ -66,10 +72,11 @@ import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Billboard, Plan]),
+    TypeOrmModule.forFeature([User, Billboard, Plan, Subscription, Contract]),
     UsersModule,
     BillboardsModule,
     PlansModule,
+    ContractsModule,
     AddressModule,
   ],
   controllers: [
@@ -103,6 +110,9 @@ import { UsersModule } from './users/users.module';
     DeleteAndRestoreUserUseCase,
     GetOneUserUseCase,
     DeleteAndRestorePlansUseCase,
+    CheckExpiredSubscriberService,
+    CheckExpiredContractService,
+    TestCronService,
   ],
 })
 export class ApiModule {}

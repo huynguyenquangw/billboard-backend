@@ -39,7 +39,7 @@ export class DeleteAndRestorePlansController {
   })
   @ApiNotFoundResponse({
     status: 404,
-    description: 'Plan with given id is not exist',
+    description: 'Plan with given id does not exist',
   })
   async deletePlans(
     @Req() req,
@@ -52,26 +52,24 @@ export class DeleteAndRestorePlansController {
    * Restore a deleted plan
    * by Admin
    */
-   @Patch('restore/:id')
-   @ApiTags('Admin')
-   @ApiBearerAuth()
-   @Roles(RoleType.ADMIN)
-   @ApiOperation({ summary: 'ADMIN: restore a deleted plan' })
-   @ApiNoContentResponse({
-     status: 204,
-     description: 'The plan with given id has been successfully restored',
-   })
-   @ApiForbiddenResponse({
-     status: 403,
-     description: 'Forbidden',
-   })
-   @ApiNotFoundResponse({
-     status: 404,
-     description: 'The plan with given id is active or not exist',
-   })
-   async restore(
-     @Param('id') planId: string,
-   ): Promise<UpdateResult | void> {
-     return await this.useCase.restore(planId);
-   }
+  @Patch('restore/:id')
+  @ApiTags('Admin')
+  @ApiBearerAuth()
+  @Roles(RoleType.ADMIN)
+  @ApiOperation({ summary: 'ADMIN: restore a deleted plan' })
+  @ApiNoContentResponse({
+    status: 204,
+    description: 'The plan with given id has been successfully restored',
+  })
+  @ApiForbiddenResponse({
+    status: 403,
+    description: 'Forbidden',
+  })
+  @ApiNotFoundResponse({
+    status: 404,
+    description: 'The plan with given id is active or not exist',
+  })
+  async restore(@Param('id') planId: string): Promise<UpdateResult | void> {
+    return await this.useCase.restore(planId);
+  }
 }

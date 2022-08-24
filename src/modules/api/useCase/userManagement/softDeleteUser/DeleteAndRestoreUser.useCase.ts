@@ -16,7 +16,7 @@ export class DeleteAndRestoreUserUseCase {
   async delete(id: string): Promise<UpdateResult> {
     const deleteResponse = await this._userRepo.softDelete(id);
     if (!deleteResponse.affected) {
-      throw new NotFoundException('User with given id is not exist');
+      throw new NotFoundException('User with given id does not exist');
     }
     return deleteResponse;
   }
@@ -40,7 +40,7 @@ export class DeleteAndRestoreUserUseCase {
     //TODO: change status to DRAFT, save and restore billboard
     const restoreResponse = await this._userRepo.restore(id);
     if (!restoreResponse.affected) {
-      throw new NotFoundException('User with given id is not exist');
+      throw new NotFoundException('User with given id does not exist');
     }
     return restoreResponse;
   }

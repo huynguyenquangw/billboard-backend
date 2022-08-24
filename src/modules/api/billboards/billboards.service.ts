@@ -9,7 +9,7 @@ import { PageMetaDto } from 'src/common/dtos/page-meta.dto';
 import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { PageDto } from 'src/common/dtos/page.dto';
 import { isStringArrayEqual } from 'src/common/helper/isStringArrayEqual.helper';
-import { RoleType, StatusType } from 'src/constants';
+import { RoleType, StatusType, UserType } from 'src/constants';
 import { ActionType } from 'src/constants/action-type';
 import { S3Service } from 'src/shared/services/aws-s3.service';
 import { In, Repository, UpdateResult } from 'typeorm';
@@ -39,7 +39,7 @@ export class BillboardsService {
     private readonly _addressService: AddressService,
     private readonly _usersService: UsersService,
     private readonly _s3Service: S3Service,
-    private readonly _planService: PlansService
+    private readonly _planService: PlansService,
   ) {}
 
   /**
@@ -86,6 +86,11 @@ export class BillboardsService {
     if (!ward) {
       throw new NotFoundException('Address not found');
     }
+    if (owner?.userType === UserType.FREE) {
+      throw new ForbiddenException(
+        'Need to subcribe before creating a new billboard',
+      );
+    }
 
     let preClients: PreviousClient[] = [];
     preClients = await this._previousClientRepo.find({
@@ -117,7 +122,7 @@ export class BillboardsService {
     });
 
     if (!billboardToUpdate) {
-      throw new NotFoundException('Billboard with given id is not exist!');
+      throw new NotFoundException('Billboard with given id does not exist!');
     }
 
     const preClientIds = body.previousClientIds ? body.previousClientIds : [];
@@ -180,12 +185,12 @@ export class BillboardsService {
       relations: ['owner'],
     });
     if (!billboardToDelete) {
-      throw new NotFoundException('Billboard with given id is not exist!');
+      throw new NotFoundException('Billboard with given id does not exist!');
     }
 
     const currentUser = await this._usersService.findOne(currentUserId);
     if (!currentUser) {
-      throw new NotFoundException('User with token is not exist!');
+      throw new NotFoundException('User with token does not exist!');
     }
 
     if (
@@ -203,7 +208,7 @@ export class BillboardsService {
     const deleteResponse = await this._billboardRepo.softDelete(billboardId);
 
     if (!deleteResponse.affected) {
-      throw new NotFoundException('Billboard with given id is not exist!');
+      throw new NotFoundException('Billboard with given id does not exist!');
     }
 
     return deleteResponse;
@@ -259,6 +264,7 @@ export class BillboardsService {
       .leftJoin('districts.wards', 'wards')
       .leftJoin('wards.billboards', 'billboards')
       .leftJoin('districts.city', 'cities')
+      .leftJoin('billboards.owner', 'users')
       // .orWhere(
       //   new Brackets((qb) => {
       //     qb.where('billboards.status = :status', {
@@ -277,6 +283,9 @@ export class BillboardsService {
       //   }),
       // )
       .where('cities.name = :name', { name: city })
+      .andWhere('users.userType = :subcribedUser', {
+        subcribedUser: UserType.SUBSCRIBED,
+      })
       .select('districts.id', 'id')
       .addSelect('districts.name', 'name')
       .addSelect('districts.abbreviation', 'abbreviation')
@@ -309,6 +318,11 @@ export class BillboardsService {
       if (selectedBillboard.owner.id !== ownerId) {
         throw new ForbiddenException('Forbidden');
       }
+      if (selectedBillboard?.owner?.userType === UserType.FREE) {
+        throw new ForbiddenException(
+          'Need to subcribe before request for approval',
+        );
+      }
 
       // check current status - DRAFT
       if (selectedBillboard.status !== StatusType.DRAFT) {
@@ -321,9 +335,11 @@ export class BillboardsService {
         throw new NotFoundException('Subscription not found');
       }
       if (sub.remainingPost < 1) {
-        throw new ForbiddenException('You have reach the maximum amount of your posts');
+        throw new ForbiddenException(
+          'You have reach the maximum amount of your posts',
+        );
       }
-  
+
       await this._planService.handleRemainingPost(sub, ActionType.DEC);
       selectedBillboard.status = StatusType.PENDING;
       return this._billboardRepo.save(selectedBillboard);
@@ -364,21 +380,6 @@ export class BillboardsService {
       throw new Error('Upload failed!');
     }
     return { uploaded_billboard_id: billboardId };
-
-    // if (uploadPictures?.length < 1) {
-    //   throw new BadRequestException('List of pictures is empty');
-    // }
-
-    // // check if upload picture list different from billboard's pictures
-    // if (isArrayDifferent(uploadPictures, billboardToAddPictures.pictures)) {
-    //   await this._s3Service.updateBillboardFiles(
-    //     billboardToAddPictures,
-    //     uploadPictures,
-    //   );
-    // }
-
-    // const updatedBillboard = await this.findOneWithRelations(billboardId);
-    // return updatedBillboard;
   }
 
   /*

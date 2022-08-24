@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RoleType, StatusType } from 'src/constants';
 import { Plan } from 'src/modules/api/plans/entities/plans.entity';
@@ -17,9 +21,7 @@ export class DeleteAndRestorePlansUseCase {
    * Soft Delete a plan
    * by ADMIN
    */
-  async delete(
-      userId : string,
-      planId: string): Promise<UpdateResult> {
+  async delete(userId: string, planId: string): Promise<UpdateResult> {
     const planToDelete = await this.plansRepo.findOne({
       where: { id: planId },
       withDeleted: true,
@@ -27,20 +29,16 @@ export class DeleteAndRestorePlansUseCase {
 
     //Check exist
     if (!planToDelete) {
-      throw new NotFoundException(
-        'Cannot find plan with given id',
-      );
+      throw new NotFoundException('Cannot find plan with given id');
     }
 
     //Check is Admin
     const currentUser = await this._usersService.findOne(userId);
     if (!currentUser) {
-      throw new NotFoundException('User with token is not exist!');
+      throw new NotFoundException('User with token does not exist!');
     }
 
-    if (
-      currentUser.role !== RoleType.ADMIN
-    ) {
+    if (currentUser.role !== RoleType.ADMIN) {
       throw new ForbiddenException('Cannot delete this plan');
     }
 
@@ -63,8 +61,9 @@ export class DeleteAndRestorePlansUseCase {
   async restore(planId: string): Promise<UpdateResult> {
     const plantoRestore = await this.plansRepo.findOne({
       where: {
-          id: planId,
-          deletedAt: Not(IsNull()) },
+        id: planId,
+        deletedAt: Not(IsNull()),
+      },
       withDeleted: true,
     });
 

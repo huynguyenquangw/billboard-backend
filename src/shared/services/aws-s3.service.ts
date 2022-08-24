@@ -210,7 +210,7 @@ export class S3Service {
   //     where: { id: billboardId },
   //   });
   //   if (!billboard) {
-  //     throw new NotFoundException('Billboard with given id is not exist!');
+  //     throw new NotFoundException('Billboard with given id does not exist!');
   //   }
   //   const savedFiles = [];
 

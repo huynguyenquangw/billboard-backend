@@ -15,5 +15,9 @@ export enum StatusType {
   SUCCESS = 'SUCCESS',
   CANCELED = 'CANCELED',
 
+  // contract status
+  ACTIVE = 'ACTIVE',
+  EXPIRED = 'EXPIRED',
+
   DELETED = 'DELETED',
 }
