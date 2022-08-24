@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { StatusType, UserType } from 'src/constants';
 import { Subscription } from 'src/modules/api/plans/entities/subscriptions.entity';
@@ -21,8 +21,8 @@ export class CheckExpiredSubscriberService {
    * Check expired subcriber
    * Every midnight
    */
-  // @Cron(CronExpression.EVERY_10_SECONDS)dd
-  @Cron('0 0 0 * * *')
+  // @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  @Cron('0 30 0 * * *')
   async checkExpiredSubscriber() {
     // check all SUCCESS subscription
     const today = new Date();
