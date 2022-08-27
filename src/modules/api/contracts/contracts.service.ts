@@ -32,7 +32,10 @@ export class ContractsService {
       throw new NotFoundException('Billboard with given id does not exist');
     }
 
-    const contract: Contract = await this._contractRepo.create({ ...body });
+    const contract: Contract = await this._contractRepo.create({
+      ...body,
+      billboard,
+    });
     const newContract: Contract = await this._contractRepo.save(contract);
 
     // update billboard toRented

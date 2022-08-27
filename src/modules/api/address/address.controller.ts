@@ -48,6 +48,12 @@ export class AddressController {
     return this.addressService.getAllCities();
   }
 
+  @Get('cities/hcm/districts')
+  @ApiOperation({ summary: 'Get all districts of Ho Chi Minh City' })
+  getAllDistrictsOfHcm(): Promise<District[]> {
+    return this.addressService.getAllDistrictsOfHcm();
+  }
+
   @Get('cities/:id/districts')
   @ApiOperation({ summary: 'Get all districts of a city' })
   getAllDistrictsWithinACity(@Param('id') id: string): Promise<District[]> {
