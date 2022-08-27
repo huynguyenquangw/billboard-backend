@@ -105,7 +105,7 @@ export class ContractsService {
   async getActive(billboardId: string) {
     const activeContract: Contract = await this._contractRepo
       .createQueryBuilder('contracts')
-      .leftJoinAndSelect('contracts.billboard', 'billboards')
+      .leftJoin('contracts.billboard', 'billboards')
       .where('contracts.status = :status', { status: StatusType.ACTIVE })
       .andWhere('billboards.id = :billboardId', {
         billboardId: billboardId,
