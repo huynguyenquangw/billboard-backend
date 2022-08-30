@@ -1,6 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { StatusType } from 'src/constants';
+import { S3PrivateService } from 'src/shared/services/aws-s3-private.service';
 import { Repository, UpdateResult } from 'typeorm';
 import { Billboard } from '../billboards/billboard.entity';
 import { BillboardsService } from '../billboards/billboards.service';
@@ -16,6 +21,7 @@ export class ContractsService {
     @InjectRepository(Billboard)
     private readonly _billboardRepo: Repository<Billboard>,
     private readonly _billboardsService: BillboardsService,
+    private readonly _s3PrivateService: S3PrivateService,
   ) {}
 
   /**
@@ -93,8 +99,29 @@ export class ContractsService {
    * Add contract's file
    * @returns
    */
-  async addPrivateFiles(contractId: string, files: Array<Express.Multer.File>) {
-    return 'true';
+  async addPrivateFile(contractId: string, file: Express.Multer.File) {
+    const contractToAddFile = await this._contractRepo.findOne({
+      where: { id: contractId, status: StatusType.ACTIVE },
+    });
+
+    if (!contractToAddFile) {
+      throw new NotFoundException('Contract with given id does not exist!');
+    }
+
+    if (!file) {
+      throw new BadRequestException('Bad Request');
+    }
+
+    const isContractPrivateFileUpdated =
+      await this._s3PrivateService.isContractPrivateFileUpdated(
+        contractToAddFile,
+        file,
+      );
+
+    if (!isContractPrivateFileUpdated) {
+      throw new Error('Upload failed!');
+    }
+    return { uploaded_contract_id: contractId };
   }
 
   /**

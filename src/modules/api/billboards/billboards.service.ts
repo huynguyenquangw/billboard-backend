@@ -392,39 +392,4 @@ export class BillboardsService {
       },
     });
   }
-
-  // async addPictures(
-  //   billboardId: string,
-  //   files: Array<Express.Multer.File>,
-  // ): Promise<any> {
-  //   const newPictures = await this._s3Service.s3AddFiles(billboardId, files);
-  //   const billboardToUpdate = await this.findOneWithRelations(billboardId);
-  //   // TODO: fix-query from pictures side
-  //   if (billboardToUpdate?.pictures) {
-  //     await this._billboardRepo.update(billboardId, {
-  //       ...billboardToUpdate,
-  //       pictures: null,
-  //     });
-  //     billboardToUpdate?.pictures.forEach(async (picture) => {
-  //       await this._s3Service.s3DeleteFile(picture.key);
-  //     });
-  //   }
-  //   await this._billboardRepo.update(billboardId, {
-  //     ...billboardToUpdate,
-  //     pictures: newPictures,
-  //   });
-  //   // return newPictures;
-  // }
-
-  // async addMultipleFiles(files: Array<Express.Multer.File>) {
-  //   const photos = await this._s3Service.upload(files);
-  //   await console.log('response: ', photos);
-
-  //   // const billboard = await this.findOne(billboardId);
-  //   // await this._billboardRepo.update(billboardId, {
-  //   //   ...billboard,
-  //   //   avatar,
-  //   // });
-  //   return photos;
-  // }
 }

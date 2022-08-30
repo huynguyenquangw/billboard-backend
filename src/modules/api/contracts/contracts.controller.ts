@@ -114,7 +114,7 @@ export class ContractsController {
    * @param req
    * @returns BillboardInfoDto
    */
-  @Post(':id/update/files')
+  @Post(':id/update/file')
   @ApiOperation({ summary: "Add contract's private files" })
   @ApiBearerAuth()
   @ApiOkResponse({
@@ -135,9 +135,9 @@ export class ContractsController {
   @UseInterceptors(FilesInterceptor('file'), TransformInterceptor)
   async addPrivateFiles(
     @Param('id') id: string,
-    @UploadedFiles() files: Array<Express.Multer.File>,
+    @UploadedFiles() file: Express.Multer.File,
   ) {
-    const result = await this._contractsService.addPrivateFiles(id, files);
+    const result = await this._contractsService.addPrivateFile(id, file);
 
     return { message: "Add contract's private files successfully", result };
   }
