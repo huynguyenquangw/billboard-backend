@@ -133,13 +133,18 @@ export class ContractsService {
     const activeContract: Contract = await this._contractRepo
       .createQueryBuilder('contracts')
       .leftJoin('contracts.billboard', 'billboards')
+      .leftJoinAndSelect('contracts.privateFile', 'private_files')
       .where('contracts.status = :status', { status: StatusType.ACTIVE })
       .andWhere('billboards.id = :billboardId', {
         billboardId: billboardId,
       })
       .getOneOrFail();
 
-    return activeContract;
+    const url = await this._s3PrivateService.generatePresignedUrl(
+      activeContract.privateFile.key,
+    );
+
+    return { ...activeContract, presignedUrl: url };
   }
 
   /**
