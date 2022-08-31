@@ -6,11 +6,11 @@ import {
   Param,
   Patch,
   Post,
-  UploadedFiles,
+  UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBadGatewayResponse,
   ApiBearerAuth,
@@ -133,9 +133,9 @@ export class ContractsController {
   @UseGuards(JwtAuthGuard)
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'), TransformInterceptor)
-  async addPrivateFiles(
+  async addPrivateFile(
     @Param('id') id: string,
-    @UploadedFiles() file: Express.Multer.File,
+    @UploadedFile() file: Express.Multer.File,
   ) {
     const result = await this._contractsService.addPrivateFile(id, file);
 
