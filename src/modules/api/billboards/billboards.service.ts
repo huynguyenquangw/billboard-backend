@@ -117,7 +117,10 @@ export class BillboardsService {
     body: UpdateBillboardDto,
   ): Promise<BillboardInfoDto> {
     const billboardToUpdate = await this._billboardRepo.findOne({
-      where: { id: id, status: StatusType.DRAFT || StatusType.REJECTED },
+      where: [
+        { id: id, status: StatusType.DRAFT },
+        { id: id, status: StatusType.REJECTED },
+      ],
       relations: ['ward'],
     });
 
