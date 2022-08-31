@@ -28,7 +28,7 @@ export class ContractsService {
    * Create contract
    * @returns
    */
-  async create(dto: CreateContractDto) {
+  async create(dto: CreateContractDto): Promise<Contract> {
     const { billboardId, ...body } = dto;
 
     const billboard: Billboard = await this._billboardsService.findOne(
@@ -65,7 +65,7 @@ export class ContractsService {
    * Update contract
    * @returns
    */
-  async update(contractId: string, body: UpdateContractDto) {
+  async update(contractId: string, body: UpdateContractDto): Promise<Contract> {
     const contractToUpdate: Contract = await this._contractRepo.findOne({
       where: {
         id: contractId,
