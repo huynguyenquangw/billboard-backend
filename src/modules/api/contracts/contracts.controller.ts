@@ -6,11 +6,11 @@ import {
   Param,
   Patch,
   Post,
-  UploadedFiles,
+  UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBadGatewayResponse,
   ApiBearerAuth,
@@ -56,7 +56,7 @@ export class ContractsController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(TransformInterceptor)
   async create(@Body() body: CreateContractDto) {
-    const result = this._contractsService.create(body);
+    const result = await this._contractsService.create(body);
     return { message: 'Created', result };
   }
 
@@ -105,7 +105,7 @@ export class ContractsController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(TransformInterceptor)
   async update(@Param('id') id: string, @Body() body: UpdateContractDto) {
-    const result = this._contractsService.update(id, body);
+    const result = await this._contractsService.update(id, body);
     return { message: "Update billboard's contract successfully", result };
   }
 
@@ -114,7 +114,7 @@ export class ContractsController {
    * @param req
    * @returns BillboardInfoDto
    */
-  @Post(':id/update/files')
+  @Post(':id/update/file')
   @ApiOperation({ summary: "Add contract's private files" })
   @ApiBearerAuth()
   @ApiOkResponse({
@@ -132,12 +132,12 @@ export class ContractsController {
   })
   @UseGuards(JwtAuthGuard)
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FilesInterceptor('file'), TransformInterceptor)
-  async addPrivateFiles(
+  @UseInterceptors(FileInterceptor('file'), TransformInterceptor)
+  async addPrivateFile(
     @Param('id') id: string,
-    @UploadedFiles() files: Array<Express.Multer.File>,
+    @UploadedFile() file: Express.Multer.File,
   ) {
-    const result = await this._contractsService.addPrivateFiles(id, files);
+    const result = await this._contractsService.addPrivateFile(id, file);
 
     return { message: "Add contract's private files successfully", result };
   }

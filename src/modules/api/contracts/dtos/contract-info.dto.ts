@@ -16,7 +16,7 @@ export class ContractInfoDto extends AbstractDto {
 
   readonly endDate: Date;
 
-  readonly privateFiles: object[];
+  readonly privateFile: object;
 
   readonly billboard: Billboard;
 
@@ -29,7 +29,7 @@ export class ContractInfoDto extends AbstractDto {
     this.note = contract.note;
     this.startDate = contract.startDate;
     this.endDate = contract.endDate;
-    this.privateFiles = contract.privateFiles;
+    this.privateFile = contract.privateFile;
     this.billboard = contract.billboard;
   }
 }

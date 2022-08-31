@@ -1,6 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { StatusType } from 'src/constants';
+import { S3PrivateService } from 'src/shared/services/aws-s3-private.service';
 import { Repository, UpdateResult } from 'typeorm';
 import { Billboard } from '../billboards/billboard.entity';
 import { BillboardsService } from '../billboards/billboards.service';
@@ -16,13 +21,14 @@ export class ContractsService {
     @InjectRepository(Billboard)
     private readonly _billboardRepo: Repository<Billboard>,
     private readonly _billboardsService: BillboardsService,
+    private readonly _s3PrivateService: S3PrivateService,
   ) {}
 
   /**
    * Create contract
    * @returns
    */
-  async create(dto: CreateContractDto) {
+  async create(dto: CreateContractDto): Promise<Contract> {
     const { billboardId, ...body } = dto;
 
     const billboard: Billboard = await this._billboardsService.findOne(
@@ -32,11 +38,11 @@ export class ContractsService {
       throw new NotFoundException('Billboard with given id does not exist');
     }
 
-    const contract: Contract = await this._contractRepo.create({
+    const newContract: Contract = await this._contractRepo.create({
       ...body,
       billboard,
     });
-    const newContract: Contract = await this._contractRepo.save(contract);
+    await this._contractRepo.save(newContract);
 
     // update billboard toRented
     await this._billboardRepo.save({
@@ -59,7 +65,7 @@ export class ContractsService {
    * Update contract
    * @returns
    */
-  async update(contractId: string, body: UpdateContractDto) {
+  async update(contractId: string, body: UpdateContractDto): Promise<Contract> {
     const contractToUpdate: Contract = await this._contractRepo.findOne({
       where: {
         id: contractId,
@@ -93,8 +99,29 @@ export class ContractsService {
    * Add contract's file
    * @returns
    */
-  async addPrivateFiles(contractId: string, files: Array<Express.Multer.File>) {
-    return 'true';
+  async addPrivateFile(contractId: string, file: Express.Multer.File) {
+    const contractToAddFile = await this._contractRepo.findOne({
+      where: { id: contractId, status: StatusType.ACTIVE },
+    });
+
+    if (!contractToAddFile) {
+      throw new NotFoundException('Contract with given id does not exist!');
+    }
+
+    if (!file) {
+      throw new BadRequestException('Bad Request');
+    }
+
+    const isContractPrivateFileUpdated =
+      await this._s3PrivateService.isContractPrivateFileUpdated(
+        contractToAddFile,
+        file,
+      );
+
+    if (!isContractPrivateFileUpdated) {
+      throw new Error('Upload failed!');
+    }
+    return { uploaded_contract_id: contractId };
   }
 
   /**
@@ -103,16 +130,23 @@ export class ContractsService {
    * @returns
    */
   async getActive(billboardId: string) {
-    const activeContract: Contract = await this._contractRepo
+    const activeContract = await this._contractRepo
       .createQueryBuilder('contracts')
       .leftJoin('contracts.billboard', 'billboards')
+      .leftJoinAndSelect('contracts.privateFile', 'private_files')
       .where('contracts.status = :status', { status: StatusType.ACTIVE })
       .andWhere('billboards.id = :billboardId', {
         billboardId: billboardId,
       })
       .getOneOrFail();
 
-    return activeContract;
+    const url = activeContract.privateFile
+      ? await this._s3PrivateService.generatePresignedUrl(
+          activeContract.privateFile.key,
+        )
+      : '';
+
+    return { ...activeContract, presignedUrl: url };
   }
 
   /**
