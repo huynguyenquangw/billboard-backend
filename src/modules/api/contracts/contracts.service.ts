@@ -38,11 +38,11 @@ export class ContractsService {
       throw new NotFoundException('Billboard with given id does not exist');
     }
 
-    const contract: Contract = await this._contractRepo.create({
+    const newContract: Contract = await this._contractRepo.create({
       ...body,
       billboard,
     });
-    const newContract: Contract = await this._contractRepo.save(contract);
+    await this._contractRepo.save(newContract);
 
     // update billboard toRented
     await this._billboardRepo.save({
@@ -140,9 +140,11 @@ export class ContractsService {
       })
       .getOneOrFail();
 
-    const url = await this._s3PrivateService.generatePresignedUrl(
-      activeContract.privateFile.key,
-    );
+    const url = activeContract.privateFile
+      ? await this._s3PrivateService.generatePresignedUrl(
+          activeContract.privateFile.key,
+        )
+      : '';
 
     return { ...activeContract, presignedUrl: url };
   }
