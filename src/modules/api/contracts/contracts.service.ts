@@ -130,7 +130,7 @@ export class ContractsService {
    * @returns
    */
   async getActive(billboardId: string) {
-    const activeContract: Contract = await this._contractRepo
+    const activeContract = await this._contractRepo
       .createQueryBuilder('contracts')
       .leftJoin('contracts.billboard', 'billboards')
       .leftJoinAndSelect('contracts.privateFile', 'private_files')
