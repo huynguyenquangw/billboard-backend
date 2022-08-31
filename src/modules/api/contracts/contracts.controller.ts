@@ -56,7 +56,7 @@ export class ContractsController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(TransformInterceptor)
   async create(@Body() body: CreateContractDto) {
-    const result = this._contractsService.create(body);
+    const result = await this._contractsService.create(body);
     return { message: 'Created', result };
   }
 
@@ -105,7 +105,7 @@ export class ContractsController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(TransformInterceptor)
   async update(@Param('id') id: string, @Body() body: UpdateContractDto) {
-    const result = this._contractsService.update(id, body);
+    const result = await this._contractsService.update(id, body);
     return { message: "Update billboard's contract successfully", result };
   }
 
