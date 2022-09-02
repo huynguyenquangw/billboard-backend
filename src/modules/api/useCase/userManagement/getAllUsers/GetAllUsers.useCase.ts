@@ -45,6 +45,7 @@ export class GetAllUsersUseCase {
    */
   async execute(
     isActive: string,
+    name: string,
     pageOptionsDto: UsersPageOptionsDto,
   ): Promise<PageDto<UserInfoDto>> {
     const queryBuilder = this._userRepository.createQueryBuilder('users');
@@ -56,6 +57,11 @@ export class GetAllUsersUseCase {
       .leftJoinAndSelect('users.ward', 'wards')
       .leftJoinAndSelect('wards.district', 'districts')
       .leftJoinAndSelect('districts.city', 'cities');
+      if(name){
+        queryBuilder.where('lower(users.name) like :selectedName',{
+          selectedName: `%${name.toLowerCase()}%`
+        })
+      }
 
     switch (isActive) {
       case 'active':

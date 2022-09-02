@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { StatusType } from 'aws-sdk/clients/codebuild';
 import { PageMetaDto } from 'src/common/dtos/page-meta.dto';
 import { PageDto } from 'src/common/dtos/page.dto';
 import { Billboard } from 'src/modules/api/billboards/billboard.entity';
@@ -12,7 +13,7 @@ export class GetAllBillboardsUseCase {
   constructor(
     @InjectRepository(Billboard)
     private readonly _billboardRepository: Repository<Billboard>,
-  ) {}
+  ) { }
 
   /**
    * Get all billboard exclude deleted
@@ -47,6 +48,8 @@ export class GetAllBillboardsUseCase {
    */
   async execute(
     isActive: string,
+    status: StatusType,
+    name: string,
     pageOptionsDto: BillboardsPageOptionsDto,
   ): Promise<PageDto<BillboardInfoDto>> {
     const queryBuilder =
@@ -59,7 +62,18 @@ export class GetAllBillboardsUseCase {
       .leftJoinAndSelect('billboards.ward', 'wards')
       .leftJoinAndSelect('wards.district', 'districts')
       .leftJoinAndSelect('districts.city', 'cities')
-      .leftJoinAndSelect('billboards.owner', 'users');
+      .leftJoinAndSelect('billboards.owner', 'users')
+    if (status) {
+      queryBuilder.where('billboards.status = :selectedStatus', {
+        selectedStatus: status,
+      })
+    }
+    if (name) {
+      queryBuilder.andWhere('lower(billboards.name) like :selectedName', {
+        selectedName: `%${name.toLowerCase()}%`,
+      })
+    }
+    ;
 
     switch (isActive) {
       case 'active':

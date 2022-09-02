@@ -73,8 +73,9 @@ export class GetAllUsersController {
   @HttpCode(HttpStatus.OK)
   async getAllActive(
     @Param('activeVal') activeVal: string = 'inactive' || 'active',
+    @Query('searchName') name: string,
     @Query() pageOptionsDto: UsersPageOptionsDto,
   ): Promise<PageDto<UserInfoDto>> {
-    return this.useCase.execute(activeVal, pageOptionsDto);
+    return this.useCase.execute(activeVal, name, pageOptionsDto);
   }
 }

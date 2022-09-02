@@ -8,6 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { StatusType } from 'aws-sdk/clients/codebuild';
 import { PageDto } from 'src/common/dtos/page.dto';
 import { RoleType } from 'src/constants';
 import { Roles } from 'src/decorators/roles.decorator';
@@ -59,8 +60,10 @@ export class GetAllBillboardsController {
   @HttpCode(HttpStatus.OK)
   async getAllActive(
     @Param('activeVal') activeVal: string = 'inactive' || 'active',
+    @Query('status') status: StatusType,
+    @Query('searchName') name: string,
     @Query() pageOptionsDto: BillboardsPageOptionsDto,
   ): Promise<PageDto<BillboardInfoDto>> {
-    return this.useCase.execute(activeVal, pageOptionsDto);
+    return this.useCase.execute(activeVal, status, name, pageOptionsDto);
   }
 }
