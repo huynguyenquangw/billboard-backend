@@ -34,8 +34,6 @@ export class GoogleService {
       )
       .toPromise();
 
-    console.log(userProfile.data.emailAddresses[0].value);
-
     //Find the user in our database that has the same email as the decryted accessToken email
     const user = await this._usersService.findExistUser(
       AuthType.GOOGLE,

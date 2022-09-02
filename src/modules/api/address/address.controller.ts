@@ -32,7 +32,6 @@ export class AddressController {
     description: 'Successfully create a new city',
   })
   async createCity(@Body() city: CreateCityDto): Promise<City> {
-    await console.log('city: ', city);
     return this.addressService.createCity(city);
   }
 

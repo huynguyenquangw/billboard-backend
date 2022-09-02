@@ -26,7 +26,6 @@ export class GetAllBillboardsWithFilterUseCase {
     pageOptionsDto: SearchBillboardsPageOptionsDto,
   ): Promise<PageDto<BillboardInfoDto>> {
     const searchText = pageOptionsDto.searchText?.trim();
-    console.log(searchText);
 
     const queryBuilder =
       this._billboardRepository.createQueryBuilder('billboards');

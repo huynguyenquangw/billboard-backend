@@ -39,7 +39,6 @@ export class CheckExpiredSubscriberService {
       return { expiredSubId: sub.id, expiredSubcriberId: sub.subscriber.id };
     });
     this.logger.debug(expiredSubAndUserIds);
-    console.log(expiredSubAndUserIds);
 
     const userQueryBuilder = this._userRepo.createQueryBuilder('users');
     const subQueryBuilder =

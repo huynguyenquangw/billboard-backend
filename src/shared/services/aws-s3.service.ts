@@ -160,8 +160,6 @@ export class S3Service {
 
       // check update case
       if (currentPics.length !== 0) {
-        console.log('Case: Update');
-
         const dbDeleteResponses = await this.deleteFileFromDatabase(billboard);
         const s3DeleteResponses = await this.deleteFileFromS3(billboard);
 
@@ -170,7 +168,6 @@ export class S3Service {
         }
       }
       if (currentPics.length === 0) {
-        console.log('Case: Add');
       }
 
       return true;
