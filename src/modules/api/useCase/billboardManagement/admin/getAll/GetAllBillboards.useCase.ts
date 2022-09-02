@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { StatusType } from 'aws-sdk/clients/codebuild';
 import { PageMetaDto } from 'src/common/dtos/page-meta.dto';
 import { PageDto } from 'src/common/dtos/page.dto';
+import { StatusType } from 'src/constants';
 import { Billboard } from 'src/modules/api/billboards/billboard.entity';
 import { BillboardInfoDto } from 'src/modules/api/billboards/dto/billboard-info.dto';
 import { BillboardsPageOptionsDto } from 'src/modules/api/infra/dtos/BillboardsPageOptions.dto.ts/BillboardsPageOptions.dto';
