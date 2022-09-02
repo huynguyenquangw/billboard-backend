@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { getEnvPath } from './common/helper/env.helper';
 import { ApiModule } from './modules/api/api.module';
@@ -11,15 +12,20 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ envFilePath, isGlobal: true }),
+    ConfigModule.forRoot({
+      envFilePath,
+      isGlobal: true,
+    }),
     TypeOrmModule.forRootAsync({
       imports: [SharedModule],
       useFactory: (configService: ApiConfigService) =>
         configService.typeOrmConfig,
       inject: [ApiConfigService],
     }),
+    ScheduleModule.forRoot(),
     AuthModule,
     ApiModule,
   ],
+  providers: [],
 })
 export class AppModule {}

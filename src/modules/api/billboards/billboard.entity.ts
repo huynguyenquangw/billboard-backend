@@ -1,4 +1,3 @@
-import { Exclude } from 'class-transformer';
 import { AbstractEntity } from 'src/common/abstract.entity';
 import { StatusType } from 'src/constants';
 import {
@@ -7,11 +6,14 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
 } from 'typeorm';
 import { Ward } from '../address/ward.entity';
+import { Contract } from '../contracts/entities/contract.entity';
 import { User } from '../users/user.entity';
 import { BillboardInfoDto } from './dto/billboard-info.dto';
-// import { UserEntity } from '../users/user.entity';
+import { Picture } from './entities/picture.entity';
+import { PreviousClient } from './previousClients.entity';
 
 @Entity({ name: 'billboards' })
 export class Billboard extends AbstractEntity {
@@ -19,8 +21,17 @@ export class Billboard extends AbstractEntity {
   owner: User;
 
   @ManyToOne(() => Ward)
-  @JoinColumn()
+  @JoinColumn({ name: 'ward_id' })
   ward: Ward;
+
+  @OneToMany(() => Picture, (picture) => picture.billboard, {
+    eager: true,
+    cascade: true,
+  })
+  pictures: Picture[];
+
+  @OneToMany(() => Contract, (contract) => contract.billboard)
+  contracts: Contract[];
 
   @Column({ default: '' })
   address: string;
@@ -30,9 +41,6 @@ export class Billboard extends AbstractEntity {
 
   @Column({ default: '' })
   name: string;
-
-  @Column('jsonb', { nullable: true })
-  picture: object[];
 
   @Column({ default: '' })
   video: string;
@@ -46,24 +54,23 @@ export class Billboard extends AbstractEntity {
   @Column({ default: 0 })
   circulation: number;
 
-  @Column({ default: '' })
-  previousClient: string;
-
   @Column({ default: 0 })
   rentalPrice: number;
 
-  @Column({ default: '' })
-  rentalDuration: string;
+  @Column({ default: 0 })
+  rentalDuration: number;
 
   @Column({ default: '' })
   description: string;
+
+  @Column('jsonb', { nullable: true })
+  previousClients: PreviousClient[];
 
   @Column({
     type: 'enum',
     enum: StatusType,
     default: StatusType.DRAFT,
   })
-  @Exclude()
   status: StatusType;
 
   @Column({ type: 'bool', default: 0 })
@@ -75,7 +82,24 @@ export class Billboard extends AbstractEntity {
   @Column({ default: 0 })
   likedCounter?: number = 0;
 
-  @DeleteDateColumn({ select: false })
+  @Column({
+    nullable: true,
+    type: 'timestamp without time zone',
+    name: 'approved_at',
+  })
+  approvedAt: Date;
+
+  @Column({ type: 'double precision', name: 'lat', nullable: true })
+  lat: number;
+
+  @Column({ type: 'double precision', name: 'long', nullable: true })
+  long: number;
+
+  @DeleteDateColumn({
+    select: false,
+    type: 'timestamp without time zone',
+    name: 'deleted_at',
+  })
   deletedAt: Date;
 
   toDto(): BillboardInfoDto {

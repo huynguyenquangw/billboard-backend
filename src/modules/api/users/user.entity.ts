@@ -1,4 +1,5 @@
 import { AbstractEntity } from 'src/common/abstract.entity';
+import { UserType } from 'src/constants';
 import { AuthType } from 'src/constants/auth-type';
 import { RoleType } from 'src/constants/role-type';
 import {
@@ -11,6 +12,7 @@ import {
 } from 'typeorm';
 import { Ward } from '../address/ward.entity';
 import { Billboard } from '../billboards/billboard.entity';
+import { Subscription } from '../plans/entities/subscriptions.entity';
 import { UserInfoDto } from './dto/user-info.dto';
 
 @Entity({ name: 'users' })
@@ -46,14 +48,24 @@ export class User extends AbstractEntity {
   authProviderId: string;
 
   @Column({
-    // select: false,
+    type: 'enum',
+    enum: UserType,
+    default: UserType.FREE,
+  })
+  userType: UserType;
+
+  @Column({
     type: 'enum',
     enum: RoleType,
     default: RoleType.USER,
   })
   role: RoleType;
 
-  @DeleteDateColumn({ select: false })
+  @DeleteDateColumn({
+    select: false,
+    type: 'timestamp without time zone',
+    name: 'deleted_at',
+  })
   deletedAt: Date;
 
   @ManyToOne(() => Ward)
@@ -62,6 +74,9 @@ export class User extends AbstractEntity {
 
   @OneToMany(() => Billboard, (billboard) => billboard.owner)
   billboards: Billboard[];
+
+  @OneToMany(() => Subscription, (subscription) => subscription.subscriber)
+  subscriptions: Subscription[];
 
   toDto(): UserInfoDto {
     return new UserInfoDto(this);

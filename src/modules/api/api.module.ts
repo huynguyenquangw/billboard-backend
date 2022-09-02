@@ -3,82 +3,134 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AddressModule } from './address/address.module';
 import { Billboard } from './billboards/billboard.entity';
 import { BillboardsModule } from './billboards/billboards.module';
+import { ContractsModule } from './contracts/contracts.module';
+import { Contract } from './contracts/entities/contract.entity';
+import { Plan } from './plans/entities/plans.entity';
+import { Subscription } from './plans/entities/subscriptions.entity';
 import { PlansModule } from './plans/plans.module';
+import {
+   FilterByStatusController, 
+   FilterByStatusUseCase,
+} from './useCase/billboardManagement/admin/filterByStatus';
 import {
   GetAllBillboardsController,
   GetAllBillboardsUseCase,
 } from './useCase/billboardManagement/admin/getAll';
 import {
-  ApproveBillboardController,
-  ApproveBillboardUseCase,
-} from './useCase/billboardManagement/admin/operator/approveBillboard';
-import {
-  GetAllPendingBillboardsController,
-  GetAllPendingBillboardsUseCase,
-} from './useCase/billboardManagement/admin/operator/getAllPendingBillboards';
-import {
-  DeleteAndRestoreBillboardController,
-  DeleteAndRestoreBillboardUseCase,
-} from './useCase/billboardManagement/admin/softDelete';
-import {
-  GetAllBillboardsByStatusController,
-  GetAllBillboardsByStatusUseCase,
-} from './useCase/billboardManagement/getAllByStatus';
+  RestoreBillboardController,
+  RestoreBillboardUseCase,
+} from './useCase/billboardManagement/admin/restore';
+import { 
+  SearchBillBoardByNameController,
+  SearchBillboardByNameUseCase, 
+} from './useCase/billboardManagement/admin/searchByName';
 import {
   GetAllBillboardsWithFilterController,
   GetAllBillboardsWithFilterUseCase,
-} from './useCase/billboardManagement/getAllWithFilter';
+} from './useCase/billboardManagement/anonymousUser/getAllBillboardsWithFilter';
 import {
-  PublishBillboardController,
-  PublishBillboardUseCase,
-} from './useCase/billboardManagement/publish';
-import { GetAllUserController } from './useCase/user/getAll/GetAllUser.controller';
-import { GetAllUserUseCase } from './useCase/user/getAll/GetAllUser.useCase';
-import { GetOneUserController, GetOneUserUseCase } from './useCase/user/getOne';
+  ApproveBillboardController,
+  ApproveBillboardUseCase,
+} from './useCase/billboardManagement/operator/approveBillboardByOperator';
+import {
+  GetAllPendingBillboardsController,
+  GetAllPendingBillboardsUseCase,
+} from './useCase/billboardManagement/operator/getAllPendingBillboardsByOperator';
+import {
+  RejectBillboardController,
+  RejectBillboardUseCase,
+} from './useCase/billboardManagement/operator/rejectBillboardByOperator';
+import {
+  GetAllBillboardsByStatusController,
+  GetAllBillboardsByStatusUseCase,
+} from './useCase/billboardManagement/owner/getAllBillboardsByStatus';
+import {
+  GetAllOperatorsController,
+  GetAllOperatorsUseCase,
+} from './useCase/operationManagement/getAllOperators';
+import {
+  DeleteAndRestorePlansController,
+  DeleteAndRestorePlansUseCase,
+} from './useCase/planManagement/admin/softDeletePlans';
+import { CheckExpiredContractService } from './useCase/taskScheduling/checkExpiredContract';
+import { CheckExpiredSubscriberService } from './useCase/taskScheduling/checkExpiredSubscriber';
+import { TestCronService } from './useCase/taskScheduling/testCron';
+// import {
+//   PublishBillboardController,
+//   PublishBillboardUseCase,
+// } from './useCase/billboardManagement/publishBillboard';
 import {
   LoggedInUserRoleCheckController,
   LoggedInUserRoleCheckUseCase,
-} from './useCase/user/loggedInUserRoleCheck';
+} from './useCase/userManagement/checkRoleCurrentUser';
+import {
+  GetAllUsersController,
+  GetAllUsersUseCase,
+} from './useCase/userManagement/getAllUsers';
+import {
+  GetOneUserController,
+  GetOneUserUseCase,
+} from './useCase/userManagement/getOneUser';
+import { 
+  SearchUserByNameController, 
+  SearchUserByNameUseCase, 
+} from './useCase/userManagement/searchByname';
 import {
   DeleteAndRestoreUserController,
   DeleteAndRestoreUserUseCase,
-} from './useCase/user/softDelete';
+} from './useCase/userManagement/softDeleteUser';
 import { User } from './users/user.entity';
 import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Billboard]),
+    TypeOrmModule.forFeature([User, Billboard, Plan, Subscription, Contract]),
     UsersModule,
     BillboardsModule,
     PlansModule,
+    ContractsModule,
     AddressModule,
   ],
   controllers: [
     GetAllBillboardsController,
     ApproveBillboardController,
+    RejectBillboardController,
     GetAllPendingBillboardsController,
-    DeleteAndRestoreBillboardController,
+    RestoreBillboardController,
     GetAllBillboardsByStatusController,
     GetAllBillboardsWithFilterController,
-    PublishBillboardController,
-    GetAllUserController,
-    GetOneUserController,
+    // PublishBillboardController,
+    GetAllOperatorsController,
+    GetAllUsersController,
     LoggedInUserRoleCheckController,
     DeleteAndRestoreUserController,
+    GetOneUserController,
+    DeleteAndRestorePlansController,
+    SearchBillBoardByNameController,
+    SearchUserByNameController,
+    FilterByStatusController,
   ],
   providers: [
     GetAllBillboardsUseCase,
     ApproveBillboardUseCase,
+    RejectBillboardUseCase,
     GetAllPendingBillboardsUseCase,
-    DeleteAndRestoreBillboardUseCase,
+    RestoreBillboardUseCase,
     GetAllBillboardsByStatusUseCase,
     GetAllBillboardsWithFilterUseCase,
-    PublishBillboardUseCase,
-    GetAllUserUseCase,
-    GetOneUserUseCase,
+    // PublishBillboardUseCase,
+    GetAllOperatorsUseCase,
+    GetAllUsersUseCase,
     LoggedInUserRoleCheckUseCase,
     DeleteAndRestoreUserUseCase,
+    GetOneUserUseCase,
+    DeleteAndRestorePlansUseCase,
+    CheckExpiredSubscriberService,
+    CheckExpiredContractService,
+    TestCronService,
+    SearchBillboardByNameUseCase,
+    SearchUserByNameUseCase,
+    FilterByStatusUseCase,
   ],
 })
 export class ApiModule {}

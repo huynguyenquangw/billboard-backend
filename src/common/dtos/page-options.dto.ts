@@ -1,7 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator';
-import { FilterMode } from 'src/constants/filter-mode';
 import { Order } from '../../constants';
 
 export class PageOptionsDto {
@@ -31,12 +30,6 @@ export class PageOptionsDto {
   @Max(50)
   @IsOptional()
   readonly take?: number = 10;
-
-  @ApiPropertyOptional({
-    default: FilterMode.DEFAULT,
-  })
-  @IsOptional()
-  readonly filterMode?: FilterMode = FilterMode.DEFAULT;
 
   get skip(): number {
     return (this.page - 1) * this.take;

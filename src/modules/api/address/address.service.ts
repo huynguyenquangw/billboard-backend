@@ -92,6 +92,17 @@ export class AddressService {
     return city.districts;
   }
 
+  async getAllDistrictsOfHcm(): Promise<District[]> {
+    const city: City = await this.cityRepository.findOne({
+      where: { name: 'Ho Chi Minh City' },
+      relations: ['districts'],
+    });
+    if (!city) {
+      throw new NotFoundException('No city');
+    }
+    return city.districts;
+  }
+
   /**
    * Ward
    */

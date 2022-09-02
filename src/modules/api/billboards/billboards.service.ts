@@ -1,28 +1,45 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { StatusType } from 'src/constants';
-import { Brackets, Repository, UpdateResult } from 'typeorm';
+import { PageMetaDto } from 'src/common/dtos/page-meta.dto';
+import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
+import { PageDto } from 'src/common/dtos/page.dto';
+import { isStringArrayEqual } from 'src/common/helper/isStringArrayEqual.helper';
+import { RoleType, StatusType, UserType } from 'src/constants';
+import { ActionType } from 'src/constants/action-type';
+import { S3Service } from 'src/shared/services/aws-s3.service';
+import { In, Repository, UpdateResult } from 'typeorm';
 import { AddressService } from '../address/address.service';
 import { District } from '../address/district.entity';
+import { PlansService } from '../plans/plans.service';
 import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
 import { Billboard } from './billboard.entity';
 import { BillboardInfoDto } from './dto/billboard-info.dto';
 import { CreateBillboardDto } from './dto/create-billboard.dto';
+import { UpdateBillboardDto } from './dto/update-billboard.dto';
+import { Picture } from './entities/picture.entity';
+import { PreviousClient } from './previousClients.entity';
 
 @Injectable()
 export class BillboardsService {
   constructor(
     @InjectRepository(Billboard)
     private readonly _billboardRepo: Repository<Billboard>,
+    @InjectRepository(PreviousClient)
+    private readonly _previousClientRepo: Repository<PreviousClient>,
     @InjectRepository(District)
     private readonly _districtRepo: Repository<District>,
-    private readonly addressService: AddressService,
-    private readonly usersService: UsersService,
+    @InjectRepository(Picture)
+    private readonly _pictureRepo: Repository<Picture>,
+    private readonly _addressService: AddressService,
+    private readonly _usersService: UsersService,
+    private readonly _s3Service: S3Service,
+    private readonly _planService: PlansService,
   ) {}
 
   /**
@@ -55,38 +72,168 @@ export class BillboardsService {
    * Create a billboard
    */
   async create(
+    body: CreateBillboardDto,
     ownerId: string,
-    createBillboardDto: CreateBillboardDto,
+    // files?: Array<Express.Multer.File>,
   ): Promise<Billboard> {
-    const owner: User = await this.usersService.findOne(ownerId);
+    const preClientIds = body.previousClientIds ? body.previousClientIds : [];
+    const owner: User = await this._usersService.findOne(ownerId);
+    const ward = await this._addressService.getOneWard(body.wardId);
+
     if (!owner) {
-      throw new NotFoundException(ownerId);
+      throw new NotFoundException('User not found');
+    }
+    if (!ward) {
+      throw new NotFoundException('Address not found');
+    }
+    if (owner?.userType === UserType.FREE) {
+      throw new ForbiddenException(
+        'Need to subcribe before creating a new billboard',
+      );
     }
 
-    const ward = await this.addressService.getOneWard(
-      createBillboardDto.wardId,
-    );
+    let preClients: PreviousClient[] = [];
+    preClients = await this._previousClientRepo.find({
+      where: { id: In(preClientIds) },
+    });
 
     const newBillboard: Billboard = await this._billboardRepo.create({
-      ...createBillboardDto,
+      ...body,
       owner: owner,
       ward: ward,
+      previousClients: preClients,
     });
 
     await this._billboardRepo.save(newBillboard);
+
     return newBillboard;
+  }
+
+  /**
+   * Update a billboard
+   */
+  async update(
+    id: string,
+    body: UpdateBillboardDto,
+  ): Promise<BillboardInfoDto> {
+    const billboardToUpdate = await this._billboardRepo.findOne({
+      where: [
+        { id: id, status: StatusType.DRAFT },
+        { id: id, status: StatusType.REJECTED },
+      ],
+      relations: ['ward'],
+    });
+
+    if (!billboardToUpdate) {
+      throw new NotFoundException('Billboard with given id does not exist!');
+    }
+
+    const preClientIds = body.previousClientIds ? body.previousClientIds : [];
+
+    const { previousClientIds, wardId, ...info } = body;
+    let updateBody = { ...info };
+
+    // check pre Clients
+    let preClients: PreviousClient[] = billboardToUpdate.previousClients;
+    const currentPreClientIds = billboardToUpdate.previousClients.map(
+      (a) => a.id,
+    );
+    if (
+      body.previousClientIds &&
+      !isStringArrayEqual(body.previousClientIds, currentPreClientIds)
+    ) {
+      preClients = await this._previousClientRepo.find({
+        where: { id: In(preClientIds) },
+      });
+      const updateBodyWithClients = {
+        ...updateBody,
+        previousClients: preClients,
+      };
+      updateBody = updateBodyWithClients;
+    }
+
+    // check ward
+    if (
+      body.wardId &&
+      billboardToUpdate.ward.id &&
+      body.wardId != billboardToUpdate.ward.id
+    ) {
+      const ward = await this._addressService.getOneWard(body.wardId);
+      const updateBodyWithWard = {
+        ...updateBody,
+        ward: ward,
+      };
+      updateBody = { ...updateBodyWithWard };
+    }
+
+    await this._billboardRepo.update(id, {
+      ...updateBody,
+    });
+
+    const updatedBillboard = await this.findOneWithRelations(id);
+    return updatedBillboard.toDto();
+  }
+
+  /**
+   * delete a billboard
+   */
+  async delete(
+    currentUserId: string,
+    billboardId: string,
+  ): Promise<UpdateResult | void> {
+    const billboardToDelete = await this._billboardRepo.findOne({
+      where: {
+        id: billboardId,
+      },
+      relations: ['owner'],
+    });
+    if (!billboardToDelete) {
+      throw new NotFoundException('Billboard with given id does not exist!');
+    }
+
+    const currentUser = await this._usersService.findOne(currentUserId);
+    if (!currentUser) {
+      throw new NotFoundException('User with token does not exist!');
+    }
+
+    if (
+      currentUser.role !== RoleType.ADMIN &&
+      (billboardToDelete.owner.id !== currentUserId ||
+        billboardToDelete.status !== StatusType.DRAFT)
+    ) {
+      throw new ForbiddenException('Cannot delete this billboard');
+    }
+
+    // DELETE billboard
+    billboardToDelete.status = StatusType.DELETED;
+    await this._billboardRepo.save(billboardToDelete);
+    console.log(billboardToDelete);
+    const deleteResponse = await this._billboardRepo.softDelete(billboardId);
+
+    if (!deleteResponse.affected) {
+      throw new NotFoundException('Billboard with given id does not exist!');
+    }
+
+    return deleteResponse;
   }
 
   //Search and get all billboard by address2, rentalPrice, size_x, size_y, district(not done)
   async search(
+    pageOptionsDto: PageOptionsDto,
     selectedAdrress2: string,
     selectedPrice: number,
     selectedSize_x: number,
     selectedSize_y: number,
     selectedDistrict: string,
-  ): Promise<Billboard[]> {
-    return this._billboardRepo.find({
-      relations: ['ward', 'ward.district', 'ward.district.city'],
+    selectedName: string,
+  ): Promise<PageDto<BillboardInfoDto>> {
+    const searchBillboard = await this._billboardRepo.findAndCount({
+      order: {
+        createdAt: pageOptionsDto.order,
+      },
+      skip: pageOptionsDto.skip,
+      take: pageOptionsDto.take,
+      relations: ['ward', 'ward.district', 'ward.district.city', 'owner'],
       where: {
         address2: selectedAdrress2,
         rentalPrice: selectedPrice,
@@ -98,72 +245,21 @@ export class BillboardsService {
             name: selectedDistrict,
           },
         },
+        name: selectedName,
       },
-      withDeleted: true,
     });
+
+    const itemCount = searchBillboard[1];
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+
+    return new PageDto(searchBillboard[0], pageMetaDto);
   }
 
   /**
-   * Update a billboard
-   */
-  async update(
-    id: string,
-    body: CreateBillboardDto,
-  ): Promise<BillboardInfoDto> {
-    const billboardToUpdate = await this._billboardRepo.findOne({
-      where: { id: id, status: StatusType.DRAFT },
-    });
-
-    if (!billboardToUpdate) {
-      throw new NotFoundException();
-    }
-
-    let fullUpdateData = {};
-    if (body.wardId) {
-      const { wardId, ...updateData } = body;
-      const ward = await this.addressService.getOneWard(wardId);
-
-      fullUpdateData = { ...updateData, ward: { ...ward } };
-    } else {
-      fullUpdateData = body;
-    }
-
-    await this._billboardRepo.update(id, fullUpdateData);
-    const updatedBillboard = await this.findOneWithRelations(id);
-    return updatedBillboard.toDto();
-  }
-
-  /**
-   * delete a billboard
-   */
-  async delete(
-    ownerId: string,
-    billboardId: string,
-  ): Promise<UpdateResult | void> {
-    const billboardToDelete = await this._billboardRepo.findOne({
-      where: { id: billboardId, status: StatusType.DRAFT },
-      relations: ['owner'],
-    });
-
-    // Check owner
-    if (billboardToDelete.owner.id !== ownerId) {
-      throw new ForbiddenException('Cannot delete this billboard');
-    }
-
-    const deleteResponse = await this._billboardRepo.softDelete(billboardId);
-    if (!deleteResponse.affected) {
-      throw new NotFoundException('Draft billboard with given id is not exist');
-    }
-    return deleteResponse;
-  }
-
-  /**
-   * Get approved billboard list within district
    */
   async getCountOfBillboardsWithinDistrict(cityName: string): Promise<any> {
     const defaultCity = 'Ho Chi Minh City';
     const city = cityName || defaultCity;
-    console.log(city);
 
     const queryBuilder = this._districtRepo.createQueryBuilder('districts');
 
@@ -171,7 +267,7 @@ export class BillboardsService {
       .leftJoin('districts.wards', 'wards')
       .leftJoin('wards.billboards', 'billboards')
       .leftJoin('districts.city', 'cities')
-      .where('cities.name = :name', { name: city })
+      .leftJoin('billboards.owner', 'users')
       // .orWhere(
       //   new Brackets((qb) => {
       //     qb.where('billboards.status = :status', {
@@ -179,25 +275,124 @@ export class BillboardsService {
       //     }).andWhere('billboards.isRented = :isRented', { isRented: false });
       //   }),
       // )
-      .orWhere(
-        new Brackets((qb) => {
-          qb.where('cities.name = :name', { name: city }).andWhere(
-            'billboards.status = :status',
-            {
-              status: StatusType.APPROVED,
-            },
-          );
-        }),
-      )
+      // .orWhere(
+      //   new Brackets((qb) => {
+      //     qb.where('cities.name = :name', { name: city }).andWhere(
+      //       'billboards.status = :status',
+      //       {
+      //         status: StatusType.APPROVED,
+      //       },
+      //     );
+      //   }),
+      // )
+      .where('cities.name = :name', { name: city })
+      .andWhere('users.userType = :subcribedUser', {
+        subcribedUser: UserType.SUBSCRIBED,
+      })
       .select('districts.id', 'id')
       .addSelect('districts.name', 'name')
       .addSelect('districts.abbreviation', 'abbreviation')
       .addSelect('districts.photoUrl', 'photoUrl')
-      .addSelect('COUNT(DISTINCT(billboards.id)) as billboard_count')
+      .addSelect(
+        `COUNT(DISTINCT(billboards.id)) filter (where billboards.status = '${StatusType.APPROVED}' or billboards.status = '${StatusType.RENTED}') as billboard_count`,
+      )
       .groupBy('districts.id');
 
     const result = await queryBuilder.getRawMany();
 
     return result;
+  }
+
+  /*
+   *Get All PreviousClient
+   */
+  async getAllPreviousClient(): Promise<PreviousClient[]> {
+    return await this._previousClientRepo.find();
+  }
+
+  /**
+   * Publish a billboard
+   */
+  async publish(ownerId: string, billboardId: string): Promise<Billboard> {
+    try {
+      const selectedBillboard = await this.findOneWithRelations(billboardId);
+
+      // check right owner
+      if (selectedBillboard.owner.id !== ownerId) {
+        throw new ForbiddenException('Forbidden');
+      }
+      if (selectedBillboard?.owner?.userType === UserType.FREE) {
+        throw new ForbiddenException(
+          'Need to subcribe before request for approval',
+        );
+      }
+
+      // check current status - DRAFT
+      if (selectedBillboard.status !== StatusType.DRAFT) {
+        throw new Error('Cannot publish this billboard');
+      }
+
+      // Check subscription
+      const sub = await this._planService.checkSubByUser(ownerId);
+      if (!sub) {
+        throw new NotFoundException('Subscription not found');
+      }
+      if (sub.remainingPost < 1) {
+        throw new ForbiddenException(
+          'You have reach the maximum amount of your posts',
+        );
+      }
+
+      await this._planService.handleRemainingPost(sub, ActionType.DEC);
+      selectedBillboard.status = StatusType.PENDING;
+      return this._billboardRepo.save(selectedBillboard);
+    } catch (error) {
+      console.error(error);
+      return error;
+    }
+  }
+
+  /**
+   * Add billboard's pictures
+   */
+  async addPictures(
+    billboardId: string,
+    uploadPictures: Array<Express.Multer.File>,
+  ) {
+    const billboardToAddPictures = await this._billboardRepo.findOne({
+      where: { id: billboardId, status: StatusType.DRAFT },
+    });
+
+    if (!billboardToAddPictures) {
+      throw new NotFoundException('Billboard with given id does not exist!');
+    }
+
+    if (!uploadPictures) {
+      throw new BadRequestException(
+        'Uploading list is empty. A billboard must has at least 5 pictures',
+      );
+    }
+
+    const isBillboardFilesUpdated =
+      await this._s3Service.isBillboardFilesUpdated(
+        billboardToAddPictures,
+        uploadPictures,
+      );
+
+    if (!isBillboardFilesUpdated) {
+      throw new Error('Upload failed!');
+    }
+    return { uploaded_billboard_id: billboardId };
+  }
+
+  /*
+   *Get One PreviousClient
+   */
+  async getOnePreviousClient(getOneId: string): Promise<PreviousClient> {
+    return await this._previousClientRepo.findOne({
+      where: {
+        id: getOneId,
+      },
+    });
   }
 }

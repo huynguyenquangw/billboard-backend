@@ -61,6 +61,16 @@ export class ApiConfigService {
     };
   }
 
+  // AWS S3
+  // get awsS3Config() {
+  //   return {
+  //     region: this.getString('AWS_REGION'),
+  //     bucketName: this.getString('AWS_BUCKET_NAME'),
+  //     accessKeyId: this.getString('AWS_ACCESS_KEY_ID'),
+  //     secretAccessKey: this.getString('AWS_SECRET_ACCESS_KEY'),
+  //   };
+  // }
+
   //   get postgresConfig(): TypeOrmModuleOptions {
   //     let entities = [
   //       __dirname + '/../../modules/**/*.entity{.ts,.js}',
@@ -110,15 +120,6 @@ export class ApiConfigService {
   //       migrationsRun: true,
   //       logging: this.getBoolean('ENABLE_ORM_LOGS'),
   //       namingStrategy: new SnakeNamingStrategy(),
-  //     };
-  //   }
-
-  // AWS S3
-  //   get awsS3Config() {
-  //     return {
-  //       bucketRegion: this.getString('AWS_S3_BUCKET_REGION'),
-  //       bucketApiVersion: this.getString('AWS_S3_API_VERSION'),
-  //       bucketName: this.getString('AWS_S3_BUCKET_NAME'),
   //     };
   //   }
 }

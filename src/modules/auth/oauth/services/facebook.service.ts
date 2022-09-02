@@ -1,20 +1,15 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { sign } from 'jsonwebtoken';
 import { AuthType } from 'src/constants';
-import { User } from 'src/modules/api/users/user.entity';
 import { UsersService } from 'src/modules/api/users/users.service';
-import { Repository } from 'typeorm';
 import { LoginPayLoadDto } from '../dto/login-payload.dto';
 
 @Injectable()
 export class FacebookService {
   constructor(
-    @InjectRepository(User)
-    protected userRepository: Repository<User>,
-    private readonly http: HttpService,
-    private readonly usersService: UsersService,
+    private readonly _http: HttpService,
+    private readonly _usersService: UsersService,
   ) {}
 
   async facebookLogin(loginPayloadDto: LoginPayLoadDto) {
@@ -22,33 +17,37 @@ export class FacebookService {
     const info_fields = 'id,name,birthday,email,gender,picture';
     const info_url = `https://graph.facebook.com/me?fields=${info_fields}&access_token=${social_access_token}`;
     try {
-      const res = await this.http.get(info_url).toPromise();
-      console.log(res.data);
-      const userId = await this.findOrCreateUser(res);
+      const res = await this._http.get(info_url).toPromise();
 
-      const apiResponse = {
+      const user = await this.findOrCreateUser(res);
+
+      const apiSuccessResponse = {
         status: { code: 200, message: 'SUCCESS' },
         data: {
           access_token: sign(
             {
-              userId: userId,
+              userId: user.id,
             },
             process.env.SOFTDEV_BILLBOARD_SECRET,
           ),
         },
       };
-      return apiResponse;
+      return apiSuccessResponse;
     } catch (error) {
       console.error(error);
     }
   }
 
   async findOrCreateUser(response) {
-    let userId = '';
-    const user = await this.usersService.findExistUser(
-      response.data.email,
+    const user = await this._usersService.findExistUser(
+      // response.data.
       AuthType.FACEBOOK,
+      response.data.email,
     );
+
+    if (user?.deletedAt) {
+      throw new UnauthorizedException('Cannot login with a banned account');
+    }
 
     if (!user) {
       const userData = {
@@ -58,13 +57,11 @@ export class FacebookService {
         name: response.data.name,
         avatar: response.data.picture.data.url,
       };
-      const newUser = await this.usersService.create(userData);
+      const newUser = await this._usersService.create(userData);
 
-      userId = newUser.id;
-      return userId;
+      return newUser;
     }
 
-    userId = user.id;
-    return userId;
+    return user;
   }
 }
