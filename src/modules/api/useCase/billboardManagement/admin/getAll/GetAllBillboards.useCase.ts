@@ -63,17 +63,6 @@ export class GetAllBillboardsUseCase {
       .leftJoinAndSelect('wards.district', 'districts')
       .leftJoinAndSelect('districts.city', 'cities')
       .leftJoinAndSelect('billboards.owner', 'users')
-    if (status) {
-      queryBuilder.where('billboards.status = :selectedStatus', {
-        selectedStatus: status,
-      })
-    }
-    if (name) {
-      queryBuilder.andWhere('lower(billboards.name) like :selectedName', {
-        selectedName: `%${name.toLowerCase()}%`,
-      })
-    }
-    ;
 
     switch (isActive) {
       case 'active':
@@ -87,6 +76,18 @@ export class GetAllBillboardsUseCase {
       default:
         break;
     }
+
+    if (status) {
+      queryBuilder.where('billboards.status = :selectedStatus', {
+        selectedStatus: status,
+      })
+    }
+    if (name) {
+      queryBuilder.andWhere('lower(billboards.name) like :selectedName', {
+        selectedName: `%${name.toLowerCase()}%`,
+      })
+    }
+    ;
 
     const itemCount = await queryBuilder.getCount();
     const { entities } = await queryBuilder.getRawAndEntities();

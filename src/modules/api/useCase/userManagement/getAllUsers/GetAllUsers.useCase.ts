@@ -57,11 +57,6 @@ export class GetAllUsersUseCase {
       .leftJoinAndSelect('users.ward', 'wards')
       .leftJoinAndSelect('wards.district', 'districts')
       .leftJoinAndSelect('districts.city', 'cities');
-      if(name){
-        queryBuilder.where('lower(users.name) like :selectedName',{
-          selectedName: `%${name.toLowerCase()}%`
-        })
-      }
 
     switch (isActive) {
       case 'active':
@@ -74,6 +69,12 @@ export class GetAllUsersUseCase {
         break;
       default:
         break;
+    }
+
+    if(name){
+      queryBuilder.where('lower(users.name) like :selectedName',{
+        selectedName: `%${name.toLowerCase()}%`
+      })
     }
 
     const itemCount = await queryBuilder.getCount();
