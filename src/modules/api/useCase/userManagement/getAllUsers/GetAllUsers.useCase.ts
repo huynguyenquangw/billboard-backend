@@ -72,7 +72,7 @@ export class GetAllUsersUseCase {
     }
 
     if(name){
-      queryBuilder.where('lower(users.name) like :selectedName',{
+      queryBuilder.andWhere('lower(users.name) like :selectedName',{
         selectedName: `%${name.toLowerCase()}%`
       })
     }
