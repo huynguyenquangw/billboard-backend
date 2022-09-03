@@ -293,7 +293,7 @@ export class BillboardsService {
       .addSelect('districts.abbreviation', 'abbreviation')
       .addSelect('districts.photoUrl', 'photoUrl')
       .addSelect(
-        `COUNT(DISTINCT(billboards.id)) filter (where (billboards.status = '${StatusType.APPROVED}' or billboards.status = '${StatusType.RENTED}') and billboards.owner.userType = '${UserType.SUBSCRIBED}') as billboard_count`,
+        `COUNT(DISTINCT(billboards.id)) filter (where (billboards.status = '${StatusType.APPROVED}' or billboards.status = '${StatusType.RENTED}') and users.userType = '${UserType.SUBSCRIBED}') as billboard_count`,
       )
       .groupBy('districts.id');
 
