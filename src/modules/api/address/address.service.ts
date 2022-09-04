@@ -149,15 +149,15 @@ export class AddressService {
   }
 
   async createWards(wards: Array<CreateWardDto>): Promise<Ward[]> {
-    const district = await this.districtRepository.findOne({
-      where: { id: wards[0].districtId },
-    });
+    // const district = await this.districtRepository.findOne({
+    //   where: { id: wards[0].districtId },
+    // });
     const newWards = [];
     wards.forEach(async (ward) => {
-      // const { districtId, ...wardToCreate } = ward;
-      // const district = await this.districtRepository.findOne({
-      //   where: { id: districtId },
-      // });
+      const { districtId, ...wardToCreate } = ward;
+      const district = await this.districtRepository.findOne({
+        where: { id: districtId },
+      });
 
       const newWard = await this.wardRepository.create({
         ...ward,
@@ -189,5 +189,11 @@ export class AddressService {
       throw new NotFoundException(districtId);
     }
     return district.wards;
+  }
+
+  async deleteWards(ids: Array<string>) {
+    return await this.wardRepository.delete({
+      id: In(ids),
+    });
   }
 }

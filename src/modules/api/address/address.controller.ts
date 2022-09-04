@@ -103,7 +103,7 @@ export class AddressController {
 
   @Delete('districts/delete')
   @ApiOperation({ summary: 'Get all wards of a district' })
-  async deleteDistrict(@Body() ids: Array<string>): Promise<any> {
+  async deleteDistricts(@Body() ids: Array<string>): Promise<any> {
     return await this.addressService.deleteDistricts(ids);
   }
 
@@ -138,5 +138,11 @@ export class AddressController {
   @ApiOperation({ summary: 'Get 1 ward' })
   async getOneWard(@Param('id') id: string): Promise<Ward> {
     return await this.addressService.getOneWard(id);
+  }
+
+  @Delete('wards/delete')
+  @ApiOperation({ summary: 'Delete all wards' })
+  async deleteDistrict(@Body() ids: Array<string>): Promise<any> {
+    return await this.addressService.deleteWards(ids);
   }
 }
