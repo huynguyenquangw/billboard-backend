@@ -42,7 +42,6 @@ export class CheckExpiredContractService {
       };
     });
     this.logger.debug(expiredContractAndUserIds);
-    console.log(expiredContractAndUserIds);
 
     const contractQueryBuilder =
       this._contractRepo.createQueryBuilder('contracts');

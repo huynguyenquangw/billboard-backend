@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { PageDto } from 'src/common/dtos/page.dto';
-import { RoleType } from 'src/constants';
+import { RoleType, StatusType } from 'src/constants';
 import { Roles } from 'src/decorators/roles.decorator';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { BillboardInfoDto } from 'src/modules/api/billboards/dto/billboard-info.dto';
@@ -59,8 +59,10 @@ export class GetAllBillboardsController {
   @HttpCode(HttpStatus.OK)
   async getAllActive(
     @Param('activeVal') activeVal: string = 'inactive' || 'active',
+    @Query('status') status: StatusType,
+    @Query('searchName') name: string,
     @Query() pageOptionsDto: BillboardsPageOptionsDto,
   ): Promise<PageDto<BillboardInfoDto>> {
-    return this.useCase.execute(activeVal, pageOptionsDto);
+    return this.useCase.execute(activeVal, status, name, pageOptionsDto);
   }
 }

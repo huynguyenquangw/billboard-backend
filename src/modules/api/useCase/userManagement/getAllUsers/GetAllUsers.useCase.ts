@@ -45,6 +45,7 @@ export class GetAllUsersUseCase {
    */
   async execute(
     isActive: string,
+    name: string,
     pageOptionsDto: UsersPageOptionsDto,
   ): Promise<PageDto<UserInfoDto>> {
     const queryBuilder = this._userRepository.createQueryBuilder('users');
@@ -68,6 +69,12 @@ export class GetAllUsersUseCase {
         break;
       default:
         break;
+    }
+
+    if(name){
+      queryBuilder.andWhere('lower(users.name) like :selectedName',{
+        selectedName: `%${name.toLowerCase()}%`
+      })
     }
 
     const itemCount = await queryBuilder.getCount();

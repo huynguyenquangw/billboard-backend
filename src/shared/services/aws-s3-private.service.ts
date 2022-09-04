@@ -142,8 +142,6 @@ export class S3PrivateService {
 
     // check update case
     if (currentFile) {
-      console.log('Case: Update');
-
       const dbDeleteResponse = await this.deleteFileFromDatabase(contract);
       const s3DeleteResponse = await this.deleteFileFromS3(contract);
 
@@ -152,8 +150,6 @@ export class S3PrivateService {
       }
     }
     if (!currentFile) {
-      console.log('Case: Add');
-
       return true;
     }
   }

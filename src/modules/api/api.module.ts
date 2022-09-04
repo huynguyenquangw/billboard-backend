@@ -9,10 +9,6 @@ import { Plan } from './plans/entities/plans.entity';
 import { Subscription } from './plans/entities/subscriptions.entity';
 import { PlansModule } from './plans/plans.module';
 import {
-   FilterByStatusController, 
-   FilterByStatusUseCase,
-} from './useCase/billboardManagement/admin/filterByStatus';
-import {
   GetAllBillboardsController,
   GetAllBillboardsUseCase,
 } from './useCase/billboardManagement/admin/getAll';
@@ -20,10 +16,6 @@ import {
   RestoreBillboardController,
   RestoreBillboardUseCase,
 } from './useCase/billboardManagement/admin/restore';
-import { 
-  SearchBillBoardByNameController,
-  SearchBillboardByNameUseCase, 
-} from './useCase/billboardManagement/admin/searchByName';
 import {
   GetAllBillboardsWithFilterController,
   GetAllBillboardsWithFilterUseCase,
@@ -71,10 +63,6 @@ import {
   GetOneUserController,
   GetOneUserUseCase,
 } from './useCase/userManagement/getOneUser';
-import { 
-  SearchUserByNameController, 
-  SearchUserByNameUseCase, 
-} from './useCase/userManagement/searchByname';
 import {
   DeleteAndRestoreUserController,
   DeleteAndRestoreUserUseCase,
@@ -106,9 +94,6 @@ import { UsersModule } from './users/users.module';
     DeleteAndRestoreUserController,
     GetOneUserController,
     DeleteAndRestorePlansController,
-    SearchBillBoardByNameController,
-    SearchUserByNameController,
-    FilterByStatusController,
   ],
   providers: [
     GetAllBillboardsUseCase,
@@ -128,9 +113,6 @@ import { UsersModule } from './users/users.module';
     CheckExpiredSubscriberService,
     CheckExpiredContractService,
     TestCronService,
-    SearchBillboardByNameUseCase,
-    SearchUserByNameUseCase,
-    FilterByStatusUseCase,
   ],
 })
 export class ApiModule {}

@@ -207,7 +207,6 @@ export class BillboardsService {
     // DELETE billboard
     billboardToDelete.status = StatusType.DELETED;
     await this._billboardRepo.save(billboardToDelete);
-    console.log(billboardToDelete);
     const deleteResponse = await this._billboardRepo.softDelete(billboardId);
 
     if (!deleteResponse.affected) {
@@ -286,15 +285,15 @@ export class BillboardsService {
       //   }),
       // )
       .where('cities.name = :name', { name: city })
-      .andWhere('users.userType = :subcribedUser', {
-        subcribedUser: UserType.SUBSCRIBED,
-      })
+      // .andWhere('users.userType = :subcribedUser', {
+      //   subcribedUser: UserType.SUBSCRIBED,
+      // })
       .select('districts.id', 'id')
       .addSelect('districts.name', 'name')
       .addSelect('districts.abbreviation', 'abbreviation')
       .addSelect('districts.photoUrl', 'photoUrl')
       .addSelect(
-        `COUNT(DISTINCT(billboards.id)) filter (where billboards.status = '${StatusType.APPROVED}' or billboards.status = '${StatusType.RENTED}') as billboard_count`,
+        `COUNT(DISTINCT(billboards.id)) filter (where (billboards.status = '${StatusType.APPROVED}' or billboards.status = '${StatusType.RENTED}') and users.userType = '${UserType.SUBSCRIBED}') as billboard_count`,
       )
       .groupBy('districts.id');
 
