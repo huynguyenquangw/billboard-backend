@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 // import { Point } from 'geojson';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { City } from './city.entity';
 import { District } from './district.entity';
 import { CreateCityDto } from './dto/create-city.dto';
@@ -101,6 +101,12 @@ export class AddressService {
       throw new NotFoundException('No city');
     }
     return city.districts;
+  }
+
+  async deleteDistricts(ids: Array<string>) {
+    return await this.districtRepository.delete({
+      id: In(ids),
+    });
   }
 
   /**

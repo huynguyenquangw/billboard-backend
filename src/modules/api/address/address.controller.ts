@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -83,6 +84,12 @@ export class AddressController {
   @ApiOperation({ summary: 'Get all wards of a district' })
   getAllWardsOfADistrict(@Param('id') id: string): Promise<Ward[]> {
     return this.addressService.getAllWardsByDistrictId(id);
+  }
+
+  @Delete('districts/delete')
+  @ApiOperation({ summary: 'Get all wards of a district' })
+  deleteDistrict(@Body() ids: Array<string>): Promise<any> {
+    return this.addressService.deleteDistricts(ids);
   }
 
   /**
