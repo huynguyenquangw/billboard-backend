@@ -78,11 +78,6 @@ export class AddressService {
     });
     const newDistricts = [];
     districts.forEach(async (district) => {
-      // const { cityId, ...districtToCreate } = district;
-      // const city = await this.cityRepository.findOne({
-      //   where: { id: cityId },
-      // });
-
       const newDistrict = await this.districtRepository.create({
         ...district,
         city: city,
