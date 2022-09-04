@@ -23,8 +23,7 @@ export class PromoteAdminUseCase {
       const user = await this._userRepository.findOne({
         where: { id: id, role: RoleType.USER },
       });
-      await this._userRepository.save({ ...user, role: RoleType.ADMIN });
-      return user;
+      return await this._userRepository.save({ ...user, role: RoleType.ADMIN });
     } catch (error) {
       console.error(error);
       return error;
