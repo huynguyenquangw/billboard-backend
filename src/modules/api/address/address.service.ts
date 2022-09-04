@@ -70,6 +70,29 @@ export class AddressService {
     return await this.districtRepository.save(newDistrict);
   }
 
+  async createDistricts(
+    districts: Array<CreateDistrictDto>,
+  ): Promise<District[]> {
+    const city = await this.cityRepository.findOne({
+      where: { id: districts[0].cityId },
+    });
+    const newDistricts = [];
+    districts.forEach(async (district) => {
+      // const { cityId, ...districtToCreate } = district;
+      // const city = await this.cityRepository.findOne({
+      //   where: { id: cityId },
+      // });
+
+      const newDistrict = await this.districtRepository.create({
+        ...district,
+        city: city,
+      });
+      newDistricts.push(await this.districtRepository.save(newDistrict));
+    });
+
+    return newDistricts;
+  }
+
   async getOneDistrict(id: string): Promise<District> {
     const district = await this.districtRepository.findOne({
       where: { id },
@@ -123,6 +146,27 @@ export class AddressService {
       district: district,
     });
     return await this.wardRepository.save(newWard);
+  }
+
+  async createWards(wards: Array<CreateWardDto>): Promise<Ward[]> {
+    const district = await this.districtRepository.findOne({
+      where: { id: wards[0].districtId },
+    });
+    const newWards = [];
+    wards.forEach(async (ward) => {
+      // const { districtId, ...wardToCreate } = ward;
+      // const district = await this.districtRepository.findOne({
+      //   where: { id: districtId },
+      // });
+
+      const newWard = await this.wardRepository.create({
+        ...ward,
+        district: district,
+      });
+      newWards.push(await this.wardRepository.save(newWard));
+    });
+
+    return newWards;
   }
 
   async getOneWard(id: string): Promise<Ward> {
