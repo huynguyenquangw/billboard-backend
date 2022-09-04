@@ -46,19 +46,32 @@ export class ApiConfigService {
   // ------------
 
   get typeOrmConfig(): TypeOrmModuleOptions {
-    return {
-      type: 'postgres',
-      host: this.getString('DATABASE_HOST'),
-      port: this.getNumber('DATABASE_PORT'),
-      database: this.getString('DATABASE_NAME'),
-      username: this.getString('DATABASE_USER'),
-      password: this.getString('DATABASE_PASSWORD'),
-      entities: ['dist/**/*.entity.{ts,js}'],
-      migrations: ['dist/migrations/*.{ts,js}'],
-      migrationsTableName: 'typeorm_migrations',
-      logger: 'file',
-      synchronize: true, // never use TRUE in production!
-    };
+    if (process.env.DATABASE_URL) {
+      return {
+        type: 'postgres',
+        url: this.getString('DATABASE_URL'),
+        host: this.getString('DATABASE_HOST'),
+        port: this.getNumber('DATABASE_PORT'),
+        database: this.getString('DATABASE_NAME'),
+        username: this.getString('DATABASE_USER'),
+        password: this.getString('DATABASE_PASSWORD'),
+        entities: ['dist/**/*.entity.{ts,js}'],
+        migrations: ['dist/migrations/*.{ts,js}'],
+        migrationsTableName: 'typeorm_migrations',
+        logger: 'file',
+        synchronize: true, // never use TRUE in production!
+      };
+    } else {
+      return {
+        type: 'postgres',
+        url: this.getString('DATABASE_URL'),
+        entities: ['dist/**/*.entity.{ts,js}'],
+        migrations: ['dist/migrations/*.{ts,js}'],
+        migrationsTableName: 'typeorm_migrations',
+        logger: 'file',
+        synchronize: true, // never use TRUE in production!
+      };
+    }
   }
 
   // AWS S3
