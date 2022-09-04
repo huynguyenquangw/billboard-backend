@@ -10,12 +10,12 @@ import {
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { TransformInterceptor } from 'src/interceptors/TransformInterceptor.service';
 import { User } from 'src/modules/api/users/user.entity';
-import { PromoteAdminUseCase } from '.';
+import { PromoteAdminUseCase } from './PromoteAdmin.useCase';
 
 @Controller('api/admin/promote')
 @ApiTags('Admin')
 export class PromoteAdminController {
-  constructor(private readonly useCase: PromoteAdminUseCase) {} // public readonly useCase: GetAllUserUseCase
+  constructor(private readonly useCase: PromoteAdminUseCase) {}
 
   @Post(':id')
   @ApiOperation({ summary: 'Promote a user to admin' })
