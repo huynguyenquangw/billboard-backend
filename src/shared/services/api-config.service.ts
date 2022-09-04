@@ -70,6 +70,9 @@ export class ApiConfigService {
         migrationsTableName: 'typeorm_migrations',
         logger: 'file',
         synchronize: true, // never use TRUE in production!
+        ssl: {
+          rejectUnauthorized: false,
+        },
       };
     }
   }
