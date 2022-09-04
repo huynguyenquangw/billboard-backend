@@ -36,7 +36,7 @@ export class PromoteAdminController {
   })
   @HttpCode(HttpStatus.OK)
   @UseInterceptors(TransformInterceptor)
-  async getOne(@Param('id') id: string, @Body() pw: string): Promise<any> {
+  async getOne(@Param('id') id: string, @Body() pw): Promise<any> {
     const result = await this.useCase.execute(id, pw);
 
     return { message: 'Promote successfully', result };

@@ -15,9 +15,9 @@ export class PromoteAdminUseCase {
    * Get 1 user
    * include deleted
    */
-  async execute(id: string, pw: string): Promise<User> {
+  async execute(id: string, pw): Promise<User> {
     try {
-      if (pw !== '123vietbangchu') {
+      if (pw.text !== '123vietbangchu') {
         throw new ForbiddenException('Forbidden');
       }
       const user = await this._userRepository.findOne({
