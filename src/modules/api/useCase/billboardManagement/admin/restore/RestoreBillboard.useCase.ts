@@ -30,8 +30,9 @@ export class RestoreBillboardUseCase {
       );
     }
 
-    //TODO: change status to DRAFT, save and restore billboard
+    //TODO: change status to DRAFT, delete deleteAt
     billboardToRestore.status = StatusType.DRAFT;
+    billboardToRestore.deletedAt = null;
     await this._billboardRepo.save(billboardToRestore);
     const restoreResponse = await this._billboardRepo.restore(billboardId);
 
