@@ -289,6 +289,18 @@ export class BillboardsService {
     return await this._previousClientRepo.find();
   }
 
+  async createMultiplePreClients(clients: Array<any>) {
+    const newClients = [];
+    clients.forEach(async (client) => {
+      const newClient = await this._previousClientRepo.create({
+        ...client,
+      });
+      newClients.push(await this._previousClientRepo.save(newClient));
+    });
+
+    return newClients;
+  }
+
   /**
    * Publish a billboard
    */
