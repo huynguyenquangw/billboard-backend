@@ -110,13 +110,6 @@ export class BillboardsController {
     );
   }
 
-  //TODO: delete after fix
-  @Get('fixname')
-  @HttpCode(HttpStatus.OK)
-  async fixName(): Promise<any> {
-    return await this._billboardsService.fixName();
-  }
-
   /**
    * only OWNER can
    * Soft-delete billboard
