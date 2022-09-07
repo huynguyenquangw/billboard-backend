@@ -267,27 +267,7 @@ export class BillboardsService {
       .leftJoin('wards.billboards', 'billboards')
       .leftJoin('districts.city', 'cities')
       .leftJoin('billboards.owner', 'users')
-      // .orWhere(
-      //   new Brackets((qb) => {
-      //     qb.where('billboards.status = :status', {
-      //       status: StatusType.APPROVED,
-      //     }).andWhere('billboards.isRented = :isRented', { isRented: false });
-      //   }),
-      // )
-      // .orWhere(
-      //   new Brackets((qb) => {
-      //     qb.where('cities.name = :name', { name: city }).andWhere(
-      //       'billboards.status = :status',
-      //       {
-      //         status: StatusType.APPROVED,
-      //       },
-      //     );
-      //   }),
-      // )
       .where('cities.name = :name', { name: city })
-      // .andWhere('users.userType = :subcribedUser', {
-      //   subcribedUser: UserType.SUBSCRIBED,
-      // })
       .select('districts.id', 'id')
       .addSelect('districts.name', 'name')
       .addSelect('districts.abbreviation', 'abbreviation')
@@ -392,6 +372,24 @@ export class BillboardsService {
       where: {
         id: getOneId,
       },
+    });
+  }
+
+  async fixName() {
+    const underline = '_';
+    const queryBuilder = await this._billboardRepo.createQueryBuilder(
+      'billboards',
+    );
+
+    await queryBuilder.where('billboards.name like :underline', {
+      underline: `%${underline}%`,
+    });
+
+    const billboards: Billboard[] = await queryBuilder.getRawMany();
+
+    billboards.forEach(async (billboard) => {
+      const newName = billboard.name.replace('_', ' ');
+      await this._billboardRepo.save({ ...billboard, name: newName });
     });
   }
 }
