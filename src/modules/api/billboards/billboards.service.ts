@@ -374,22 +374,4 @@ export class BillboardsService {
       },
     });
   }
-
-  async fixName() {
-    const underline = '_';
-    const queryBuilder = await this._billboardRepo.createQueryBuilder(
-      'billboards',
-    );
-
-    await queryBuilder.where('billboards.name like :underline', {
-      underline: `%${underline}%`,
-    });
-
-    const billboards: Billboard[] = await queryBuilder.getRawMany();
-
-    billboards.forEach(async (billboard) => {
-      const newName = billboard.name.replace('_', ' ');
-      await this._billboardRepo.save({ ...billboard, name: newName });
-    });
-  }
 }

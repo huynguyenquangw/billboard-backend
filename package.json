@@ -1,12 +1,12 @@
 {
-  "name": "backend",
-  "version": "0.0.1",
+  "name": "Billboard-Api",
+  "version": "1.0.0",
   "description": "",
-  "author": "",
+  "author": "Soft Dev",
   "private": true,
   "license": "UNLICENSED",
   "engines": {
-    "node": "18.x",
+    "node": "16.x",
     "yarn": "1.x"
   },
   "scripts": {
