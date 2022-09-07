@@ -267,27 +267,7 @@ export class BillboardsService {
       .leftJoin('wards.billboards', 'billboards')
       .leftJoin('districts.city', 'cities')
       .leftJoin('billboards.owner', 'users')
-      // .orWhere(
-      //   new Brackets((qb) => {
-      //     qb.where('billboards.status = :status', {
-      //       status: StatusType.APPROVED,
-      //     }).andWhere('billboards.isRented = :isRented', { isRented: false });
-      //   }),
-      // )
-      // .orWhere(
-      //   new Brackets((qb) => {
-      //     qb.where('cities.name = :name', { name: city }).andWhere(
-      //       'billboards.status = :status',
-      //       {
-      //         status: StatusType.APPROVED,
-      //       },
-      //     );
-      //   }),
-      // )
       .where('cities.name = :name', { name: city })
-      // .andWhere('users.userType = :subcribedUser', {
-      //   subcribedUser: UserType.SUBSCRIBED,
-      // })
       .select('districts.id', 'id')
       .addSelect('districts.name', 'name')
       .addSelect('districts.abbreviation', 'abbreviation')
@@ -307,6 +287,18 @@ export class BillboardsService {
    */
   async getAllPreviousClient(): Promise<PreviousClient[]> {
     return await this._previousClientRepo.find();
+  }
+
+  async createMultiplePreClients(clients: Array<any>) {
+    const newClients = [];
+    clients.forEach(async (client) => {
+      const newClient = await this._previousClientRepo.create({
+        ...client,
+      });
+      newClients.push(await this._previousClientRepo.save(newClient));
+    });
+
+    return newClients;
   }
 
   /**
