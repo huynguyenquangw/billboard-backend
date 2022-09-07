@@ -64,6 +64,10 @@ import {
   GetOneUserUseCase,
 } from './useCase/userManagement/getOneUser';
 import {
+  PromoteAdminController,
+  PromoteAdminUseCase,
+} from './useCase/userManagement/promoteAdmin';
+import {
   DeleteAndRestoreUserController,
   DeleteAndRestoreUserUseCase,
 } from './useCase/userManagement/softDeleteUser';
@@ -91,6 +95,7 @@ import { UsersModule } from './users/users.module';
     GetAllOperatorsController,
     GetAllUsersController,
     LoggedInUserRoleCheckController,
+    PromoteAdminController,
     DeleteAndRestoreUserController,
     GetOneUserController,
     DeleteAndRestorePlansController,
@@ -107,6 +112,7 @@ import { UsersModule } from './users/users.module';
     GetAllOperatorsUseCase,
     GetAllUsersUseCase,
     LoggedInUserRoleCheckUseCase,
+    PromoteAdminUseCase,
     DeleteAndRestoreUserUseCase,
     GetOneUserUseCase,
     DeleteAndRestorePlansUseCase,

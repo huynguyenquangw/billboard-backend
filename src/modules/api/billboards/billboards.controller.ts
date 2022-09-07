@@ -19,6 +19,7 @@ import {
   ApiForbiddenResponse,
   ApiNoContentResponse,
   ApiNotFoundResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
@@ -164,6 +165,21 @@ export class BillboardsController {
   @HttpCode(HttpStatus.OK)
   async publish(@Req() req, @Param('id') id: string): Promise<any> {
     return this._billboardsService.publish(req.user.id, id);
+  }
+
+  @Post('preClient/create/multiple')
+  @ApiOperation({ summary: 'Create new previous clients' })
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description: 'Successfully create new previous clients',
+  })
+  @UseInterceptors(TransformInterceptor)
+  async createMultiplePreClients(@Body() clients: Array<any>): Promise<any> {
+    const result = await this._billboardsService.createMultiplePreClients(
+      clients,
+    );
+
+    return { message: 'Create new previous clients successfully', result };
   }
 
   //Get All PreviousClient

@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 // import { Point } from 'geojson';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { City } from './city.entity';
 import { District } from './district.entity';
 import { CreateCityDto } from './dto/create-city.dto';
@@ -70,6 +70,24 @@ export class AddressService {
     return await this.districtRepository.save(newDistrict);
   }
 
+  async createDistricts(
+    districts: Array<CreateDistrictDto>,
+  ): Promise<District[]> {
+    const city = await this.cityRepository.findOne({
+      where: { id: districts[0].cityId },
+    });
+    const newDistricts = [];
+    districts.forEach(async (district) => {
+      const newDistrict = await this.districtRepository.create({
+        ...district,
+        city: city,
+      });
+      newDistricts.push(await this.districtRepository.save(newDistrict));
+    });
+
+    return newDistricts;
+  }
+
   async getOneDistrict(id: string): Promise<District> {
     const district = await this.districtRepository.findOne({
       where: { id },
@@ -103,6 +121,12 @@ export class AddressService {
     return city.districts;
   }
 
+  async deleteDistricts(ids: Array<string>) {
+    return await this.districtRepository.delete({
+      id: In(ids),
+    });
+  }
+
   /**
    * Ward
    */
@@ -117,6 +141,27 @@ export class AddressService {
       district: district,
     });
     return await this.wardRepository.save(newWard);
+  }
+
+  async createWards(wards: Array<CreateWardDto>): Promise<Ward[]> {
+    // const district = await this.districtRepository.findOne({
+    //   where: { id: wards[0].districtId },
+    // });
+    const newWards = [];
+    wards.forEach(async (ward) => {
+      const { districtId, ...wardToCreate } = ward;
+      const district = await this.districtRepository.findOne({
+        where: { id: districtId },
+      });
+
+      const newWard = await this.wardRepository.create({
+        ...ward,
+        district: district,
+      });
+      newWards.push(await this.wardRepository.save(newWard));
+    });
+
+    return newWards;
   }
 
   async getOneWard(id: string): Promise<Ward> {
@@ -139,5 +184,11 @@ export class AddressService {
       throw new NotFoundException(districtId);
     }
     return district.wards;
+  }
+
+  async deleteWards(ids: Array<string>) {
+    return await this.wardRepository.delete({
+      id: In(ids),
+    });
   }
 }
