@@ -47,7 +47,10 @@ export class ContractsService {
     // update billboard toRented
     await this._billboardRepo.save({
       ...billboard,
-      ...{ status: StatusType.RENTED },
+      ...{
+        status: StatusType.RENTED,
+        rentedCounter: billboard.rentedCounter + 1,
+      },
     });
 
     return newContract;
