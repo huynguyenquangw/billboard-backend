@@ -205,6 +205,9 @@ export class BillboardsService {
     }
 
     // DELETE billboard
+    if (billboardToDelete.approvedAt) {
+      billboardToDelete.approvedAt = null;
+    }
     billboardToDelete.status = StatusType.DELETED;
     await this._billboardRepo.save(billboardToDelete);
     const deleteResponse = await this._billboardRepo.softDelete(billboardId);
